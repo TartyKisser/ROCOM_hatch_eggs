@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>洛克王国家园孵蛋最优排布</title>
+    <title>洛克王国家园孵蛋最优排布计算系统</title>
     <style>
         :root {
             --primary: #6366f1;
@@ -508,6 +508,16 @@
                 top: 2px;
                 left: 2px;
             }
+            /* --- 请在这里新增以下代码 --- */
+            .yellow-box {
+                width: 95%; /* 限制在屏幕内，两边留出一点空隙 */
+                box-sizing: border-box; /* 确保 padding 不会额外增加宽度 */
+                padding: 12px 15px; /* 移动端稍微缩小一点内边距，显得更精致 */
+                font-size: 0.85rem; /* 稍微缩小字体 */
+                border-radius: 12px;
+                word-wrap: break-word; /* 【核心修复】强制长链接打断换行，防止撑爆盒子 */
+                word-break: break-all; 
+            }
         }
     </style>
 </head>
@@ -519,7 +529,7 @@
             <p class="art-style desc-font">输入你的精灵，生成最优家园排布方案，最大化生蛋配对路径</p>
         
             <div class="yellow-box">
-                欢迎广大玩家免费使用本网站，也欢迎各位大佬们能基于本项目做出更好的作品！<br>
+                欢迎广大玩家免费使用本网站，也希望各位大佬们能基于本项目做出更好的作品！<br>
                 GitHub项目地址：<a href="https://github.com/TartyKisser/ROCOM_hatch_eggs" target="_blank" class="box-link">https://github.com/TartyKisser/ROCOM_hatch_eggs</a><br>
                 本网站部分数据来源于洛克王国世界WIKI：<a href="https://wiki.biligame.com/rocom" target="_blank" class="box-link">https://wiki.biligame.com/rocom</a>
             </div>
