@@ -346,7 +346,76 @@
             background: rgba(255,255,255,0.18);
             font-size: 0.92rem;
             font-weight: 900;
+        }
+
+        .detail-header-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
             margin-bottom: 12px;
+        }
+
+        .detail-value-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .detail-value-chip {
+            display: inline-flex;
+            position: relative;
+            align-items: center;
+            gap: 7px;
+            min-height: 32px;
+            padding: 6px 10px;
+            border: 1px solid rgba(255,255,255,0.24);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.18);
+            color: white;
+            font-size: 0.82rem;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .detail-value-chip.image-value {
+            width: 136px;
+            height: 54px;
+            min-height: 54px;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .value-badge-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .value-badge-number {
+            position: absolute;
+            left: 64%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 42px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 950;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(124, 28, 126, 0.5);
+        }
+
+        .value-logo {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            flex: 0 0 auto;
         }
 
         .detail-title {
@@ -621,6 +690,14 @@
                 padding: 20px;
             }
 
+            .detail-header-row {
+                flex-direction: column;
+            }
+
+            .detail-value-row {
+                justify-content: flex-start;
+            }
+
             .portrait-wrap {
                 min-height: 220px;
             }
@@ -753,6 +830,10 @@
         const ATTRIBUTE_LOGOS = Object.fromEntries(
             ATTRIBUTES.map(attr => [attr, `./web_images/types/${attr}.png`])
         );
+        const VALUE_LOGOS = {
+            baseStarlightValue: './web_images/values/base-starlight-value.png',
+            baseReviewRockCoin: './web_images/values/base-review-rock-coin.png'
+        };
         const ATTRIBUTE_COLORS = {
             '普通': '#3F89B4',
             '草': '#4EBC73',
@@ -855,6 +936,48 @@
             return `<span class="type-chip">${renderAttributeLogo(attr)}<span>${escapeHtml(attr)}</span></span>`;
         }
 
+        function displayValue(value) {
+            return value === undefined || value === null || value === '' ? '-' : value;
+        }
+
+        function renderValueLogo(key) {
+            const logo = VALUE_LOGOS[key] || '';
+            return logo
+                ? `<img class="value-logo" src="${escapeHtml(logo)}" alt="" aria-hidden="true" onerror="this.style.display='none'">`
+                : '';
+        }
+
+        function renderImageValueChip(key, label, value) {
+            const logo = VALUE_LOGOS[key] || '';
+            const labelText = `${label}：${displayValue(value)}`;
+            return `
+                <span class="detail-value-chip image-value" title="${escapeHtml(labelText)}" aria-label="${escapeHtml(labelText)}">
+                    <img class="value-badge-image" src="${escapeHtml(logo)}" alt="" aria-hidden="true" onerror="this.style.display='none'">
+                    <span class="value-badge-number">${escapeHtml(displayValue(value))}</span>
+                </span>
+            `;
+        }
+
+        function renderDetailValueChip(key, label, value) {
+            if (key === 'baseStarlightValue') {
+                return renderImageValueChip(key, label, value);
+            }
+
+            return `
+                <span class="detail-value-chip">
+                    ${renderValueLogo(key)}
+                    <span>${escapeHtml(label)}：${escapeHtml(displayValue(value))}</span>
+                </span>
+            `;
+        }
+
+        function renderDetailValues(record) {
+            return [
+                renderDetailValueChip('baseStarlightValue', '基础星光值', record.baseStarlightValue),
+                renderDetailValueChip('baseReviewRockCoin', '基础回顾洛克贝', record.baseReviewRockCoin)
+            ].join('');
+        }
+
         function renderAttributeChips(record) {
             const attributes = record.attributes && record.attributes.length ? record.attributes : ['无属性'];
             return attributes.map(renderAttributeChip).join('');
@@ -873,7 +996,7 @@
             const groups = recordEggGroups(record);
             const eggChips = groups.length
                 ? groups.map(group => `<span class="type-chip egg-chip">蛋组：${escapeHtml(group)}</span>`).join('')
-                : '<span class="type-chip egg-chip">蛋组：未知</span>';
+                : '<span class="type-chip egg-chip">蛋组：不可繁殖</span>';
 
             return attributeChips + eggChips;
         }
@@ -1002,7 +1125,12 @@
                         <img class="portrait" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" onerror="this.style.display='none'">
                     </div>
                     <div>
-                        <div class="detail-number">No.${escapeHtml(record.number)}</div>
+                        <div class="detail-header-row">
+                            <div class="detail-number">No.${escapeHtml(record.number)}</div>
+                            <div class="detail-value-row">
+                                ${renderDetailValues(record)}
+                            </div>
+                        </div>
                         <h2 class="detail-title">${escapeHtml(record.title)}</h2>
                         <div class="type-row">
                             ${renderDetailChips(record)}
