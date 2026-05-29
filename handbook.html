@@ -28,7 +28,7 @@
             padding: 20px;
             font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text);
-            background: url('./bg.jpg') no-repeat center center fixed,
+            background: url('./web_images/bg.jpg') no-repeat center center fixed,
                         linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             background-size: cover;
         }
@@ -174,10 +174,22 @@
             margin-top: 12px;
         }
 
+        .filter-block + .filter-block {
+            margin-top: 10px;
+        }
+
+        .filter-label {
+            margin-top: 12px;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
         .filter-chip,
         .type-chip {
             display: inline-flex;
             align-items: center;
+            gap: 5px;
             min-height: 28px;
             padding: 5px 9px;
             border: 1px solid rgba(99,102,241,0.16);
@@ -187,6 +199,13 @@
             font-size: 0.82rem;
             font-weight: 800;
             cursor: pointer;
+        }
+
+        .type-logo {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            flex: 0 0 auto;
         }
 
         .filter-chip.active {
@@ -206,9 +225,9 @@
             border: 1px solid rgba(255,255,255,0.55);
             border-radius: 18px;
             padding: 14px;
-            background:
+            background: var(--sprite-bg,
                 linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.84)),
-                radial-gradient(circle at top right, rgba(99,102,241,0.16), transparent 42%);
+                radial-gradient(circle at top right, rgba(99,102,241,0.16), transparent 42%));
             box-shadow: 0 14px 34px rgba(15,23,42,0.14);
             display: flex;
             flex-direction: column;
@@ -298,9 +317,9 @@
             gap: 26px;
             align-items: center;
             color: white;
-            background:
+            background: var(--sprite-bg,
                 linear-gradient(135deg, rgba(79,70,229,0.94), rgba(14,165,233,0.74)),
-                radial-gradient(circle at top right, rgba(236,72,153,0.48), transparent 42%);
+                radial-gradient(circle at top right, rgba(236,72,153,0.48), transparent 42%));
         }
 
         .portrait-wrap {
@@ -695,10 +714,17 @@
         <main id="galleryView" class="view active">
             <section class="panel controls">
                 <div class="search-row">
-                    <input id="searchInput" class="search-input" type="search" placeholder="搜索编号、名称、属性或分布..." autocomplete="off">
+                    <input id="searchInput" class="search-input" type="search" placeholder="搜索编号、名称、属性、蛋组或分布..." autocomplete="off">
                     <button id="clearSearch" class="btn" type="button">清空</button>
                 </div>
-                <div id="filters" class="filters"></div>
+                <div class="filter-block">
+                    <div class="filter-label">系别</div>
+                    <div id="filters" class="filters"></div>
+                </div>
+                <div class="filter-block">
+                    <div class="filter-label">蛋组</div>
+                    <div id="eggFilters" class="filters"></div>
+                </div>
             </section>
 
             <section id="cardGrid" class="card-grid">
@@ -724,15 +750,42 @@
         const STAT_LABELS = ['生命', '物攻', '魔攻', '物防', '魔防', '速度'];
         const STAT_MAX = 180;
         const ATTRIBUTES = ['普通', '草', '火', '水', '光', '地', '冰', '龙', '电', '毒', '虫', '武', '翼', '萌', '幽', '恶', '机械', '幻'];
+        const ATTRIBUTE_LOGOS = Object.fromEntries(
+            ATTRIBUTES.map(attr => [attr, `./web_images/types/${attr}.png`])
+        );
+        const ATTRIBUTE_COLORS = {
+            '普通': '#3F89B4',
+            '草': '#4EBC73',
+            '火': '#DB5525',
+            '水': '#6AA9FE',
+            '光': '#4FC0FF',
+            '地': '#9A7E3F',
+            '冰': '#5FADDD',
+            '龙': '#ED4962',
+            '电': '#E7C506',
+            '毒': '#BA62E0',
+            '虫': '#9ECE21',
+            '武': '#FF9636',
+            '翼': '#3EC7CA',
+            '萌': '#FC7CAC',
+            '幽': '#9446EC',
+            '恶': '#CF467A',
+            '机械': '#40CBA9',
+            '幻': '#9FA7F8'
+        };
+        const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
 
         let records = [];
         let filteredRecords = [];
+        let eggGroups = [];
         let selectedId = '';
         let activeAttribute = '';
+        let activeEggGroup = '';
 
         const searchInput = document.getElementById('searchInput');
         const clearSearch = document.getElementById('clearSearch');
         const filters = document.getElementById('filters');
+        const eggFilters = document.getElementById('eggFilters');
         const cardGrid = document.getElementById('cardGrid');
         const detailPanel = document.getElementById('detailPanel');
         const resultCount = document.getElementById('resultCount');
@@ -760,12 +813,66 @@
             return value === undefined || value === null || value === '' ? '-' : value;
         }
 
-        function renderDetailChips(record) {
+        function hexToRgba(hex, alpha) {
+            const normalizedHex = String(hex || FALLBACK_ATTRIBUTE_COLOR).replace('#', '');
+            const value = normalizedHex.length === 3
+                ? normalizedHex.split('').map(char => char + char).join('')
+                : normalizedHex.padEnd(6, '0').slice(0, 6);
+            const red = parseInt(value.slice(0, 2), 16);
+            const green = parseInt(value.slice(2, 4), 16);
+            const blue = parseInt(value.slice(4, 6), 16);
+            return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+        }
+
+        function recordAttributes(record) {
+            return record.attributes && record.attributes.length ? record.attributes : ['普通'];
+        }
+
+        function attributeColor(attr) {
+            return ATTRIBUTE_COLORS[attr] || FALLBACK_ATTRIBUTE_COLOR;
+        }
+
+        function recordBackgroundStyle(record, mode = 'card') {
+            const colors = recordAttributes(record).slice(0, 2).map(attributeColor);
+            const firstColor = colors[0] || FALLBACK_ATTRIBUTE_COLOR;
+            const secondColor = colors[1] || firstColor;
+
+            if (mode === 'detail') {
+                return `--sprite-bg: linear-gradient(135deg, ${hexToRgba(firstColor, 0.95)}, ${hexToRgba(secondColor, 0.78)}), radial-gradient(circle at top right, rgba(255,255,255,0.22), transparent 42%);`;
+            }
+
+            return `--sprite-bg: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.72)), linear-gradient(135deg, ${hexToRgba(firstColor, 0.42)}, ${hexToRgba(secondColor, 0.42)});`;
+        }
+
+        function renderAttributeLogo(attr) {
+            const logo = ATTRIBUTE_LOGOS[attr] || '';
+            return logo
+                ? `<img class="type-logo" src="${escapeHtml(logo)}" alt="" aria-hidden="true" onerror="this.style.display='none'">`
+                : '';
+        }
+
+        function renderAttributeChip(attr) {
+            return `<span class="type-chip">${renderAttributeLogo(attr)}<span>${escapeHtml(attr)}</span></span>`;
+        }
+
+        function renderAttributeChips(record) {
             const attributes = record.attributes && record.attributes.length ? record.attributes : ['无属性'];
-            const attributeChips = attributes.map(attr => `<span class="type-chip">${escapeHtml(attr)}</span>`).join('');
-            const eggGroups = Array.isArray(record.eggGroups) ? record.eggGroups.filter(Boolean) : [];
-            const eggChips = eggGroups.length
-                ? eggGroups.map(group => `<span class="type-chip egg-chip">蛋组：${escapeHtml(group)}</span>`).join('')
+            return attributes.map(renderAttributeChip).join('');
+        }
+
+        function recordEggGroups(record) {
+            return Array.isArray(record.eggGroups) ? record.eggGroups.filter(Boolean) : [];
+        }
+
+        function buildEggGroups() {
+            eggGroups = [...new Set(records.flatMap(recordEggGroups))].sort((a, b) => a.localeCompare(b, 'zh-CN'));
+        }
+
+        function renderDetailChips(record) {
+            const attributeChips = renderAttributeChips(record);
+            const groups = recordEggGroups(record);
+            const eggChips = groups.length
+                ? groups.map(group => `<span class="type-chip egg-chip">蛋组：${escapeHtml(group)}</span>`).join('')
                 : '<span class="type-chip egg-chip">蛋组：未知</span>';
 
             return attributeChips + eggChips;
@@ -795,7 +902,7 @@
             filters.innerHTML = [
                 `<button class="filter-chip ${activeAttribute === '' ? 'active' : ''}" type="button" data-attr="">全部</button>`,
                 ...ATTRIBUTES.map(attr => (
-                    `<button class="filter-chip ${activeAttribute === attr ? 'active' : ''}" type="button" data-attr="${escapeHtml(attr)}">${escapeHtml(attr)}</button>`
+                    `<button class="filter-chip ${activeAttribute === attr ? 'active' : ''}" type="button" data-attr="${escapeHtml(attr)}">${renderAttributeLogo(attr)}<span>${escapeHtml(attr)}</span></button>`
                 ))
             ].join('');
 
@@ -805,14 +912,30 @@
                     applyFilters();
                 });
             });
+
+            eggFilters.innerHTML = [
+                `<button class="filter-chip ${activeEggGroup === '' ? 'active' : ''}" type="button" data-egg-group="">全部</button>`,
+                ...eggGroups.map(group => (
+                    `<button class="filter-chip ${activeEggGroup === group ? 'active' : ''}" type="button" data-egg-group="${escapeHtml(group)}">${escapeHtml(group)}</button>`
+                ))
+            ].join('');
+
+            eggFilters.querySelectorAll('.filter-chip').forEach(button => {
+                button.addEventListener('click', () => {
+                    activeEggGroup = button.dataset.eggGroup || '';
+                    applyFilters();
+                });
+            });
         }
 
         function applyFilters() {
             const keyword = normalize(searchInput.value);
             filteredRecords = records.filter(record => {
-                const matchesKeyword = !keyword || record.searchText.includes(keyword);
-                const matchesAttribute = !activeAttribute || record.attributes.includes(activeAttribute);
-                return matchesKeyword && matchesAttribute;
+                const searchableText = normalize([record.searchText, ...recordEggGroups(record)].join(''));
+                const matchesKeyword = !keyword || searchableText.includes(keyword);
+                const matchesAttribute = !activeAttribute || recordAttributes(record).includes(activeAttribute);
+                const matchesEggGroup = !activeEggGroup || recordEggGroups(record).includes(activeEggGroup);
+                return matchesKeyword && matchesAttribute && matchesEggGroup;
             });
             renderFilters();
             renderCards();
@@ -826,14 +949,14 @@
             }
 
             cardGrid.innerHTML = filteredRecords.map(record => `
-                <button class="sprite-card" type="button" data-id="${escapeHtml(record.id)}">
+                <button class="sprite-card" type="button" data-id="${escapeHtml(record.id)}" style="${recordBackgroundStyle(record)}">
                     <div class="card-image-wrap">
                         <img class="card-image" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
                     </div>
                     <div class="card-number">NO.${escapeHtml(record.number)}</div>
                     <div class="card-title">${escapeHtml(record.title)}</div>
                     <div class="card-types">
-                        ${(record.attributes.length ? record.attributes : ['无属性']).map(attr => `<span class="type-chip">${escapeHtml(attr)}</span>`).join('')}
+                        ${renderAttributeChips(record)}
                     </div>
                 </button>
             `).join('');
@@ -874,7 +997,7 @@
                 : '<tr><td colspan="6">暂无技能资料。</td></tr>';
 
             detailPanel.innerHTML = `
-                <div class="detail-hero">
+                <div class="detail-hero" style="${recordBackgroundStyle(record, 'detail')}">
                     <div class="portrait-wrap">
                         <img class="portrait" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" onerror="this.style.display='none'">
                     </div>
@@ -974,6 +1097,7 @@
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
                 records = data.records || [];
+                buildEggGroups();
                 filteredRecords = records;
 
                 renderFilters();
@@ -994,6 +1118,7 @@
         clearSearch.addEventListener('click', () => {
             searchInput.value = '';
             activeAttribute = '';
+            activeEggGroup = '';
             applyFilters();
         });
         backToGallery.addEventListener('click', () => showGallery());
