@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奇遇混抓推荐 - 洛克王国世界工具站</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: rgba(226,232,240,0.9);
+            --panel: rgba(255,255,255,0.92);
+            --panel-soft: rgba(248,250,252,0.88);
+            --shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+            --success: #16a34a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            background: url('./web_images/bg.jpg') no-repeat center center fixed,
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+        }
+
+        .container {
+            width: 96%;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 42px 20px 28px;
+            color: white;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.32);
+            border-radius: 999px;
+            background: rgba(15,23,42,0.22);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .main-title {
+            font-size: 2.6rem;
+            line-height: 1.12;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-shadow: 0 4px 18px rgba(15,23,42,0.45);
+        }
+
+        .desc-font {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.94);
+            text-shadow: 0 2px 8px rgba(15,23,42,0.28);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 10px 16px;
+            border: 1px solid rgba(255,255,255,0.48);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-dark);
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(15,23,42,0.12);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99,102,241,0.48);
+        }
+
+        .count-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 36px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.84);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.55);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .controls {
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) minmax(180px, 260px) auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-input,
+        .select-input {
+            width: 100%;
+            min-height: 46px;
+            padding: 13px 15px;
+            border: 2px solid var(--border);
+            border-radius: 13px;
+            font-size: 1rem;
+            color: var(--text);
+            background: rgba(255,255,255,0.94);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .search-input:focus,
+        .select-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        .target-strip {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            padding-bottom: 2px;
+            overflow-x: auto;
+        }
+
+        .target-chip {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 38px;
+            padding: 7px 11px 7px 7px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 999px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font-size: 0.86rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .target-chip.active {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+        }
+
+        .target-chip img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.82);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .summary-tile {
+            padding: 15px;
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+
+        .summary-value {
+            color: var(--primary-dark);
+            font-size: 1.35rem;
+            font-weight: 950;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 14px;
+        }
+
+        .strategy-card {
+            overflow: hidden;
+        }
+
+        .strategy-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 13px 14px;
+            border-bottom: 1px solid rgba(226,232,240,0.82);
+            background:
+                linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.1)),
+                rgba(255,255,255,0.48);
+        }
+
+        .target-mini {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            gap: 10px;
+        }
+
+        .mini-img {
+            width: 46px;
+            height: 46px;
+            object-fit: contain;
+            flex: 0 0 auto;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.78);
+        }
+
+        .mini-label {
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            font-weight: 900;
+            margin-bottom: 2px;
+        }
+
+        .mini-name {
+            overflow: hidden;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 74px;
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 999px;
+            background: rgba(22,163,74,0.12);
+            color: var(--success);
+            font-size: 1rem;
+            font-weight: 950;
+        }
+
+        .strategy-body {
+            padding: 14px;
+        }
+
+        .pair-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+            gap: 10px;
+            align-items: center;
+        }
+
+        .plus {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(99,102,241,0.1);
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            font-weight: 950;
+        }
+
+        .sprite-card {
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid rgba(226,232,240,0.92);
+            border-radius: 14px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.72)),
+                linear-gradient(135deg, var(--type-a, #6366f1), var(--type-b, #ec4899));
+        }
+
+        .sprite-image-wrap {
+            height: 118px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.78), rgba(255,255,255,0.24) 58%, transparent);
+        }
+
+        .sprite-image {
+            max-width: 100%;
+            max-height: 112px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 16px rgba(15,23,42,0.16));
+        }
+
+        .sprite-number {
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .sprite-name {
+            overflow: hidden;
+            margin-top: 2px;
+            color: var(--text);
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .type-chip,
+        .rule-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 24px;
+            padding: 4px 7px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 900;
+        }
+
+        .type-chip {
+            color: var(--primary-dark);
+            background: rgba(99,102,241,0.08);
+            border: 1px solid rgba(99,102,241,0.14);
+        }
+
+        .type-logo {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            flex: 0 0 auto;
+        }
+
+        .rule-chip {
+            color: #be123c;
+            background: rgba(244,63,94,0.1);
+        }
+
+        .others {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(148,163,184,0.58);
+        }
+
+        .others-title {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .other-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .other-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+            max-width: 100%;
+            padding: 5px 9px 5px 5px;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.05);
+            color: var(--text);
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .other-item img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.82);
+            flex: 0 0 auto;
+        }
+
+        .empty-state {
+            padding: 26px;
+            color: var(--text-secondary);
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .load-more-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 18px 0 6px;
+        }
+
+        .footer-beian {
+            text-align: center;
+            margin-top: 40px;
+            padding-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .footer-beian a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .footer-beian a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 980px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .main-title {
+                font-size: 1.9rem;
+            }
+
+            .topbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .strategy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pair-row {
+                grid-template-columns: 1fr;
+            }
+
+            .plus {
+                justify-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hero-eyebrow">ADVENTURE</div>
+            <h1 class="main-title">奇遇混抓推荐</h1>
+            <p class="desc-font">按星光值之和排序，寻找更快触发奇遇事件的混抓组合。</p>
+        </header>
+
+        <div class="topbar">
+            <a class="btn" href="index.html">‹ 返回主页</a>
+            <div class="topbar-actions">
+                <div class="count-pill" id="resultCount">数据加载中</div>
+            </div>
+        </div>
+
+        <section class="panel controls">
+            <div class="control-grid">
+                <input id="searchInput" class="search-input" type="search" placeholder="搜索目标、混抓精灵或编号..." autocomplete="off">
+                <select id="targetSelect" class="select-input" aria-label="目标奇遇精灵">
+                    <option value="">全部奇遇精灵</option>
+                </select>
+                <button id="clearSearch" class="btn" type="button">清空</button>
+            </div>
+            <div id="targetStrip" class="target-strip"></div>
+        </section>
+
+        <section class="summary-grid">
+            <div class="panel summary-tile">
+                <div class="summary-label">奇遇目标</div>
+                <div id="targetTotal" class="summary-value">-</div>
+            </div>
+            <div class="panel summary-tile">
+                <div class="summary-label">候选混抓精灵</div>
+                <div id="candidateTotal" class="summary-value">-</div>
+            </div>
+            <div class="panel summary-tile">
+                <div class="summary-label">可触发组合</div>
+                <div id="pairTotal" class="summary-value">-</div>
+            </div>
+            <div class="panel summary-tile">
+                <div class="summary-label">当前策略</div>
+                <div id="strategyTotal" class="summary-value">-</div>
+            </div>
+        </section>
+
+        <main>
+            <section id="strategyGrid" class="strategy-grid">
+                <div class="panel empty-state">正在计算推荐策略...</div>
+            </section>
+            <div class="load-more-wrap">
+                <button id="loadMore" class="btn" type="button" style="display:none;">显示更多</button>
+            </div>
+        </main>
+    </div>
+
+    <div class="footer-beian">
+        <a href="https://beian.mps.gov.cn/#/query/webSearch?code=32058102002843" rel="noreferrer" target="_blank">
+            <img src="https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png" alt="" style="width: 20px; height: 20px;">
+            苏公网安备32058102002843号
+        </a>
+    </div>
+
+    <script>
+        const ATTRIBUTES = ['普通', '草', '火', '水', '光', '地', '冰', '龙', '电', '毒', '虫', '武', '翼', '萌', '幽', '恶', '机械', '幻'];
+        const ATTRIBUTE_LOGOS = Object.fromEntries(
+            ATTRIBUTES.map(attr => [attr, `./web_images/types/${attr}.png`])
+        );
+        const ATTRIBUTE_COLORS = {
+            '普通': '#3F89B4',
+            '草': '#4EBC73',
+            '火': '#DB5525',
+            '水': '#6AA9FE',
+            '光': '#4FC0FF',
+            '地': '#9A7E3F',
+            '冰': '#5FADDD',
+            '龙': '#ED4962',
+            '电': '#E7C506',
+            '毒': '#BA62E0',
+            '虫': '#9ECE21',
+            '武': '#FF9636',
+            '翼': '#3EC7CA',
+            '萌': '#FC7CAC',
+            '幽': '#9446EC',
+            '恶': '#CF467A',
+            '机械': '#40CBA9',
+            '幻': '#9FA7F8'
+        };
+        const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
+        const PAGE_SIZE = 80;
+
+        let records = [];
+        let adventureTargets = [];
+        let adventureNumbers = new Set();
+        let candidates = [];
+        let allStrategies = [];
+        let filteredStrategies = [];
+        let visibleCount = PAGE_SIZE;
+        let activeTarget = '';
+
+        const searchInput = document.getElementById('searchInput');
+        const targetSelect = document.getElementById('targetSelect');
+        const clearSearch = document.getElementById('clearSearch');
+        const targetStrip = document.getElementById('targetStrip');
+        const strategyGrid = document.getElementById('strategyGrid');
+        const resultCount = document.getElementById('resultCount');
+        const loadMore = document.getElementById('loadMore');
+        const targetTotal = document.getElementById('targetTotal');
+        const candidateTotal = document.getElementById('candidateTotal');
+        const pairTotal = document.getElementById('pairTotal');
+        const strategyTotal = document.getElementById('strategyTotal');
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function normalize(value) {
+            return String(value || '').replace(/\s+/g, '').toLowerCase();
+        }
+
+        function normalizeNumber(value) {
+            const digits = String(value || '').replace(/\D/g, '');
+            return digits ? digits.padStart(3, '0') : '';
+        }
+
+        function parseCsv(text) {
+            const rows = [];
+            let row = [];
+            let cell = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i += 1) {
+                const char = text[i];
+                const next = text[i + 1];
+
+                if (char === '"' && inQuotes && next === '"') {
+                    cell += '"';
+                    i += 1;
+                } else if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    row.push(cell);
+                    cell = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (char === '\r' && next === '\n') i += 1;
+                    row.push(cell);
+                    if (row.some(value => value !== '')) rows.push(row);
+                    row = [];
+                    cell = '';
+                } else {
+                    cell += char;
+                }
+            }
+
+            if (cell || row.length) {
+                row.push(cell);
+                if (row.some(value => value !== '')) rows.push(row);
+            }
+
+            const headers = rows.shift() || [];
+            return rows.map(values => Object.fromEntries(headers.map((header, index) => [header.trim(), (values[index] || '').trim()])));
+        }
+
+        function cleanList(values) {
+            return (values || []).filter(Boolean);
+        }
+
+        function setKey(values) {
+            return [...values].filter(Boolean).sort((a, b) => a.localeCompare(b, 'zh-CN')).join('|');
+        }
+
+        function intersect(a, b) {
+            const second = new Set(b);
+            return a.filter(item => second.has(item));
+        }
+
+        function subsets(values) {
+            const items = cleanList(values);
+            const result = [];
+            const total = 1 << items.length;
+            for (let mask = 1; mask < total; mask += 1) {
+                result.push(items.filter((_, index) => mask & (1 << index)));
+            }
+            return result;
+        }
+
+        function addToIndex(index, key, target) {
+            if (!key) return;
+            if (!index.has(key)) index.set(key, new Set());
+            index.get(key).add(target);
+        }
+
+        function buildTargetIndex(targets) {
+            const attributeIndex = new Map();
+            const eggIndex = new Map();
+
+            targets.forEach(target => {
+                subsets(target.attributes).forEach(items => addToIndex(attributeIndex, setKey(items), target));
+                subsets(target.eggGroups).forEach(items => addToIndex(eggIndex, setKey(items), target));
+            });
+
+            return { attributeIndex, eggIndex };
+        }
+
+        function recordAttributes(record) {
+            return cleanList(record.attributes).length ? cleanList(record.attributes) : ['普通'];
+        }
+
+        function recordEggGroups(record) {
+            return cleanList(record.eggGroups);
+        }
+
+        function attributeColor(attr) {
+            return ATTRIBUTE_COLORS[attr] || FALLBACK_ATTRIBUTE_COLOR;
+        }
+
+        function spriteStyle(record) {
+            const colors = recordAttributes(record).slice(0, 2).map(attributeColor);
+            return `--type-a:${colors[0] || FALLBACK_ATTRIBUTE_COLOR};--type-b:${colors[1] || colors[0] || FALLBACK_ATTRIBUTE_COLOR};`;
+        }
+
+        function renderAttributeLogo(attr) {
+            const logo = ATTRIBUTE_LOGOS[attr] || '';
+            return logo
+                ? `<img class="type-logo" src="${escapeHtml(logo)}" alt="" aria-hidden="true" onerror="this.style.display='none'">`
+                : '';
+        }
+
+        function renderTypeChips(record) {
+            return recordAttributes(record).map(attr => (
+                `<span class="type-chip">${renderAttributeLogo(attr)}<span>${escapeHtml(attr)}</span></span>`
+            )).join('');
+        }
+
+        function formatNo(number) {
+            return `NO.${escapeHtml(number)}`;
+        }
+
+        function renderSprite(record) {
+            return `
+                <div class="sprite-card" style="${spriteStyle(record)}">
+                    <div class="sprite-image-wrap">
+                        <img class="sprite-image" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div class="sprite-number">${formatNo(record.number)}</div>
+                    <div class="sprite-name">${escapeHtml(record.title)}</div>
+                    <div class="chip-row">${renderTypeChips(record)}</div>
+                </div>
+            `;
+        }
+
+        function renderOtherTarget(target) {
+            return `
+                <span class="other-item" title="${formatNo(target.number)} ${escapeHtml(target.title)}">
+                    <img src="${escapeHtml(target.portrait)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span>${formatNo(target.number)} ${escapeHtml(target.title)}</span>
+                </span>
+            `;
+        }
+
+        function renderStrategy(strategy) {
+            const others = strategy.otherTargets.length
+                ? strategy.otherTargets.map(renderOtherTarget).join('')
+                : '<span class="other-item">暂无</span>';
+            const ruleChips = strategy.rules.map(rule => `<span class="rule-chip">${escapeHtml(rule)}</span>`).join('');
+
+            return `
+                <article class="panel strategy-card">
+                    <div class="strategy-head">
+                        <div class="target-mini">
+                            <img class="mini-img" src="${escapeHtml(strategy.target.portrait)}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
+                            <div>
+                                <div class="mini-label">目标奇遇</div>
+                                <div class="mini-name">${formatNo(strategy.target.number)} ${escapeHtml(strategy.target.title)}</div>
+                            </div>
+                        </div>
+                        <div class="score-badge">${escapeHtml(strategy.score)}</div>
+                    </div>
+                    <div class="strategy-body">
+                        <div class="pair-row">
+                            ${renderSprite(strategy.first)}
+                            <span class="plus">+</span>
+                            ${renderSprite(strategy.second)}
+                        </div>
+                        <div class="chip-row">${ruleChips}</div>
+                        <div class="others">
+                            <div class="others-title">还可能触发</div>
+                            <div class="other-list">${others}</div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function buildStrategies() {
+            const { attributeIndex, eggIndex } = buildTargetIndex(adventureTargets);
+            const strategies = [];
+            let triggeredPairCount = 0;
+
+            for (let i = 0; i < candidates.length; i += 1) {
+                for (let j = i + 1; j < candidates.length; j += 1) {
+                    const first = candidates[i];
+                    const second = candidates[j];
+                    if (first.number === second.number) continue;
+
+                    const attributeKey = setKey(intersect(recordAttributes(first), recordAttributes(second)));
+                    const eggKey = setKey(intersect(recordEggGroups(first), recordEggGroups(second)));
+                    const targetRuleMap = new Map();
+
+                    (attributeIndex.get(attributeKey) || []).forEach(target => targetRuleMap.set(target.number, {
+                        target,
+                        rules: ['系别交集']
+                    }));
+
+                    (eggIndex.get(eggKey) || []).forEach(target => {
+                        const item = targetRuleMap.get(target.number) || { target, rules: [] };
+                        item.rules.push('蛋组交集');
+                        targetRuleMap.set(target.number, item);
+                    });
+
+                    if (!targetRuleMap.size) continue;
+
+                    triggeredPairCount += 1;
+                    const triggeredTargets = [...targetRuleMap.values()].map(item => item.target);
+
+                    targetRuleMap.forEach(item => {
+                        strategies.push({
+                            target: item.target,
+                            first,
+                            second,
+                            score: first.baseStarlightValue + second.baseStarlightValue,
+                            rules: item.rules,
+                            otherTargets: triggeredTargets.filter(target => target.number !== item.target.number),
+                            searchText: normalize([
+                                item.target.number,
+                                item.target.title,
+                                first.number,
+                                first.title,
+                                second.number,
+                                second.title,
+                                ...triggeredTargets.map(target => `${target.number}${target.title}`)
+                            ].join(' '))
+                        });
+                    });
+                }
+            }
+
+            strategies.sort((a, b) => (
+                b.score - a.score
+                || a.target.number.localeCompare(b.target.number)
+                || a.first.number.localeCompare(b.first.number)
+                || a.second.number.localeCompare(b.second.number)
+            ));
+
+            pairTotal.textContent = String(triggeredPairCount);
+            return strategies;
+        }
+
+        function renderTargetControls() {
+            targetSelect.innerHTML = [
+                '<option value="">全部奇遇精灵</option>',
+                ...adventureTargets.map(target => (
+                    `<option value="${escapeHtml(target.number)}">${formatNo(target.number)} ${escapeHtml(target.title)}</option>`
+                ))
+            ].join('');
+
+            targetStrip.innerHTML = [
+                `<button class="target-chip ${activeTarget === '' ? 'active' : ''}" type="button" data-target="">全部</button>`,
+                ...adventureTargets.map(target => `
+                    <button class="target-chip ${activeTarget === target.number ? 'active' : ''}" type="button" data-target="${escapeHtml(target.number)}">
+                        <img src="${escapeHtml(target.portrait)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                        <span>${formatNo(target.number)} ${escapeHtml(target.title)}</span>
+                    </button>
+                `)
+            ].join('');
+
+            targetStrip.querySelectorAll('.target-chip').forEach(button => {
+                button.addEventListener('click', () => {
+                    activeTarget = button.dataset.target || '';
+                    targetSelect.value = activeTarget;
+                    visibleCount = PAGE_SIZE;
+                    applyFilters();
+                });
+            });
+        }
+
+        function applyFilters() {
+            const keyword = normalize(searchInput.value);
+            filteredStrategies = allStrategies.filter(strategy => {
+                const matchesTarget = !activeTarget || strategy.target.number === activeTarget;
+                const matchesKeyword = !keyword || strategy.searchText.includes(keyword);
+                return matchesTarget && matchesKeyword;
+            });
+
+            strategyTotal.textContent = String(filteredStrategies.length);
+            resultCount.textContent = `共 ${filteredStrategies.length} 条推荐`;
+            renderTargetControls();
+            renderStrategies();
+        }
+
+        function renderStrategies() {
+            if (!filteredStrategies.length) {
+                strategyGrid.innerHTML = '<div class="panel empty-state">没有匹配的混抓策略。</div>';
+                loadMore.style.display = 'none';
+                return;
+            }
+
+            const visible = filteredStrategies.slice(0, visibleCount);
+            strategyGrid.innerHTML = visible.map(renderStrategy).join('');
+            loadMore.style.display = visibleCount < filteredStrategies.length ? 'inline-flex' : 'none';
+            loadMore.textContent = `显示更多（${Math.min(PAGE_SIZE, filteredStrategies.length - visibleCount)}）`;
+        }
+
+        async function init() {
+            try {
+                const [handbookResponse, adventureResponse] = await Promise.all([
+                    fetch('handbook_data.json'),
+                    fetch('adventure.csv')
+                ]);
+                const handbook = await handbookResponse.json();
+                const adventureRows = parseCsv(await adventureResponse.text());
+
+                records = handbook.records || [];
+                adventureNumbers = new Set(adventureRows.map(row => normalizeNumber(row['图鉴编号'])));
+                adventureTargets = adventureRows
+                    .map(row => records.find(record => record.number === normalizeNumber(row['图鉴编号'])))
+                    .filter(Boolean);
+                candidates = records.filter(record => (
+                    !adventureNumbers.has(record.number)
+                    && Number.isFinite(record.baseStarlightValue)
+                ));
+
+                targetTotal.textContent = String(adventureTargets.length);
+                candidateTotal.textContent = String(candidates.length);
+                renderTargetControls();
+                allStrategies = buildStrategies();
+                filteredStrategies = allStrategies;
+                strategyTotal.textContent = String(filteredStrategies.length);
+                resultCount.textContent = `共 ${filteredStrategies.length} 条推荐`;
+                renderStrategies();
+            } catch (error) {
+                console.error(error);
+                resultCount.textContent = '加载失败';
+                strategyGrid.innerHTML = '<div class="panel empty-state">请确认 handbook_data.json 和 adventure.csv 存在并可访问。</div>';
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            visibleCount = PAGE_SIZE;
+            applyFilters();
+        });
+
+        targetSelect.addEventListener('change', () => {
+            activeTarget = targetSelect.value;
+            visibleCount = PAGE_SIZE;
+            applyFilters();
+        });
+
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            activeTarget = '';
+            targetSelect.value = '';
+            visibleCount = PAGE_SIZE;
+            applyFilters();
+        });
+
+        loadMore.addEventListener('click', () => {
+            visibleCount += PAGE_SIZE;
+            renderStrategies();
+        });
+
+        init();
+    </script>
+</body>
+</html>
