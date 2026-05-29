@@ -411,40 +411,6 @@
             text-shadow: 0 1px 3px rgba(124, 28, 126, 0.5);
         }
 
-        .detail-value-chip.text-value {
-            gap: 9px;
-            border-color: rgba(255,255,255,0.32);
-            background:
-                linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.08)),
-                linear-gradient(135deg, rgba(255,205,126,0.34), rgba(236,72,153,0.2));
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.24);
-        }
-
-        .value-logo {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            flex: 0 0 auto;
-        }
-
-        .value-text {
-            display: inline-flex;
-            align-items: baseline;
-            gap: 5px;
-        }
-
-        .value-label {
-            color: rgba(255,255,255,0.88);
-            font-size: 0.84rem;
-        }
-
-        .value-number {
-            color: white;
-            font-size: 1rem;
-            font-weight: 950;
-            text-shadow: 0 1px 3px rgba(120, 53, 15, 0.42);
-        }
-
         .detail-title {
             font-size: clamp(2rem, 4vw, 3.3rem);
             line-height: 1.08;
@@ -967,13 +933,6 @@
             return value === undefined || value === null || value === '' ? '暂无' : value;
         }
 
-        function renderValueLogo(key) {
-            const logo = VALUE_LOGOS[key] || '';
-            return logo
-                ? `<img class="value-logo" src="${escapeHtml(logo)}" alt="" aria-hidden="true" onerror="this.style.display='none'">`
-                : '';
-        }
-
         function renderImageValueChip(key, label, value) {
             const logo = VALUE_LOGOS[key] || '';
             const labelText = `${label}：${displayValue(value)}`;
@@ -986,19 +945,7 @@
         }
 
         function renderDetailValueChip(key, label, value) {
-            if (key === 'baseStarlightValue') {
-                return renderImageValueChip(key, label, value);
-            }
-
-            return `
-                <span class="detail-value-chip text-value">
-                    ${renderValueLogo(key)}
-                    <span class="value-text">
-                        <span class="value-label">${escapeHtml(label)}：</span>
-                        <span class="value-number">${escapeHtml(displayValue(value))}</span>
-                    </span>
-                </span>
-            `;
+            return renderImageValueChip(key, label, value);
         }
 
         function renderDetailValues(record) {
