@@ -352,6 +352,10 @@
             cursor: default;
         }
 
+        .detail-hero .egg-chip {
+            background: rgba(236,72,153,0.24);
+        }
+
         .hero-copy {
             line-height: 1.8;
             color: rgba(255,255,255,0.92);
@@ -681,9 +685,8 @@
         </header>
 
         <div class="topbar">
-            <a class="btn" href="index.html">‹ 返回主页</a>
+            <button id="backToGallery" class="btn" type="button" style="display:none;">‹ 返回图鉴</button>
             <div class="topbar-actions">
-                <button id="backToGallery" class="btn" type="button" style="display:none;">‹ 返回图鉴</button>
                 <div class="count-pill" id="resultCount">数据加载中</div>
             </div>
         </div>
@@ -753,6 +756,17 @@
         function statValue(record, key) {
             const value = record.stats && record.stats[key];
             return value === undefined || value === null || value === '' ? '-' : value;
+        }
+
+        function renderDetailChips(record) {
+            const attributes = record.attributes && record.attributes.length ? record.attributes : ['无属性'];
+            const attributeChips = attributes.map(attr => `<span class="type-chip">${escapeHtml(attr)}</span>`).join('');
+            const eggGroups = Array.isArray(record.eggGroups) ? record.eggGroups.filter(Boolean) : [];
+            const eggChips = eggGroups.length
+                ? eggGroups.map(group => `<span class="type-chip egg-chip">蛋组：${escapeHtml(group)}</span>`).join('')
+                : '<span class="type-chip egg-chip">蛋组：未知</span>';
+
+            return attributeChips + eggChips;
         }
 
         function showGallery(updateHash = true) {
@@ -864,7 +878,7 @@
                         <div class="detail-number">No.${escapeHtml(record.number)}</div>
                         <h2 class="detail-title">${escapeHtml(record.title)}</h2>
                         <div class="type-row">
-                            ${(record.attributes.length ? record.attributes : ['无属性']).map(attr => `<span class="type-chip">${escapeHtml(attr)}</span>`).join('')}
+                            ${renderDetailChips(record)}
                         </div>
                         <p class="hero-copy">${escapeHtml(record.description || '暂无简介。')}</p>
                     </div>
