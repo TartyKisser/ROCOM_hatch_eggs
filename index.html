@@ -631,13 +631,15 @@
                         if (group2 && group2 !== 'null') eggGroups.push(group2);
                         if (!firstNamesById.has(paddedId)) firstNamesById.set(paddedId, name);
 
-                        const imageFileName = `${paddedId}${firstNamesById.get(paddedId)}.png`;
+                        const exactImageFileName = `${paddedId}${name}.png`;
+                        const firstImageFileName = `${paddedId}${firstNamesById.get(paddedId)}.png`;
 
                         spriteData.push({
                             id: paddedId,
                             name: name,
-                            imagePath: `rocom_imgs_standard/${encodeURIComponent(imageFileName)}`,
-                            fallbackImagePath: `rocom_imgs/${paddedId}.png`,
+                            imagePath: `rocom_imgs_standard/${encodeURIComponent(exactImageFileName)}`,
+                            fallbackImagePath: `rocom_imgs_standard/${encodeURIComponent(firstImageFileName)}`,
+                            numberedImagePath: `rocom_imgs/${paddedId}.png`,
                             eggGroups: eggGroups
                         });
                     }
@@ -654,7 +656,7 @@
 
             for (let i = 0; i < count; i++) {
                 // 增加了 id 字段用于调用图片
-                selectedSprites.push({ id: '', name: '', imagePath: '', fallbackImagePath: '', gender: 'male', eggGroups: [] });
+                selectedSprites.push({ id: '', name: '', imagePath: '', fallbackImagePath: '', numberedImagePath: '', gender: 'male', eggGroups: [] });
 
                 const row = document.createElement('div');
                 row.className = 'sprite-row';
@@ -727,6 +729,7 @@
                         selectedSprites[index].name = sprite.name;
                         selectedSprites[index].imagePath = sprite.imagePath;
                         selectedSprites[index].fallbackImagePath = sprite.fallbackImagePath;
+                        selectedSprites[index].numberedImagePath = sprite.numberedImagePath;
                         selectedSprites[index].eggGroups = sprite.eggGroups;
                         list.style.display = 'none';
                     });
@@ -946,6 +949,7 @@
                         selectedSprites[i].name = found.name;
                         selectedSprites[i].imagePath = found.imagePath;
                         selectedSprites[i].fallbackImagePath = found.fallbackImagePath;
+                        selectedSprites[i].numberedImagePath = found.numberedImagePath;
                         selectedSprites[i].eggGroups = found.eggGroups;
                     } else {
                         // 如果查不到（可能是用户乱敲的），清空内部状态以便后续报错拦截
@@ -953,6 +957,7 @@
                         selectedSprites[i].name = '';
                         selectedSprites[i].imagePath = '';
                         selectedSprites[i].fallbackImagePath = '';
+                        selectedSprites[i].numberedImagePath = '';
                         selectedSprites[i].eggGroups = [];
                     }
                 } else {
@@ -960,6 +965,7 @@
                     selectedSprites[i].name = '';
                     selectedSprites[i].imagePath = '';
                     selectedSprites[i].fallbackImagePath = '';
+                    selectedSprites[i].numberedImagePath = '';
                     selectedSprites[i].eggGroups = [];
                 }
             }
@@ -1046,12 +1052,13 @@
 
                 const imagePath = sprite.imagePath || '';
                 const fallbackImagePath = sprite.fallbackImagePath || '';
+                const numberedImagePath = sprite.numberedImagePath || '';
 
                 // 写入数字角标和中心图片
-                // onerror：优先回退到旧编号图片，仍失败则隐藏该 <img> 标签
+                // onerror：精确图失败时回退到同编号首条图片，再失败则回退到旧编号图片
                 nest.innerHTML = `
                     <span class="nest-badge">${index + 1}</span>
-                    <img class="nest-sprite-img" src="${imagePath}" data-fallback="${fallbackImagePath}" alt="${sprite.name}" onerror="if (this.dataset.fallback) { this.src = this.dataset.fallback; this.dataset.fallback = ''; } else { this.style.display='none'; }">
+                    <img class="nest-sprite-img" src="${imagePath}" data-fallback="${fallbackImagePath}" data-numbered-fallback="${numberedImagePath}" alt="${sprite.name}" onerror="if (this.dataset.fallback && this.src !== new URL(this.dataset.fallback, document.baseURI).href) { this.src = this.dataset.fallback; this.dataset.fallback = ''; } else if (this.dataset.numberedFallback) { this.src = this.dataset.numberedFallback; this.dataset.numberedFallback = ''; } else { this.style.display='none'; }">
                 `;
 
                 gridDisplay.appendChild(nest);
@@ -1097,6 +1104,7 @@
                     name: input ? input.value : sprite.name,
                     imagePath: sprite.imagePath,
                     fallbackImagePath: sprite.fallbackImagePath,
+                    numberedImagePath: sprite.numberedImagePath,
                     gender: sprite.gender,
                     eggGroups: sprite.eggGroups
                 };
@@ -1113,6 +1121,7 @@
                     selectedSprites[i].name = backupData[i].name;
                     selectedSprites[i].imagePath = backupData[i].imagePath;
                     selectedSprites[i].fallbackImagePath = backupData[i].fallbackImagePath;
+                    selectedSprites[i].numberedImagePath = backupData[i].numberedImagePath;
                     selectedSprites[i].eggGroups = backupData[i].eggGroups;
                 }
                 selectGender(i, backupData[i].gender);
