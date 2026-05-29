@@ -1029,7 +1029,7 @@
 
                 // 格式化图片路径，保证 002.png 等三位数前导零（应对 CSV 里的 "2"）
                 const paddedId = String(sprite.id).padStart(3, '0');
-                const imagePath = `rocom_imgs_resized/${paddedId}.png`;
+                const imagePath = `rocom_imgs_standard/${paddedId}.png`;
 
                 // 写入数字角标和中心图片
                 // onerror：当图片因为任何原因加载失败时，自动隐藏该 <img> 标签
