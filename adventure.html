@@ -284,17 +284,32 @@
         }
 
         .score-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 74px;
-            height: 38px;
-            padding: 0 12px;
-            border-radius: 999px;
-            background: rgba(22,163,74,0.12);
-            color: var(--success);
+            position: relative;
+            width: 136px;
+            height: 54px;
+            min-width: 136px;
+            overflow: hidden;
+        }
+
+        .score-badge-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .score-badge-number {
+            position: absolute;
+            left: 64%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 42px;
+            color: #ffffff;
             font-size: 1rem;
             font-weight: 950;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(124, 28, 126, 0.5);
         }
 
         .strategy-body {
@@ -602,6 +617,12 @@
             blue: ['植物组', '天空组', '海洋组', '机械组', '魔力组'],
             red: ['拟人组', '妖精组', '虫组', '软体组']
         };
+        const EGG_BOX_LABELS = {
+            yellow: '黄色盒子',
+            blue: '蓝色盒子',
+            red: '红色盒子'
+        };
+        const STARLIGHT_BADGE = './web_images/values/base-starlight-value.png';
         const EGG_GROUP_TO_BOX = Object.fromEntries(
             Object.entries(EGG_GROUP_BOXES).flatMap(([box, groups]) => groups.map(group => [group, box]))
         );
@@ -786,6 +807,15 @@
             `;
         }
 
+        function renderScoreBadge(score) {
+            return `
+                <div class="score-badge" title="星光值之和：${escapeHtml(score)}" aria-label="星光值之和：${escapeHtml(score)}">
+                    <img class="score-badge-image" src="${escapeHtml(STARLIGHT_BADGE)}" alt="" aria-hidden="true" onerror="this.style.display='none'">
+                    <span class="score-badge-number">${escapeHtml(score)}</span>
+                </div>
+            `;
+        }
+
         function renderStrategy(strategy) {
             const others = strategy.otherTargets.length
                 ? strategy.otherTargets.map(renderOtherTarget).join('')
@@ -795,15 +825,15 @@
             return `
                 <article class="panel strategy-card">
                     <div class="strategy-head">
-                        <div class="target-mini">
-                            <img class="mini-img" src="${escapeHtml(strategy.target.portrait)}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
+	                        <div class="target-mini">
+	                            <img class="mini-img" src="${escapeHtml(strategy.target.portrait)}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
                             <div>
                                 <div class="mini-label">目标奇遇</div>
-                                <div class="mini-name">${formatNo(strategy.target.number)} ${escapeHtml(strategy.target.title)}</div>
-                            </div>
-                        </div>
-                        <div class="score-badge">${escapeHtml(strategy.score)}</div>
-                    </div>
+	                                <div class="mini-name">${formatNo(strategy.target.number)} ${escapeHtml(strategy.target.title)}</div>
+	                            </div>
+	                        </div>
+	                        ${renderScoreBadge(strategy.score)}
+	                    </div>
                     <div class="strategy-body">
                         <div class="pair-row">
                             ${renderSprite(strategy.first)}
@@ -843,7 +873,8 @@
                     commonEggBoxes.forEach(box => {
                         (eggBoxIndex.get(box) || []).forEach(target => {
                             const item = targetRuleMap.get(target.number) || { target, rules: [] };
-                            if (!item.rules.includes('蛋组盒子')) item.rules.push('蛋组盒子');
+                            const boxRule = `蛋组：${EGG_BOX_LABELS[box] || box}`;
+                            if (!item.rules.includes(boxRule)) item.rules.push(boxRule);
                             targetRuleMap.set(target.number, item);
                         });
                     });
