@@ -685,6 +685,7 @@
         </header>
 
         <div class="topbar">
+            <a id="homeLink" class="btn" href="index.html">‹ 返回主页</a>
             <button id="backToGallery" class="btn" type="button" style="display:none;">‹ 返回图鉴</button>
             <div class="topbar-actions">
                 <div class="count-pill" id="resultCount">数据加载中</div>
@@ -737,6 +738,7 @@
         const resultCount = document.getElementById('resultCount');
         const galleryView = document.getElementById('galleryView');
         const detailView = document.getElementById('detailView');
+        const homeLink = document.getElementById('homeLink');
         const backToGallery = document.getElementById('backToGallery');
 
         function escapeHtml(value) {
@@ -772,6 +774,7 @@
         function showGallery(updateHash = true) {
             galleryView.classList.add('active');
             detailView.classList.remove('active');
+            homeLink.style.display = 'inline-flex';
             backToGallery.style.display = 'none';
             if (updateHash) history.pushState('', document.title, location.pathname + location.search);
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -782,6 +785,7 @@
             renderDetail();
             galleryView.classList.remove('active');
             detailView.classList.add('active');
+            homeLink.style.display = 'none';
             backToGallery.style.display = 'inline-flex';
             if (updateHash) location.hash = encodeURIComponent(id);
             window.scrollTo({ top: 0, behavior: 'smooth' });
