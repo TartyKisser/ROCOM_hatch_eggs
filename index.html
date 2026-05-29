@@ -615,20 +615,29 @@
                 const text = await response.text();
                 const lines = text.trim().split(/\r?\n/);  
                 const headers = lines[0].split(',');
+                const firstNamesById = new Map();
 
                 for (let i = 1; i < lines.length; i++) {
                     const parts = lines[i].split(',');
                     if (parts.length >= 4) {
                         const eggGroups = [];
+                        const rawId = parts[0].trim();
+                        const paddedId = String(rawId).padStart(3, '0');
+                        const name = parts[1].trim();
                         const group1 = parts[2] ? parts[2].trim() : '';
                         const group2 = parts[3] ? parts[3].trim() : '';
 
                         if (group1 && group1 !== 'null') eggGroups.push(group1);
                         if (group2 && group2 !== 'null') eggGroups.push(group2);
+                        if (!firstNamesById.has(paddedId)) firstNamesById.set(paddedId, name);
+
+                        const imageFileName = `${paddedId}${firstNamesById.get(paddedId)}.png`;
 
                         spriteData.push({
-                            id: parts[0].trim(), // 确保把前后空格去掉
-                            name: parts[1],
+                            id: paddedId,
+                            name: name,
+                            imagePath: `rocom_imgs_standard/${encodeURIComponent(imageFileName)}`,
+                            fallbackImagePath: `rocom_imgs/${paddedId}.png`,
                             eggGroups: eggGroups
                         });
                     }
@@ -645,7 +654,7 @@
 
             for (let i = 0; i < count; i++) {
                 // 增加了 id 字段用于调用图片
-                selectedSprites.push({ id: '', name: '', gender: 'male', eggGroups: [] });
+                selectedSprites.push({ id: '', name: '', imagePath: '', fallbackImagePath: '', gender: 'male', eggGroups: [] });
 
                 const row = document.createElement('div');
                 row.className = 'sprite-row';
@@ -716,6 +725,8 @@
                         // 保存选中精灵的 ID
                         selectedSprites[index].id = sprite.id; 
                         selectedSprites[index].name = sprite.name;
+                        selectedSprites[index].imagePath = sprite.imagePath;
+                        selectedSprites[index].fallbackImagePath = sprite.fallbackImagePath;
                         selectedSprites[index].eggGroups = sprite.eggGroups;
                         list.style.display = 'none';
                     });
@@ -933,16 +944,22 @@
                     if (found) {
                         selectedSprites[i].id = found.id;
                         selectedSprites[i].name = found.name;
+                        selectedSprites[i].imagePath = found.imagePath;
+                        selectedSprites[i].fallbackImagePath = found.fallbackImagePath;
                         selectedSprites[i].eggGroups = found.eggGroups;
                     } else {
                         // 如果查不到（可能是用户乱敲的），清空内部状态以便后续报错拦截
                         selectedSprites[i].id = '';
                         selectedSprites[i].name = '';
+                        selectedSprites[i].imagePath = '';
+                        selectedSprites[i].fallbackImagePath = '';
                         selectedSprites[i].eggGroups = [];
                     }
                 } else {
                     selectedSprites[i].id = '';
                     selectedSprites[i].name = '';
+                    selectedSprites[i].imagePath = '';
+                    selectedSprites[i].fallbackImagePath = '';
                     selectedSprites[i].eggGroups = [];
                 }
             }
@@ -1027,15 +1044,14 @@
                     nest.classList.add('female-nest');
                 }
 
-                // 格式化图片路径，保证 002.png 等三位数前导零（应对 CSV 里的 "2"）
-                const paddedId = String(sprite.id).padStart(3, '0');
-                const imagePath = `rocom_imgs_standard/${paddedId}.png`;
+                const imagePath = sprite.imagePath || '';
+                const fallbackImagePath = sprite.fallbackImagePath || '';
 
                 // 写入数字角标和中心图片
-                // onerror：当图片因为任何原因加载失败时，自动隐藏该 <img> 标签
+                // onerror：优先回退到旧编号图片，仍失败则隐藏该 <img> 标签
                 nest.innerHTML = `
                     <span class="nest-badge">${index + 1}</span>
-                    <img class="nest-sprite-img" src="${imagePath}" alt="${sprite.name}" onerror="this.style.display='none'">
+                    <img class="nest-sprite-img" src="${imagePath}" data-fallback="${fallbackImagePath}" alt="${sprite.name}" onerror="if (this.dataset.fallback) { this.src = this.dataset.fallback; this.dataset.fallback = ''; } else { this.style.display='none'; }">
                 `;
 
                 gridDisplay.appendChild(nest);
@@ -1079,6 +1095,8 @@
                 return {
                     id: sprite.id, // 保留备份 ID
                     name: input ? input.value : sprite.name,
+                    imagePath: sprite.imagePath,
+                    fallbackImagePath: sprite.fallbackImagePath,
                     gender: sprite.gender,
                     eggGroups: sprite.eggGroups
                 };
@@ -1093,6 +1111,8 @@
                     input.value = backupData[i].name;
                     selectedSprites[i].id = backupData[i].id; // 恢复 ID
                     selectedSprites[i].name = backupData[i].name;
+                    selectedSprites[i].imagePath = backupData[i].imagePath;
+                    selectedSprites[i].fallbackImagePath = backupData[i].fallbackImagePath;
                     selectedSprites[i].eggGroups = backupData[i].eggGroups;
                 }
                 selectGender(i, backupData[i].gender);
