@@ -31,6 +31,103 @@
             flex-direction: column;
         }
 
+        .reward-widget {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+        }
+
+        .reward-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 0 15px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.2);
+            color: #ffffff;
+            font: inherit;
+            font-size: 0.94rem;
+            font-weight: 800;
+            text-shadow: 0 2px 8px rgba(15,23,42,0.35);
+            box-shadow: 0 10px 26px rgba(15,23,42,0.18);
+            cursor: pointer;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        }
+
+        .reward-button:hover,
+        .reward-button[aria-expanded="true"] {
+            transform: translateY(-1px);
+            border-color: rgba(255,255,255,0.72);
+            background: rgba(255,255,255,0.28);
+        }
+
+        .reward-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+        }
+
+        .reward-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: min(520px, calc(100vw - 40px));
+            padding: 14px;
+            border: 1px solid rgba(255,255,255,0.42);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.94);
+            box-shadow: 0 24px 60px rgba(15,23,42,0.28);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transform-origin: top right;
+            transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .reward-widget.is-open .reward-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .reward-images {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .reward-image-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .reward-image-box span {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .reward-image {
+            width: 100%;
+            aspect-ratio: 1;
+            border: 1px solid rgba(99,102,241,0.18);
+            border-radius: 12px;
+            background: #f8fafc;
+            object-fit: contain;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
+        }
+
         .container {
             width: 95%;
             max-width: 1180px;
@@ -323,6 +420,26 @@
                 padding: 16px;
             }
 
+            .reward-widget {
+                top: 14px;
+                right: 14px;
+            }
+
+            .reward-button {
+                min-height: 36px;
+                padding: 0 12px;
+                font-size: 0.86rem;
+            }
+
+            .reward-menu {
+                width: calc(100vw - 28px);
+                padding: 12px;
+            }
+
+            .reward-images {
+                gap: 10px;
+            }
+
             .main-title {
                 font-size: 1.8rem;
             }
@@ -349,6 +466,27 @@
     </style>
 </head>
 <body>
+    <div class="reward-widget" id="rewardWidget">
+        <button class="reward-button" type="button" id="rewardButton" aria-expanded="false" aria-controls="rewardMenu">
+            <svg class="reward-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 21s-7-4.35-9.45-8.62C.63 9.03 2.63 5 6.43 5c2.01 0 3.49 1.08 4.37 2.23C11.67 6.08 13.15 5 15.16 5c3.8 0 5.8 4.03 3.88 7.38C16.6 16.65 12 21 12 21Z" fill="currentColor"/>
+            </svg>
+            打赏
+        </button>
+        <div class="reward-menu" id="rewardMenu" role="menu" aria-label="打赏二维码">
+            <div class="reward-images">
+                <div class="reward-image-box">
+                    <img class="reward-image" id="rewardImageLeft" src="data:," alt="左侧打赏二维码">
+                    <span id="rewardLabelLeft">左侧图片</span>
+                </div>
+                <div class="reward-image-box">
+                    <img class="reward-image" id="rewardImageRight" src="data:," alt="右侧打赏二维码">
+                    <span id="rewardLabelRight">右侧图片</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <div class="hero-eyebrow">ROCOM TOOLS</div>
@@ -400,5 +538,58 @@
             苏公网安备32058102002843号
         </a>
     </div>
+    <script>
+        const rewardPlaceholder = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240"%3E%3Crect width="240" height="240" rx="18" fill="%23f8fafc"/%3E%3Crect x="28" y="28" width="184" height="184" rx="14" fill="none" stroke="%23cbd5e1" stroke-width="4" stroke-dasharray="10 10"/%3E%3Ctext x="120" y="112" fill="%2364748b" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle"%3EReward Image%3C/text%3E%3Ctext x="120" y="140" fill="%2394a3b8" font-family="Arial, sans-serif" font-size="14" text-anchor="middle"%3Ereplace image url%3C/text%3E%3C/svg%3E';
+
+        // 预留接口：把左右两张打赏图片地址填到这里即可。
+        const rewardImageConfig = {
+            left: './web_images/reward-left.jpg',
+            right: './web_images/reward-right.jpg',
+            leftLabel: '微信',
+            rightLabel: '支付宝'
+        };
+        window.rewardImageConfig = rewardImageConfig;
+
+        const rewardWidget = document.getElementById('rewardWidget');
+        const rewardButton = document.getElementById('rewardButton');
+        const rewardImageLeft = document.getElementById('rewardImageLeft');
+        const rewardImageRight = document.getElementById('rewardImageRight');
+        const rewardLabelLeft = document.getElementById('rewardLabelLeft');
+        const rewardLabelRight = document.getElementById('rewardLabelRight');
+
+        function applyRewardImages(config = {}) {
+            rewardImageLeft.src = config.left || rewardPlaceholder;
+            rewardImageRight.src = config.right || rewardPlaceholder;
+            rewardLabelLeft.textContent = config.leftLabel || '左侧图片';
+            rewardLabelRight.textContent = config.rightLabel || '右侧图片';
+        }
+
+        window.setRewardImages = function setRewardImages(config = {}) {
+            Object.assign(rewardImageConfig, config);
+            applyRewardImages(rewardImageConfig);
+        };
+
+        rewardButton.addEventListener('click', function () {
+            const isOpen = rewardWidget.classList.toggle('is-open');
+            rewardButton.setAttribute('aria-expanded', String(isOpen));
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!rewardWidget.contains(event.target)) {
+                rewardWidget.classList.remove('is-open');
+                rewardButton.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                rewardWidget.classList.remove('is-open');
+                rewardButton.setAttribute('aria-expanded', 'false');
+                rewardButton.focus();
+            }
+        });
+
+        applyRewardImages(rewardImageConfig);
+    </script>
 </body>
 </html>
