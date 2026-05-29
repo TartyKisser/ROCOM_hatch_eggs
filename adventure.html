@@ -145,13 +145,12 @@
 
         .control-grid {
             display: grid;
-            grid-template-columns: minmax(220px, 1fr) minmax(180px, 260px) auto;
+            grid-template-columns: minmax(220px, 1fr) auto;
             gap: 12px;
             align-items: center;
         }
 
-        .search-input,
-        .select-input {
+        .search-input {
             width: 100%;
             min-height: 46px;
             padding: 13px 15px;
@@ -164,22 +163,21 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .search-input:focus,
-        .select-input:focus {
+        .search-input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
         }
 
         .target-strip {
             display: flex;
+            flex-wrap: wrap;
             gap: 8px;
             margin-top: 14px;
             padding-bottom: 2px;
-            overflow-x: auto;
         }
 
         .target-chip {
-            flex: 0 0 auto;
+            flex: 0 1 auto;
             display: inline-flex;
             align-items: center;
             gap: 7px;
@@ -481,10 +479,6 @@
             .summary-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-
-            .control-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         @media (max-width: 768px) {
@@ -499,6 +493,10 @@
             .topbar {
                 align-items: stretch;
                 flex-direction: column;
+            }
+
+            .control-grid {
+                grid-template-columns: 1fr;
             }
 
             .strategy-grid {
@@ -533,9 +531,6 @@
         <section class="panel controls">
             <div class="control-grid">
                 <input id="searchInput" class="search-input" type="search" placeholder="搜索目标、混抓精灵或编号..." autocomplete="off">
-                <select id="targetSelect" class="select-input" aria-label="目标奇遇精灵">
-                    <option value="">全部奇遇精灵</option>
-                </select>
                 <button id="clearSearch" class="btn" type="button">清空</button>
             </div>
             <div id="targetStrip" class="target-strip"></div>
@@ -602,6 +597,14 @@
             '机械': '#40CBA9',
             '幻': '#9FA7F8'
         };
+        const EGG_GROUP_BOXES = {
+            yellow: ['动物组', '大地组', '巨灵组', '爬行组', '龙组'],
+            blue: ['植物组', '天空组', '海洋组', '机械组', '魔力组'],
+            red: ['拟人组', '妖精组', '虫组', '软体组']
+        };
+        const EGG_GROUP_TO_BOX = Object.fromEntries(
+            Object.entries(EGG_GROUP_BOXES).flatMap(([box, groups]) => groups.map(group => [group, box]))
+        );
         const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
         const PAGE_SIZE = 80;
 
@@ -615,7 +618,6 @@
         let activeTarget = '';
 
         const searchInput = document.getElementById('searchInput');
-        const targetSelect = document.getElementById('targetSelect');
         const clearSearch = document.getElementById('clearSearch');
         const targetStrip = document.getElementById('targetStrip');
         const strategyGrid = document.getElementById('strategyGrid');
@@ -712,16 +714,20 @@
             index.get(key).add(target);
         }
 
+        function eggBoxes(groups) {
+            return [...new Set(cleanList(groups).map(group => EGG_GROUP_TO_BOX[group]).filter(Boolean))];
+        }
+
         function buildTargetIndex(targets) {
             const attributeIndex = new Map();
-            const eggIndex = new Map();
+            const eggBoxIndex = new Map();
 
             targets.forEach(target => {
                 subsets(target.attributes).forEach(items => addToIndex(attributeIndex, setKey(items), target));
-                subsets(target.eggGroups).forEach(items => addToIndex(eggIndex, setKey(items), target));
+                eggBoxes(target.eggGroups).forEach(box => addToIndex(eggBoxIndex, box, target));
             });
 
-            return { attributeIndex, eggIndex };
+            return { attributeIndex, eggBoxIndex };
         }
 
         function recordAttributes(record) {
@@ -815,7 +821,7 @@
         }
 
         function buildStrategies() {
-            const { attributeIndex, eggIndex } = buildTargetIndex(adventureTargets);
+            const { attributeIndex, eggBoxIndex } = buildTargetIndex(adventureTargets);
             const strategies = [];
             let triggeredPairCount = 0;
 
@@ -826,7 +832,7 @@
                     if (first.number === second.number) continue;
 
                     const attributeKey = setKey(intersect(recordAttributes(first), recordAttributes(second)));
-                    const eggKey = setKey(intersect(recordEggGroups(first), recordEggGroups(second)));
+                    const commonEggBoxes = eggBoxes(intersect(recordEggGroups(first), recordEggGroups(second)));
                     const targetRuleMap = new Map();
 
                     (attributeIndex.get(attributeKey) || []).forEach(target => targetRuleMap.set(target.number, {
@@ -834,10 +840,12 @@
                         rules: ['系别交集']
                     }));
 
-                    (eggIndex.get(eggKey) || []).forEach(target => {
-                        const item = targetRuleMap.get(target.number) || { target, rules: [] };
-                        item.rules.push('蛋组交集');
-                        targetRuleMap.set(target.number, item);
+                    commonEggBoxes.forEach(box => {
+                        (eggBoxIndex.get(box) || []).forEach(target => {
+                            const item = targetRuleMap.get(target.number) || { target, rules: [] };
+                            if (!item.rules.includes('蛋组盒子')) item.rules.push('蛋组盒子');
+                            targetRuleMap.set(target.number, item);
+                        });
                     });
 
                     if (!targetRuleMap.size) continue;
@@ -879,13 +887,6 @@
         }
 
         function renderTargetControls() {
-            targetSelect.innerHTML = [
-                '<option value="">全部奇遇精灵</option>',
-                ...adventureTargets.map(target => (
-                    `<option value="${escapeHtml(target.number)}">${formatNo(target.number)} ${escapeHtml(target.title)}</option>`
-                ))
-            ].join('');
-
             targetStrip.innerHTML = [
                 `<button class="target-chip ${activeTarget === '' ? 'active' : ''}" type="button" data-target="">全部</button>`,
                 ...adventureTargets.map(target => `
@@ -899,7 +900,6 @@
             targetStrip.querySelectorAll('.target-chip').forEach(button => {
                 button.addEventListener('click', () => {
                     activeTarget = button.dataset.target || '';
-                    targetSelect.value = activeTarget;
                     visibleCount = PAGE_SIZE;
                     applyFilters();
                 });
@@ -972,16 +972,9 @@
             applyFilters();
         });
 
-        targetSelect.addEventListener('change', () => {
-            activeTarget = targetSelect.value;
-            visibleCount = PAGE_SIZE;
-            applyFilters();
-        });
-
         clearSearch.addEventListener('click', () => {
             searchInput.value = '';
             activeTarget = '';
-            targetSelect.value = '';
             visibleCount = PAGE_SIZE;
             applyFilters();
         });
