@@ -85,6 +85,13 @@
             margin-bottom: 18px;
         }
 
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -121,13 +128,6 @@
             font-weight: 700;
         }
 
-        .handbook-layout {
-            display: grid;
-            grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
-            gap: 18px;
-            align-items: start;
-        }
-
         .panel {
             background: var(--panel);
             border: 1px solid rgba(255,255,255,0.55);
@@ -137,19 +137,21 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
-        .sidebar {
-            position: sticky;
-            top: 18px;
-            overflow: hidden;
+        .controls {
+            padding: 18px;
+            margin-bottom: 18px;
         }
 
-        .search-area {
-            padding: 18px;
-            border-bottom: 1px solid var(--border);
+        .search-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
         }
 
         .search-input {
             width: 100%;
+            min-height: 46px;
             padding: 13px 15px;
             border: 2px solid var(--border);
             border-radius: 13px;
@@ -193,65 +195,95 @@
             border-color: transparent;
         }
 
-        .list {
-            max-height: 70vh;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .list-item {
-            width: 100%;
-            min-height: 76px;
-            border: 1px solid transparent;
-            border-radius: 14px;
-            padding: 10px;
-            background: transparent;
+        .card-grid {
             display: grid;
-            grid-template-columns: 56px minmax(0, 1fr);
-            gap: 11px;
+            grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+            gap: 14px;
+        }
+
+        .sprite-card {
+            min-height: 218px;
+            border: 1px solid rgba(255,255,255,0.55);
+            border-radius: 18px;
+            padding: 14px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.84)),
+                radial-gradient(circle at top right, rgba(99,102,241,0.16), transparent 42%);
+            box-shadow: 0 14px 34px rgba(15,23,42,0.14);
+            display: flex;
+            flex-direction: column;
             align-items: center;
+            text-align: center;
             cursor: pointer;
-            text-align: left;
-            transition: background 0.16s ease, border-color 0.16s ease;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
 
-        .list-item:hover,
-        .list-item.active {
-            background: rgba(99,102,241,0.08);
-            border-color: rgba(99,102,241,0.18);
+        .sprite-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99,102,241,0.42);
+            box-shadow: 0 20px 44px rgba(15,23,42,0.22);
         }
 
-        .list-thumb {
-            width: 56px;
-            height: 56px;
-            object-fit: contain;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.86);
-        }
-
-        .list-title {
-            font-size: 0.98rem;
-            font-weight: 900;
-            color: var(--text);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .list-meta {
-            margin-top: 4px;
+        .card-image-wrap {
+            width: 116px;
+            height: 116px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 7px;
-            color: var(--text-secondary);
+            justify-content: center;
+            border-radius: 22px;
+            background:
+                radial-gradient(circle, rgba(255,255,255,0.95), rgba(238,242,255,0.72));
+        }
+
+        .card-image {
+            width: 108px;
+            height: 108px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 12px rgba(15,23,42,0.16));
+        }
+
+        .card-number {
+            color: var(--primary-dark);
             font-size: 0.82rem;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            width: 100%;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 900;
+            line-height: 1.35;
+            min-height: 2.7em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-types {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
         }
 
         .empty-state {
-            padding: 26px 16px;
+            padding: 34px 16px;
             text-align: center;
             color: var(--text-secondary);
             font-weight: 700;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
         }
 
         .detail {
@@ -383,6 +415,31 @@
             border-radius: 2px;
         }
 
+        .fruit-card {
+            display: grid;
+            grid-template-columns: 118px minmax(0, 1fr);
+            gap: 16px;
+            align-items: center;
+        }
+
+        .fruit-image-wrap {
+            width: 118px;
+            height: 118px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid rgba(226,232,240,0.92);
+        }
+
+        .fruit-image {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 12px rgba(15,23,42,0.12));
+        }
+
         .stats-grid {
             display: grid;
             gap: 10px;
@@ -444,17 +501,15 @@
         }
 
         .skill-table-wrap {
-            max-height: 520px;
-            overflow: auto;
             border: 1px solid var(--border);
             border-radius: 14px;
             background: rgba(255,255,255,0.72);
+            overflow: hidden;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 720px;
         }
 
         th,
@@ -467,9 +522,6 @@
         }
 
         th {
-            position: sticky;
-            top: 0;
-            z-index: 1;
             background: rgba(248,250,252,0.98);
             color: var(--text-secondary);
             font-weight: 900;
@@ -510,20 +562,12 @@
         }
 
         @media (max-width: 980px) {
-            .handbook-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-            }
-
-            .list {
-                max-height: 420px;
-            }
-
             .detail-hero {
                 grid-template-columns: 1fr;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             }
         }
 
@@ -539,6 +583,10 @@
             .topbar {
                 align-items: stretch;
                 flex-direction: column;
+            }
+
+            .search-row {
+                grid-template-columns: 1fr;
             }
 
             .info-grid {
@@ -558,6 +606,69 @@
                 grid-template-columns: 58px 1fr 38px;
                 gap: 8px;
             }
+
+            .fruit-card {
+                grid-template-columns: 1fr;
+                justify-items: start;
+            }
+
+            table,
+            thead,
+            tbody,
+            tr,
+            th,
+            td {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                padding: 12px;
+                border-bottom: 1px solid rgba(226,232,240,0.86);
+            }
+
+            tr:last-child {
+                border-bottom: 0;
+            }
+
+            td {
+                padding: 4px 0;
+                border-bottom: 0;
+            }
+
+            td::before {
+                content: attr(data-label);
+                display: inline-block;
+                min-width: 46px;
+                margin-right: 8px;
+                color: var(--text-secondary);
+                font-weight: 900;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .sprite-card {
+                min-height: 190px;
+                padding: 10px;
+            }
+
+            .card-image-wrap {
+                width: 96px;
+                height: 96px;
+            }
+
+            .card-image {
+                width: 90px;
+                height: 90px;
+            }
         }
     </style>
 </head>
@@ -566,25 +677,32 @@
         <header>
             <div class="hero-eyebrow">HANDBOOK</div>
             <h1 class="main-title">精灵图鉴</h1>
-            <p class="desc-font">检索精灵资料、属性、种族值、特性与技能。</p>
+            <p class="desc-font">浏览精灵卡片，点击进入详情。</p>
         </header>
 
         <div class="topbar">
             <a class="btn" href="index.html">‹ 返回主页</a>
-            <div class="count-pill" id="resultCount">数据加载中</div>
+            <div class="topbar-actions">
+                <button id="backToGallery" class="btn" type="button" style="display:none;">‹ 返回图鉴</button>
+                <div class="count-pill" id="resultCount">数据加载中</div>
+            </div>
         </div>
 
-        <main class="handbook-layout">
-            <aside class="panel sidebar">
-                <div class="search-area">
+        <main id="galleryView" class="view active">
+            <section class="panel controls">
+                <div class="search-row">
                     <input id="searchInput" class="search-input" type="search" placeholder="搜索编号、名称、属性或分布..." autocomplete="off">
-                    <div id="filters" class="filters"></div>
+                    <button id="clearSearch" class="btn" type="button">清空</button>
                 </div>
-                <div id="spriteList" class="list">
-                    <div class="empty-state">正在加载图鉴数据...</div>
-                </div>
-            </aside>
+                <div id="filters" class="filters"></div>
+            </section>
 
+            <section id="cardGrid" class="card-grid">
+                <div class="empty-state">正在加载图鉴数据...</div>
+            </section>
+        </main>
+
+        <main id="detailView" class="view">
             <section id="detailPanel" class="panel detail">
                 <div class="empty-state">请选择一个精灵查看详情。</div>
             </section>
@@ -609,10 +727,14 @@
         let activeAttribute = '';
 
         const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
         const filters = document.getElementById('filters');
-        const spriteList = document.getElementById('spriteList');
+        const cardGrid = document.getElementById('cardGrid');
         const detailPanel = document.getElementById('detailPanel');
         const resultCount = document.getElementById('resultCount');
+        const galleryView = document.getElementById('galleryView');
+        const detailView = document.getElementById('detailView');
+        const backToGallery = document.getElementById('backToGallery');
 
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -631,6 +753,24 @@
         function statValue(record, key) {
             const value = record.stats && record.stats[key];
             return value === undefined || value === null || value === '' ? '-' : value;
+        }
+
+        function showGallery(updateHash = true) {
+            galleryView.classList.add('active');
+            detailView.classList.remove('active');
+            backToGallery.style.display = 'none';
+            if (updateHash) history.pushState('', document.title, location.pathname + location.search);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showDetail(id, updateHash = true) {
+            selectedId = id;
+            renderDetail();
+            galleryView.classList.remove('active');
+            detailView.classList.add('active');
+            backToGallery.style.display = 'inline-flex';
+            if (updateHash) location.hash = encodeURIComponent(id);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function renderFilters() {
@@ -656,43 +796,32 @@
                 const matchesAttribute = !activeAttribute || record.attributes.includes(activeAttribute);
                 return matchesKeyword && matchesAttribute;
             });
-
-            if (!filteredRecords.some(record => record.id === selectedId)) {
-                selectedId = filteredRecords[0]?.id || '';
-            }
-
             renderFilters();
-            renderList();
-            renderDetail();
+            renderCards();
         }
 
-        function renderList() {
+        function renderCards() {
             resultCount.textContent = `共 ${filteredRecords.length} / ${records.length} 条`;
             if (filteredRecords.length === 0) {
-                spriteList.innerHTML = '<div class="empty-state">没有匹配的精灵。</div>';
+                cardGrid.innerHTML = '<div class="panel empty-state">没有匹配的精灵。</div>';
                 return;
             }
 
-            spriteList.innerHTML = filteredRecords.map(record => `
-                <button class="list-item ${record.id === selectedId ? 'active' : ''}" type="button" data-id="${escapeHtml(record.id)}">
-                    <img class="list-thumb" src="${escapeHtml(record.icon || record.portrait)}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
-                    <div>
-                        <div class="list-title">${escapeHtml(record.title)}</div>
-                        <div class="list-meta">
-                            <span>No.${escapeHtml(record.number)}</span>
-                            <span>${escapeHtml(record.attributes.join(' / ') || '无属性')}</span>
-                        </div>
+            cardGrid.innerHTML = filteredRecords.map(record => `
+                <button class="sprite-card" type="button" data-id="${escapeHtml(record.id)}">
+                    <div class="card-image-wrap">
+                        <img class="card-image" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div class="card-number">NO.${escapeHtml(record.number)}</div>
+                    <div class="card-title">${escapeHtml(record.title)}</div>
+                    <div class="card-types">
+                        ${(record.attributes.length ? record.attributes : ['无属性']).map(attr => `<span class="type-chip">${escapeHtml(attr)}</span>`).join('')}
                     </div>
                 </button>
             `).join('');
 
-            spriteList.querySelectorAll('.list-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    selectedId = item.dataset.id;
-                    location.hash = encodeURIComponent(selectedId);
-                    renderList();
-                    renderDetail();
-                });
+            cardGrid.querySelectorAll('.sprite-card').forEach(card => {
+                card.addEventListener('click', () => showDetail(card.dataset.id));
             });
         }
 
@@ -716,12 +845,12 @@
             const skills = record.skills && record.skills.length
                 ? record.skills.map(skill => `
                     <tr>
-                        <td>${escapeHtml(skill.level)}</td>
-                        <td><strong>${escapeHtml(skill.name)}</strong></td>
-                        <td>${escapeHtml(skill.cost || '-')}</td>
-                        <td>${escapeHtml(skill.category || '-')}</td>
-                        <td>${escapeHtml(skill.power || '-')}</td>
-                        <td class="skill-desc">${escapeHtml(skill.description || '-')}</td>
+                        <td data-label="等级">${escapeHtml(skill.level)}</td>
+                        <td data-label="技能"><strong>${escapeHtml(skill.name)}</strong></td>
+                        <td data-label="能量">${escapeHtml(skill.cost || '-')}</td>
+                        <td data-label="类别">${escapeHtml(skill.category || '-')}</td>
+                        <td data-label="威力">${escapeHtml(skill.power || '-')}</td>
+                        <td data-label="描述" class="skill-desc">${escapeHtml(skill.description || '-')}</td>
                     </tr>
                 `).join('')
                 : '<tr><td colspan="6">暂无技能资料。</td></tr>';
@@ -729,7 +858,7 @@
             detailPanel.innerHTML = `
                 <div class="detail-hero">
                     <div class="portrait-wrap">
-                        <img class="portrait" src="${escapeHtml(record.portrait || record.icon)}" alt="${escapeHtml(record.title)}" onerror="this.style.display='none'">
+                        <img class="portrait" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" onerror="this.style.display='none'">
                     </div>
                     <div>
                         <div class="detail-number">No.${escapeHtml(record.number)}</div>
@@ -754,6 +883,16 @@
                         <div class="info-tile">
                             <div class="info-label">体重</div>
                             <div class="info-value">${escapeHtml(record.weight || '-')}</div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3 class="section-title">精灵果实</h3>
+                        <div class="fruit-card">
+                            <div class="fruit-image-wrap">
+                                <img class="fruit-image" src="${escapeHtml(record.icon || record.portrait)}" alt="${escapeHtml(record.title)} 精灵果实" onerror="this.style.display='none'">
+                            </div>
+                            <p class="ability-desc">${escapeHtml(record.title)} 对应的精灵果实图片。</p>
                         </div>
                     </div>
 
@@ -819,20 +958,36 @@
                 records = data.records || [];
                 filteredRecords = records;
 
-                const hashId = decodeURIComponent(location.hash.replace(/^#/, ''));
-                selectedId = records.some(record => record.id === hashId) ? hashId : records[0]?.id || '';
                 renderFilters();
-                renderList();
-                renderDetail();
+                renderCards();
+
+                const hashId = decodeURIComponent(location.hash.replace(/^#/, ''));
+                if (records.some(record => record.id === hashId)) {
+                    showDetail(hashId, false);
+                }
             } catch (error) {
                 console.error(error);
                 resultCount.textContent = '加载失败';
-                spriteList.innerHTML = '<div class="empty-state">图鉴数据加载失败。</div>';
-                detailPanel.innerHTML = '<div class="empty-state">请确认 handbook_data.json 存在并可访问。</div>';
+                cardGrid.innerHTML = '<div class="panel empty-state">请确认 handbook_data.json 存在并可访问。</div>';
             }
         }
 
         searchInput.addEventListener('input', applyFilters);
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            activeAttribute = '';
+            applyFilters();
+        });
+        backToGallery.addEventListener('click', () => showGallery());
+        window.addEventListener('hashchange', () => {
+            const hashId = decodeURIComponent(location.hash.replace(/^#/, ''));
+            if (hashId && records.some(record => record.id === hashId)) {
+                showDetail(hashId, false);
+            } else {
+                showGallery(false);
+            }
+        });
+
         loadHandbook();
     </script>
 </body>
