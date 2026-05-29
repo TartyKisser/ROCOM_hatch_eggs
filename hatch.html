@@ -28,7 +28,7 @@
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: url('./bg.jpg') no-repeat center center fixed, 
+            background: url('./web_images/bg.jpg') no-repeat center center fixed, 
                         linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             background-size: cover;
             min-height: 100vh;
@@ -50,31 +50,40 @@
             flex-direction: column; 
             align-items: center;    
             text-align: center;
-            padding: 40px 20px;
+            padding: 46px 20px 34px;
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         header h1 {
             font-size: 2.8rem;
+            line-height: 1.12;
             margin-bottom: 15px;
             color: #ffffff; 
             font-weight: 900;
-            letter-spacing: 3px;
-            text-shadow: 
-                -2px -2px 0 #eca50b,  
-                 2px -2px 0 #eca50b,
-                -2px  2px 0 #eca50b,
-                 2px  2px 0 #eca50b,
-                 0px  4px 0 #3730a3,
-                 0px  6px 0 #312e81,
-                 0px  8px 10px rgba(0,0,0,0.4);
-            transform: rotate(-2deg); 
+            letter-spacing: 1px;
+            text-shadow: 0 4px 18px rgba(15,23,42,0.45);
         }
 
         header p {
             font-size: 1.1rem;
             opacity: 0.95;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.32);
+            border-radius: 999px;
+            background: rgba(15,23,42,0.22);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-shadow: none;
         }
 
         .art-style {
@@ -101,33 +110,47 @@
         .desc-font {
             font-size: 1.1rem;
             font-family: "Microsoft YaHei", "STHeiti", sans-serif; 
-            margin-bottom: 25px;
-            opacity: 0.95;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.94);
+            opacity: 0.98;
+            text-shadow: 0 2px 8px rgba(15,23,42,0.28);
         }
 
-        .yellow-box {
-            background: linear-gradient(135deg, #4f46e5, #4f46e5);
-            border: 2px solid #4f46e5;
+        .source-panel {
+            max-width: 820px;
+            background: rgba(255,255,255,0.16);
+            border: 1px solid rgba(255,255,255,0.28);
             color: #ffffff;
-            font-weight: bold;
-            padding: 15px 25px;
-            border-radius: 15px;
-            display: inline-block; 
+            padding: 14px 18px;
+            border-radius: 18px;
             font-size: 0.95rem;
-            line-height: 1.8;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            line-height: 1.7;
+            box-shadow: 0 14px 35px rgba(15,23,42,0.16);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .source-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-top: 10px;
         }
 
         .box-link {
-            color: #f0f003;
+            display: inline-flex;
+            color: #ffffff;
             font-weight: bold;
-            text-decoration: underline;
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.16);
             transition: color 0.3s;
         }
 
         .box-link:hover {
-            color: #78350f;
+            color: #fef3c7;
         }
 
         .github-link {
@@ -668,7 +691,7 @@
                 left: 2px;
             }
             /* --- 请在这里新增以下代码 --- */
-            .yellow-box {
+            .source-panel {
                 width: 95%; /* 限制在屏幕内，两边留出一点空隙 */
                 box-sizing: border-box; /* 确保 padding 不会额外增加宽度 */
                 padding: 12px 15px; /* 移动端稍微缩小一点内边距，显得更精致 */
@@ -683,14 +706,17 @@
 <body>
     <div class="container">
         <header>
-            <h1 class="art-style main-title">家园小窝排布系统</h1>
+            <div class="hero-eyebrow">HATCH LAYOUT</div>
+            <h1 class="main-title">家园小窝排布系统</h1>
             
-            <p class="art-style desc-font">输入你的精灵，生成最优家园排布方案，最大化生蛋配对路径</p>
+            <p class="desc-font">输入精灵与性别，快速生成更高效的小窝排布方案。</p>
         
-            <div class="yellow-box">
-                欢迎广大玩家免费使用本网站，也希望各位大佬们能基于本项目做出更好的作品！<br>
-                GitHub项目地址：<a href="https://github.com/TartyKisser/ROCOM_hatch_eggs" target="_blank" class="box-link">https://github.com/TartyKisser/ROCOM_hatch_eggs</a><br>
-                本网站部分数据来源于洛克王国世界WIKI：<a href="https://wiki.biligame.com/rocom" target="_blank" class="box-link">https://wiki.biligame.com/rocom</a>
+            <div class="source-panel">
+                <span>免费开放使用，数据参考洛克王国世界 WIKI，欢迎一起完善。</span>
+                <div class="source-links">
+                    <a href="https://github.com/TartyKisser/ROCOM_hatch_eggs" target="_blank" class="box-link">GitHub 项目</a>
+                    <a href="https://wiki.biligame.com/rocom" target="_blank" class="box-link">数据来源 WIKI</a>
+                </div>
             </div>
         </header>
 
