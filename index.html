@@ -239,6 +239,188 @@
             color: #fef3c7;
         }
 
+        .merchant-panel {
+            margin: 0 0 22px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.18);
+            box-shadow: 0 18px 45px rgba(15,23,42,0.16);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .merchant-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .merchant-title-wrap {
+            min-width: 0;
+        }
+
+        .merchant-title {
+            font-size: 1.1rem;
+            line-height: 1.2;
+            font-weight: 950;
+            text-shadow: 0 3px 12px rgba(15,23,42,0.35);
+        }
+
+        .merchant-subtitle {
+            margin-top: 4px;
+            color: rgba(255,255,255,0.82);
+            font-size: 0.86rem;
+            font-weight: 700;
+        }
+
+        .merchant-status {
+            flex: 0 0 auto;
+            padding: 6px 10px;
+            border: 1px solid rgba(255,255,255,0.26);
+            border-radius: 999px;
+            background: rgba(15,23,42,0.18);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .merchant-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .merchant-card {
+            min-height: 122px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background:
+                linear-gradient(90deg, rgba(255,255,255,0.92), rgba(255,255,255,0.74)),
+                url('./web_images/商品背景框.png') center / 100% 100% no-repeat;
+            display: grid;
+            grid-template-columns: 86px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 10px 24px rgba(15,23,42,0.14);
+            overflow: hidden;
+        }
+
+        .merchant-icon-frame {
+            position: relative;
+            width: 82px;
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: url('./web_images/商品图标背景.png') center / contain no-repeat;
+        }
+
+        .merchant-item-img {
+            max-width: 58px;
+            max-height: 58px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 10px rgba(15,23,42,0.18));
+        }
+
+        .merchant-item-img.is-missing {
+            display: none;
+        }
+
+        .merchant-icon-fallback {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            font-size: 1.5rem;
+            font-weight: 950;
+        }
+
+        .merchant-item-img:not(.is-missing) + .merchant-icon-fallback {
+            display: none;
+        }
+
+        .merchant-info {
+            min-width: 0;
+        }
+
+        .merchant-item-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .merchant-item-name {
+            overflow: hidden;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .merchant-limit {
+            flex: 0 0 auto;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: rgba(236,72,153,0.12);
+            color: #be185d;
+            font-size: 0.74rem;
+            font-weight: 900;
+        }
+
+        .merchant-item-type {
+            overflow: hidden;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .merchant-price-badge {
+            position: relative;
+            width: 118px;
+            height: 47px;
+            margin-top: 8px;
+        }
+
+        .merchant-price-badge img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .merchant-price-text {
+            position: absolute;
+            left: 62%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 42px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-weight: 950;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(124,28,126,0.5);
+        }
+
+        .merchant-empty {
+            padding: 18px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.82);
+            color: var(--text-secondary);
+            font-weight: 850;
+            text-align: center;
+        }
+
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -474,6 +656,36 @@
                 gap: 10px;
             }
 
+            .merchant-panel {
+                padding: 12px;
+                border-radius: 14px;
+            }
+
+            .merchant-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .merchant-list {
+                grid-template-columns: 1fr;
+            }
+
+            .merchant-card {
+                grid-template-columns: 76px minmax(0, 1fr);
+                min-height: 112px;
+                padding: 10px 12px;
+            }
+
+            .merchant-icon-frame {
+                width: 72px;
+                height: 72px;
+            }
+
+            .merchant-item-img {
+                max-width: 52px;
+                max-height: 52px;
+            }
+
             header {
                 padding-top: 180px;
             }
@@ -529,6 +741,19 @@
             <p class="desc-font">把常用资料和计算工具放在一个更顺手的地方。</p>
         </header>
 
+        <section class="merchant-panel" aria-labelledby="merchantTitle">
+            <div class="merchant-head">
+                <div class="merchant-title-wrap">
+                    <h2 class="merchant-title" id="merchantTitle">远行商人提醒</h2>
+                    <div class="merchant-subtitle" id="merchantSubtitle">正在获取当前售卖信息...</div>
+                </div>
+                <div class="merchant-status" id="merchantStatus">加载中</div>
+            </div>
+            <div class="merchant-list" id="merchantList">
+                <div class="merchant-empty">正在抓取远行商人商品...</div>
+            </div>
+        </section>
+
         <main class="feature-grid">
             <a class="feature-card visual-card nest-card" href="hatch.html">
                 <div>
@@ -566,6 +791,202 @@
         </a>
     </div>
     <script>
+        const merchantShopConfig = {
+            sourceUrl: 'https://www.onebiji.com/hykb_tools/comm/lkwgmerchant/preview.php?id=1&immgj=0',
+            itemImageDir: './web_images/shop/',
+            itemImageExtension: 'png',
+            itemImageMap: {
+                // 示例：'国王球': './web_images/shop/国王球.png'
+            },
+            corsProxyUrls: [
+                url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                url => `https://corsproxy.io/?${encodeURIComponent(url)}`
+            ]
+        };
+        window.merchantShopConfig = merchantShopConfig;
+
+        const merchantList = document.getElementById('merchantList');
+        const merchantSubtitle = document.getElementById('merchantSubtitle');
+        const merchantStatus = document.getElementById('merchantStatus');
+        const merchantPeriodLabels = {
+            1: '08:00-12:00',
+            2: '12:00-16:00',
+            3: '16:00-20:00',
+            4: '20:00-24:00'
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function currentMerchantPeriod(date = new Date()) {
+            const hour = date.getHours();
+            if (hour >= 8 && hour < 12) return 1;
+            if (hour >= 12 && hour < 16) return 2;
+            if (hour >= 16 && hour < 20) return 3;
+            if (hour >= 20 && hour < 24) return 4;
+            return 0;
+        }
+
+        function cleanMerchantPrice(value) {
+            return String(value || '').replace(/^价格[:：]\s*/, '').replace(/\s+/g, '');
+        }
+
+        function normalizeMerchantImageUrl(value) {
+            if (!value) return '';
+            if (value.startsWith('//')) return `${location.protocol}${value}`;
+            return value;
+        }
+
+        function localMerchantImagePath(item) {
+            if (merchantShopConfig.itemImageMap[item.name]) {
+                return merchantShopConfig.itemImageMap[item.name];
+            }
+            return `${merchantShopConfig.itemImageDir}${encodeURIComponent(item.name)}.${merchantShopConfig.itemImageExtension}`;
+        }
+
+        function parseMerchantOnclick(onclick) {
+            const args = [];
+            String(onclick || '').replace(/'((?:\\'|[^'])*)'/g, (_, value) => {
+                args.push(value.replace(/\\'/g, "'"));
+                return _;
+            });
+            return {
+                sourceImage: normalizeMerchantImageUrl(args[0] || ''),
+                type: args[2] || '',
+                description: args[3] || ''
+            };
+        }
+
+        function parseMerchantHtml(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const periodMatch = html.match(/var\s+index\s*=\s*(\d+)/);
+            const hourMatch = html.match(/var\s+hour\s*=\s*(\d+)/);
+            const remotePeriod = periodMatch ? Number(periodMatch[1]) : currentMerchantPeriod();
+            const remoteHour = hourMatch ? Number(hourMatch[1]) : new Date().getHours();
+            const items = [...doc.querySelectorAll('.shop-list li')].map(itemNode => {
+                const extra = parseMerchantOnclick(itemNode.getAttribute('onclick') || '');
+                const name = itemNode.querySelector('.shop_name')?.textContent.trim() || '';
+                const price = cleanMerchantPrice(itemNode.querySelector('.shop_price')?.textContent.trim() || '');
+                const limit = itemNode.querySelector('.gitem em')?.textContent.trim() || '';
+                const className = itemNode.className || '';
+                const styleText = itemNode.getAttribute('style') || '';
+                const visible = !/display\s*:\s*none/i.test(styleText);
+                return {
+                    name,
+                    price,
+                    limit,
+                    type: extra.type,
+                    description: extra.description,
+                    localImage: '',
+                    sourceImage: extra.sourceImage,
+                    period: Number((className.match(/show_(\d)/) || [])[1] || 0),
+                    className,
+                    visible
+                };
+            }).filter(item => item.name);
+
+            const periodClass = `show_${remotePeriod}`;
+            let currentItems = items.filter(item => item.visible);
+            if (!currentItems.length && remotePeriod) {
+                currentItems = items.filter(item => item.className.includes(periodClass));
+            }
+
+            return {
+                items: currentItems,
+                period: remotePeriod,
+                hour: remoteHour,
+                updatedAt: new Date()
+            };
+        }
+
+        async function fetchMerchantSource() {
+            const urls = [
+                merchantShopConfig.sourceUrl,
+                ...merchantShopConfig.corsProxyUrls.map(buildUrl => buildUrl(merchantShopConfig.sourceUrl))
+            ];
+
+            let lastError = null;
+            for (const url of urls) {
+                try {
+                    const response = await fetch(url, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.text();
+                } catch (error) {
+                    lastError = error;
+                }
+            }
+            throw lastError || new Error('无法获取远行商人数据');
+        }
+
+        function renderMerchantItems(data) {
+            const label = merchantPeriodLabels[data.period] || '当前时段';
+            merchantSubtitle.textContent = data.period
+                ? `${label} 在售商品`
+                : '每日 00:00-08:00 通常无远行商人';
+            merchantStatus.textContent = data.items.length ? '已同步' : '暂无在售';
+
+            if (!data.items.length) {
+                merchantList.innerHTML = '<div class="merchant-empty">当前没有可展示的远行商人商品。</div>';
+                return;
+            }
+
+            merchantList.innerHTML = data.items.map(item => {
+                const localImage = item.localImage || localMerchantImagePath(item);
+                const fallbackText = escapeHtml((item.name || '?').slice(0, 1));
+                return `
+                    <article class="merchant-card" title="${escapeHtml(item.description || item.name)}">
+                        <div class="merchant-icon-frame">
+                            <img class="merchant-item-img" src="${escapeHtml(localImage)}" alt="${escapeHtml(item.name)}" loading="lazy" onerror="this.classList.add('is-missing')">
+                            <span class="merchant-icon-fallback">${fallbackText}</span>
+                        </div>
+                        <div class="merchant-info">
+                            <div class="merchant-item-top">
+                                <div class="merchant-item-name">${escapeHtml(item.name)}</div>
+                                ${item.limit ? `<span class="merchant-limit">${escapeHtml(item.limit)}</span>` : ''}
+                            </div>
+                            <div class="merchant-item-type">${escapeHtml(item.type || '远行商人商品')}</div>
+                            <div class="merchant-price-badge" aria-label="价格：${escapeHtml(item.price || '-')} 洛克贝">
+                                <img src="./web_images/values/base-review-rock-coin.png" alt="" aria-hidden="true">
+                                <span class="merchant-price-text">${escapeHtml(item.price || '-')}</span>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function renderMerchantError() {
+            merchantSubtitle.textContent = '暂时无法自动获取售卖信息';
+            merchantStatus.textContent = '同步失败';
+            merchantList.innerHTML = '<div class="merchant-empty">远行商人数据抓取失败，稍后刷新页面重试。</div>';
+        }
+
+        window.setMerchantItems = function setMerchantItems(items, options = {}) {
+            renderMerchantItems({
+                items: Array.isArray(items) ? items : [],
+                period: options.period || currentMerchantPeriod(),
+                hour: new Date().getHours(),
+                updatedAt: new Date()
+            });
+        };
+
+        async function loadMerchantShop() {
+            try {
+                const html = await fetchMerchantSource();
+                renderMerchantItems(parseMerchantHtml(html));
+            } catch (error) {
+                console.error(error);
+                renderMerchantError();
+            }
+        }
+
         const rewardPlaceholder = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240"%3E%3Crect width="240" height="240" rx="18" fill="%23f8fafc"/%3E%3Crect x="28" y="28" width="184" height="184" rx="14" fill="none" stroke="%23cbd5e1" stroke-width="4" stroke-dasharray="10 10"/%3E%3Ctext x="120" y="112" fill="%2364748b" font-family="Arial, sans-serif" font-size="18" font-weight="700" text-anchor="middle"%3EReward Image%3C/text%3E%3Ctext x="120" y="140" fill="%2394a3b8" font-family="Arial, sans-serif" font-size="14" text-anchor="middle"%3Ereplace image url%3C/text%3E%3C/svg%3E';
 
         // 预留接口：把左右两张打赏图片地址填到这里即可。
@@ -617,6 +1038,7 @@
         });
 
         applyRewardImages(rewardImageConfig);
+        loadMerchantShop();
     </script>
     <script>
     (function(){
