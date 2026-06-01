@@ -143,11 +143,29 @@
             margin-bottom: 18px;
         }
 
-        .control-grid {
+        .adventure-control-section + .adventure-control-section {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px dashed rgba(148,163,184,0.5);
+        }
+
+        .control-title {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            font-weight: 950;
+        }
+
+        .candidate-search-grid {
             display: grid;
-            grid-template-columns: minmax(220px, 1fr) auto;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
-            align-items: center;
+            align-items: start;
+        }
+
+        .candidate-field {
+            position: relative;
+            min-width: 0;
         }
 
         .search-input {
@@ -168,11 +186,88 @@
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
         }
 
+        .suggest-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            z-index: 12;
+            display: none;
+            max-height: 280px;
+            overflow: auto;
+            padding: 6px;
+            border: 1px solid rgba(99,102,241,0.18);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 18px 36px rgba(15,23,42,0.18);
+        }
+
+        .suggest-menu.is-open {
+            display: block;
+        }
+
+        .suggest-option {
+            display: grid;
+            grid-template-columns: 36px minmax(0, 1fr);
+            gap: 9px;
+            align-items: center;
+            width: 100%;
+            padding: 7px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .suggest-option:hover {
+            background: rgba(99,102,241,0.08);
+        }
+
+        .suggest-option img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: rgba(248,250,252,0.9);
+        }
+
+        .suggest-name {
+            display: block;
+            overflow: hidden;
+            font-size: 0.9rem;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .suggest-number {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            font-weight: 800;
+        }
+
+        .controls-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .btn-primary {
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+        }
+
         .target-strip {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 14px;
             padding-bottom: 2px;
         }
 
@@ -490,6 +585,43 @@
             color: #ffffff;
         }
 
+        .back-to-top {
+            position: fixed;
+            right: 24px;
+            bottom: 86px;
+            z-index: 30;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            font-weight: 950;
+            box-shadow: 0 12px 28px rgba(15,23,42,0.18);
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .back-to-top.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            border-color: rgba(99,102,241,0.48);
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 980px) {
             .summary-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -501,6 +633,13 @@
                 padding: 16px;
             }
 
+            .back-to-top {
+                right: 16px;
+                bottom: 72px;
+                width: 44px;
+                height: 44px;
+            }
+
             .main-title {
                 font-size: 1.9rem;
             }
@@ -510,7 +649,7 @@
                 flex-direction: column;
             }
 
-            .control-grid {
+            .candidate-search-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -544,11 +683,27 @@
         </div>
 
         <section class="panel controls">
-            <div class="control-grid">
-                <input id="searchInput" class="search-input" type="search" placeholder="搜索目标、混抓精灵或编号..." autocomplete="off">
-                <button id="clearSearch" class="btn" type="button">清空</button>
+            <div class="adventure-control-section">
+                <div class="control-title">选择奇遇精灵</div>
+                <div id="targetStrip" class="target-strip"></div>
             </div>
-            <div id="targetStrip" class="target-strip"></div>
+            <div class="adventure-control-section">
+                <div class="control-title">限定混抓精灵（可选）</div>
+                <div class="candidate-search-grid">
+                    <div class="candidate-field">
+                        <input id="candidateInputA" class="search-input" type="search" placeholder="输入第一只精灵名称或编号" autocomplete="off" aria-controls="candidateSuggestA">
+                        <div id="candidateSuggestA" class="suggest-menu" role="listbox"></div>
+                    </div>
+                    <div class="candidate-field">
+                        <input id="candidateInputB" class="search-input" type="search" placeholder="输入第二只精灵名称或编号" autocomplete="off" aria-controls="candidateSuggestB">
+                        <div id="candidateSuggestB" class="suggest-menu" role="listbox"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="controls-actions">
+                <button id="startSearch" class="btn btn-primary" type="button">开始搜索</button>
+                <button id="clearSearch" class="btn" type="button">清空条件</button>
+            </div>
         </section>
 
         <section class="summary-grid">
@@ -586,6 +741,8 @@
             苏公网安备32058102002843号
         </a>
     </div>
+
+    <button id="backToTop" class="back-to-top" type="button" aria-label="回到顶部">↑</button>
 
     <script>
         const ATTRIBUTES = ['普通', '草', '火', '水', '光', '地', '冰', '龙', '电', '毒', '虫', '武', '翼', '萌', '幽', '恶', '机械', '幻'];
@@ -638,7 +795,11 @@
         let visibleCount = PAGE_SIZE;
         let activeTarget = '';
 
-        const searchInput = document.getElementById('searchInput');
+        const candidateInputA = document.getElementById('candidateInputA');
+        const candidateInputB = document.getElementById('candidateInputB');
+        const candidateSuggestA = document.getElementById('candidateSuggestA');
+        const candidateSuggestB = document.getElementById('candidateSuggestB');
+        const startSearch = document.getElementById('startSearch');
         const clearSearch = document.getElementById('clearSearch');
         const targetStrip = document.getElementById('targetStrip');
         const strategyGrid = document.getElementById('strategyGrid');
@@ -648,6 +809,7 @@
         const candidateTotal = document.getElementById('candidateTotal');
         const pairTotal = document.getElementById('pairTotal');
         const strategyTotal = document.getElementById('strategyTotal');
+        const backToTop = document.getElementById('backToTop');
 
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -783,6 +945,63 @@
 
         function formatNo(number) {
             return `NO.${escapeHtml(number)}`;
+        }
+
+        function candidateInputLabel(record) {
+            return `${record.number} ${record.title}`;
+        }
+
+        function candidateSearchText(record) {
+            return normalize(`${record.number} ${record.title}`);
+        }
+
+        function candidateMatchesTerm(record, term) {
+            return !term || candidateSearchText(record).includes(term);
+        }
+
+        function renderCandidateSuggestOption(record) {
+            return `
+                <button class="suggest-option" type="button" data-number="${escapeHtml(record.number)}">
+                    <img src="${escapeHtml(record.portrait)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span>
+                        <span class="suggest-name">${escapeHtml(record.title)}</span>
+                        <span class="suggest-number">${formatNo(record.number)}</span>
+                    </span>
+                </button>
+            `;
+        }
+
+        function closeSuggestMenu(menu) {
+            menu.classList.remove('is-open');
+        }
+
+        function updateCandidateSuggestions(input, menu) {
+            const keyword = normalize(input.value);
+            if (!keyword) {
+                closeSuggestMenu(menu);
+                return;
+            }
+
+            const matches = candidates
+                .filter(record => candidateMatchesTerm(record, keyword))
+                .slice(0, 10);
+
+            if (!matches.length) {
+                menu.innerHTML = '<div class="empty-state" style="padding:12px;">没有匹配的候选精灵。</div>';
+                menu.classList.add('is-open');
+                return;
+            }
+
+            menu.innerHTML = matches.map(renderCandidateSuggestOption).join('');
+            menu.classList.add('is-open');
+            menu.querySelectorAll('.suggest-option').forEach(option => {
+                option.addEventListener('mousedown', event => {
+                    event.preventDefault();
+                    const record = candidates.find(item => item.number === option.dataset.number);
+                    if (record) input.value = candidateInputLabel(record);
+                    closeSuggestMenu(menu);
+                });
+            });
         }
 
         function renderSprite(record) {
@@ -931,18 +1150,30 @@
             targetStrip.querySelectorAll('.target-chip').forEach(button => {
                 button.addEventListener('click', () => {
                     activeTarget = button.dataset.target || '';
-                    visibleCount = PAGE_SIZE;
-                    applyFilters();
+                    renderTargetControls();
                 });
             });
         }
 
         function applyFilters() {
-            const keyword = normalize(searchInput.value);
+            const firstTerm = normalize(candidateInputA.value);
+            const secondTerm = normalize(candidateInputB.value);
             filteredStrategies = allStrategies.filter(strategy => {
                 const matchesTarget = !activeTarget || strategy.target.number === activeTarget;
-                const matchesKeyword = !keyword || strategy.searchText.includes(keyword);
-                return matchesTarget && matchesKeyword;
+                const matchesFirstCandidate = candidateMatchesTerm(strategy.first, firstTerm);
+                const matchesSecondCandidate = candidateMatchesTerm(strategy.second, secondTerm);
+                const matchesReverseFirst = candidateMatchesTerm(strategy.first, secondTerm);
+                const matchesReverseSecond = candidateMatchesTerm(strategy.second, firstTerm);
+                const matchesCandidates = (
+                    (!firstTerm && !secondTerm)
+                    || (firstTerm && !secondTerm && (matchesFirstCandidate || matchesReverseSecond))
+                    || (!firstTerm && secondTerm && (matchesReverseFirst || matchesSecondCandidate))
+                    || (firstTerm && secondTerm && (
+                        (matchesFirstCandidate && matchesSecondCandidate)
+                        || (matchesReverseFirst && matchesReverseSecond)
+                    ))
+                );
+                return matchesTarget && matchesCandidates;
             });
 
             strategyTotal.textContent = String(filteredStrategies.length);
@@ -998,15 +1229,37 @@
             }
         }
 
-        searchInput.addEventListener('input', () => {
+        startSearch.addEventListener('click', () => {
             visibleCount = PAGE_SIZE;
             applyFilters();
         });
 
+        candidateInputA.addEventListener('input', () => updateCandidateSuggestions(candidateInputA, candidateSuggestA));
+        candidateInputB.addEventListener('input', () => updateCandidateSuggestions(candidateInputB, candidateSuggestB));
+        candidateInputA.addEventListener('focus', () => updateCandidateSuggestions(candidateInputA, candidateSuggestA));
+        candidateInputB.addEventListener('focus', () => updateCandidateSuggestions(candidateInputB, candidateSuggestB));
+        candidateInputA.addEventListener('blur', () => setTimeout(() => closeSuggestMenu(candidateSuggestA), 120));
+        candidateInputB.addEventListener('blur', () => setTimeout(() => closeSuggestMenu(candidateSuggestB), 120));
+        candidateInputA.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                visibleCount = PAGE_SIZE;
+                applyFilters();
+            }
+        });
+        candidateInputB.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                visibleCount = PAGE_SIZE;
+                applyFilters();
+            }
+        });
+
         clearSearch.addEventListener('click', () => {
-            searchInput.value = '';
+            candidateInputA.value = '';
+            candidateInputB.value = '';
             activeTarget = '';
             visibleCount = PAGE_SIZE;
+            closeSuggestMenu(candidateSuggestA);
+            closeSuggestMenu(candidateSuggestB);
             applyFilters();
         });
 
@@ -1014,6 +1267,16 @@
             visibleCount += PAGE_SIZE;
             renderStrategies();
         });
+
+        function syncBackToTop() {
+            backToTop.classList.toggle('is-visible', window.scrollY > 320);
+        }
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        window.addEventListener('scroll', syncBackToTop, { passive: true });
+        syncBackToTop();
 
         init();
     </script>
