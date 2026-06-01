@@ -248,19 +248,19 @@
                 linear-gradient(180deg, #ffe59a 0%, #ffd15f 54%, #f7b840 100%);
             box-shadow: 0 18px 45px rgba(108,65,13,0.2), inset 0 1px 0 rgba(255,255,255,0.55);
             position: relative;
-            overflow: visible;
+            overflow: hidden;
             isolation: isolate;
         }
 
         .merchant-panel::after {
             content: '';
             position: absolute;
-            right: 14px;
-            top: -88px;
-            width: 190px;
-            height: 190px;
+            right: 18px;
+            bottom: -54px;
+            width: 220px;
+            height: 165px;
             background: url('./web_images/商人.png') center top / contain no-repeat;
-            z-index: -1;
+            z-index: 0;
             pointer-events: none;
         }
 
@@ -272,6 +272,8 @@
             margin-bottom: 12px;
             padding-right: 160px;
             color: #6b3f0a;
+            position: relative;
+            z-index: 1;
         }
 
         .merchant-title-wrap {
@@ -367,10 +369,18 @@
         }
 
         .merchant-item-top {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .merchant-name-line {
             display: flex;
             align-items: center;
+            min-width: 0;
             gap: 8px;
-            margin-bottom: 5px;
         }
 
         .merchant-item-name {
@@ -402,31 +412,29 @@
         }
 
         .merchant-price-badge {
-            position: relative;
-            width: 118px;
-            height: 47px;
-            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            min-width: 78px;
+            color: #7c4a0d;
         }
 
         .merchant-price-badge img {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+            width: 22px;
+            height: 21px;
             object-fit: contain;
+            flex: 0 0 auto;
         }
 
         .merchant-price-text {
-            position: absolute;
-            left: 62%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            min-width: 42px;
-            color: #ffffff;
+            min-width: 0;
+            color: #7c4a0d;
             font-size: 0.9rem;
             font-weight: 950;
-            text-align: center;
-            text-shadow: 0 1px 3px rgba(124,28,126,0.5);
+            line-height: 1;
+            text-align: right;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.56);
         }
 
         .merchant-empty {
@@ -679,10 +687,10 @@
             }
 
             .merchant-panel::after {
-                right: -18px;
-                top: -68px;
-                width: 150px;
-                height: 150px;
+                right: -12px;
+                bottom: -42px;
+                width: 164px;
+                height: 123px;
             }
 
             .merchant-head {
@@ -974,14 +982,16 @@
                         </div>
                         <div class="merchant-info">
                             <div class="merchant-item-top">
-                                <div class="merchant-item-name">${escapeHtml(item.name)}</div>
-                                ${item.limit ? `<span class="merchant-limit">${escapeHtml(item.limit)}</span>` : ''}
+                                <div class="merchant-name-line">
+                                    <div class="merchant-item-name">${escapeHtml(item.name)}</div>
+                                    ${item.limit ? `<span class="merchant-limit">${escapeHtml(item.limit)}</span>` : ''}
+                                </div>
+                                <div class="merchant-price-badge" aria-label="价格：${escapeHtml(item.price || '-')} 洛克贝">
+                                    <img src="./web_images/coin.png" alt="" aria-hidden="true">
+                                    <span class="merchant-price-text">${escapeHtml(item.price || '-')}</span>
+                                </div>
                             </div>
                             <div class="merchant-item-type">${escapeHtml(item.type || '远行商人商品')}</div>
-                            <div class="merchant-price-badge" aria-label="价格：${escapeHtml(item.price || '-')} 洛克贝">
-                                <img src="./web_images/values/base-review-rock-coin.png" alt="" aria-hidden="true">
-                                <span class="merchant-price-text">${escapeHtml(item.price || '-')}</span>
-                            </div>
                         </div>
                     </article>
                 `;
