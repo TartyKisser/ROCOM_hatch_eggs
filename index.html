@@ -792,7 +792,8 @@
     </div>
     <script>
         const merchantShopConfig = {
-            sourceUrl: 'https://www.onebiji.com/hykb_tools/comm/lkwgmerchant/preview.php?id=1&immgj=0',
+            sourceUrl: './merchant_proxy.php',
+            remoteSourceUrl: 'https://www.onebiji.com/hykb_tools/comm/lkwgmerchant/preview.php?id=1&immgj=0',
             itemImageDir: './web_images/shop/',
             itemImageExtension: 'png',
             itemImageMap: {
@@ -909,7 +910,7 @@
         async function fetchMerchantSource() {
             const urls = [
                 merchantShopConfig.sourceUrl,
-                ...merchantShopConfig.corsProxyUrls.map(buildUrl => buildUrl(merchantShopConfig.sourceUrl))
+                ...merchantShopConfig.corsProxyUrls.map(buildUrl => buildUrl(merchantShopConfig.remoteSourceUrl))
             ];
 
             let lastError = null;
@@ -965,7 +966,7 @@
         function renderMerchantError() {
             merchantSubtitle.textContent = '暂时无法自动获取售卖信息';
             merchantStatus.textContent = '同步失败';
-            merchantList.innerHTML = '<div class="merchant-empty">远行商人数据抓取失败，稍后刷新页面重试。</div>';
+            merchantList.innerHTML = '<div class="merchant-empty">远行商人数据抓取失败，请确认 merchant_proxy.php 已随站点部署并可访问。</div>';
         }
 
         window.setMerchantItems = function setMerchantItems(items, options = {}) {
