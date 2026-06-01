@@ -38,6 +38,29 @@
             top: 20px;
             right: 20px;
             z-index: 20;
+            width: min(360px, calc(100vw - 40px));
+        }
+
+        .reward-widget .source-panel {
+            width: 100%;
+            max-width: none;
+            padding: 12px 14px;
+            border-radius: 16px;
+            font-size: 0.86rem;
+            line-height: 1.55;
+            text-align: left;
+            text-shadow: 0 2px 8px rgba(15,23,42,0.3);
+        }
+
+        .reward-widget .source-links {
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .reward-widget .box-link {
+            padding: 5px 9px;
+            font-size: 0.82rem;
         }
 
         .reward-button {
@@ -45,14 +68,14 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            min-height: 40px;
-            padding: 0 15px;
+            min-height: 31px;
+            padding: 0 11px;
             border: 1px solid rgba(255,255,255,0.5);
             border-radius: 999px;
             background: rgba(255,255,255,0.2);
             color: #ffffff;
             font: inherit;
-            font-size: 0.94rem;
+            font-size: 0.82rem;
             font-weight: 800;
             text-shadow: 0 2px 8px rgba(15,23,42,0.35);
             box-shadow: 0 10px 26px rgba(15,23,42,0.18);
@@ -142,7 +165,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 50px 20px 36px;
+            padding: 120px 20px 36px;
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
@@ -425,12 +448,21 @@
             .reward-widget {
                 top: 14px;
                 right: 14px;
+                width: calc(100vw - 28px);
+            }
+
+            .reward-widget .source-panel {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+                border-radius: 12px;
+                word-wrap: break-word;
+                word-break: break-all;
             }
 
             .reward-button {
-                min-height: 36px;
-                padding: 0 12px;
-                font-size: 0.86rem;
+                min-height: 30px;
+                padding: 0 10px;
+                font-size: 0.8rem;
             }
 
             .reward-menu {
@@ -440,6 +472,10 @@
 
             .reward-images {
                 gap: 10px;
+            }
+
+            header {
+                padding-top: 180px;
             }
 
             .main-title {
@@ -454,27 +490,24 @@
                 min-height: 210px;
                 border-radius: 14px;
             }
-
-            .source-panel {
-                width: 95%;
-                box-sizing: border-box;
-                padding: 12px 15px;
-                font-size: 0.85rem;
-                border-radius: 12px;
-                word-wrap: break-word;
-                word-break: break-all;
-            }
         }
     </style>
 </head>
 <body>
     <div class="reward-widget" id="rewardWidget">
-        <button class="reward-button" type="button" id="rewardButton" aria-expanded="false" aria-controls="rewardMenu">
-            <svg class="reward-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 21s-7-4.35-9.45-8.62C.63 9.03 2.63 5 6.43 5c2.01 0 3.49 1.08 4.37 2.23C11.67 6.08 13.15 5 15.16 5c3.8 0 5.8 4.03 3.88 7.38C16.6 16.65 12 21 12 21Z" fill="currentColor"/>
-            </svg>
-            打赏
-        </button>
+        <div class="source-panel">
+            <span>免费开放使用，数据参考洛克王国世界 WIKI，欢迎一起完善。</span>
+            <div class="source-links">
+                <a href="https://github.com/TartyKisser/ROCOM_hatch_eggs" target="_blank" class="box-link">GitHub 项目</a>
+                <a href="https://wiki.biligame.com/rocom" target="_blank" class="box-link">数据来源 WIKI</a>
+                <button class="reward-button" type="button" id="rewardButton" aria-expanded="false" aria-controls="rewardMenu">
+                    <svg class="reward-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 21s-7-4.35-9.45-8.62C.63 9.03 2.63 5 6.43 5c2.01 0 3.49 1.08 4.37 2.23C11.67 6.08 13.15 5 15.16 5c3.8 0 5.8 4.03 3.88 7.38C16.6 16.65 12 21 12 21Z" fill="currentColor"/>
+                    </svg>
+                    打赏
+                </button>
+            </div>
+        </div>
         <div class="reward-menu" id="rewardMenu" role="menu" aria-label="打赏二维码">
             <div class="reward-images">
                 <div class="reward-image-box">
@@ -494,14 +527,6 @@
             <div class="hero-eyebrow">ROCOM TOOLS</div>
             <h1 class="main-title">洛克王国世界工具站</h1>
             <p class="desc-font">把常用资料和计算工具放在一个更顺手的地方。</p>
-
-            <div class="source-panel">
-                <span>免费开放使用，数据参考洛克王国世界 WIKI，欢迎一起完善。</span>
-                <div class="source-links">
-                    <a href="https://github.com/TartyKisser/ROCOM_hatch_eggs" target="_blank" class="box-link">GitHub 项目</a>
-                    <a href="https://wiki.biligame.com/rocom" target="_blank" class="box-link">数据来源 WIKI</a>
-                </div>
-            </div>
         </header>
 
         <main class="feature-grid">
