@@ -500,6 +500,12 @@
             border-radius: 2px;
         }
 
+        .fruit-evolution-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 18px;
+        }
+
         .fruit-card {
             display: grid;
             grid-template-columns: 118px minmax(0, 1fr);
@@ -523,6 +529,66 @@
             height: 100px;
             object-fit: contain;
             filter: drop-shadow(0 8px 12px rgba(15,23,42,0.12));
+        }
+
+        .evolution-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+            gap: 10px;
+        }
+
+        .evolution-item {
+            min-width: 0;
+            padding: 10px;
+            border: 1px solid rgba(226,232,240,0.92);
+            border-radius: 14px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.74)),
+                linear-gradient(135deg, var(--type-a, #6366f1), var(--type-b, #ec4899));
+            text-align: center;
+        }
+
+        .evolution-image-wrap {
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 7px;
+            border-radius: 12px;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.84), rgba(255,255,255,0.24) 62%, transparent);
+        }
+
+        .evolution-image {
+            max-width: 78px;
+            max-height: 78px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 12px rgba(15,23,42,0.14));
+        }
+
+        .evolution-number {
+            color: var(--text-secondary);
+            font-size: 0.74rem;
+            font-weight: 900;
+        }
+
+        .evolution-name {
+            overflow: hidden;
+            margin-top: 2px;
+            color: var(--text);
+            font-size: 0.86rem;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .evolution-empty {
+            padding: 18px;
+            border: 1px dashed rgba(148,163,184,0.72);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.62);
+            color: var(--text-secondary);
+            font-weight: 850;
+            text-align: center;
         }
 
         .stats-grid {
@@ -719,6 +785,10 @@
             }
 
             .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .fruit-evolution-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -1025,6 +1095,42 @@
             return attributeChips + eggChips;
         }
 
+        function renderEvolutionChain(record) {
+            const evolutionIds = Array.isArray(record.evolution) ? record.evolution.filter(Boolean) : [];
+            const hasEvolution = evolutionIds.length > 1;
+
+            if (!hasEvolution) {
+                return '<div class="evolution-empty">当前精灵无进化链</div>';
+            }
+
+            return `
+                <div class="evolution-list">
+                    ${evolutionIds.map(id => {
+                        const evolutionRecord = records.find(item => item.id === id);
+                        if (!evolutionRecord) {
+                            return `
+                                <div class="evolution-item">
+                                    <div class="evolution-image-wrap"></div>
+                                    <div class="evolution-number">${escapeHtml(id.split('-', 1)[0] || '-')}</div>
+                                    <div class="evolution-name">${escapeHtml(id.replace(/^\d+-/, ''))}</div>
+                                </div>
+                            `;
+                        }
+
+                        return `
+                            <div class="evolution-item" style="${recordBackgroundStyle(evolutionRecord)}">
+                                <div class="evolution-image-wrap">
+                                    <img class="evolution-image" src="${escapeHtml(evolutionRecord.portrait)}" alt="${escapeHtml(evolutionRecord.title)}" loading="lazy" onerror="this.style.display='none'">
+                                </div>
+                                <div class="evolution-number">NO.${escapeHtml(evolutionRecord.number)}</div>
+                                <div class="evolution-name">${escapeHtml(evolutionRecord.title)}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
         function showGallery(updateHash = true) {
             galleryView.classList.add('active');
             detailView.classList.remove('active');
@@ -1179,13 +1285,20 @@
                         </div>
                     </div>
 
-                    <div class="section">
-                        <h3 class="section-title">精灵果实</h3>
-                        <div class="fruit-card">
-                            <div class="fruit-image-wrap">
-                                <img class="fruit-image" src="${escapeHtml(record.icon || record.portrait)}" alt="${escapeHtml(record.title)} 精灵果实" onerror="this.style.display='none'">
+                    <div class="fruit-evolution-grid">
+                        <div class="section">
+                            <h3 class="section-title">精灵果实</h3>
+                            <div class="fruit-card">
+                                <div class="fruit-image-wrap">
+                                    <img class="fruit-image" src="${escapeHtml(record.icon || record.portrait)}" alt="${escapeHtml(record.title)} 精灵果实" onerror="this.style.display='none'">
+                                </div>
+                                <p class="ability-desc">${escapeHtml(record.title)} 对应的精灵果实图片。</p>
                             </div>
-                            <p class="ability-desc">${escapeHtml(record.title)} 对应的精灵果实图片。</p>
+                        </div>
+
+                        <div class="section">
+                            <h3 class="section-title">进化链</h3>
+                            ${renderEvolutionChain(record)}
                         </div>
                     </div>
 
