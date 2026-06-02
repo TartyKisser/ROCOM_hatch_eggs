@@ -221,6 +221,7 @@
         }
 
         .sprite-card {
+            position: relative;
             min-height: 218px;
             border: 1px solid rgba(255,255,255,0.55);
             border-radius: 18px;
@@ -241,6 +242,18 @@
             transform: translateY(-5px);
             border-color: rgba(99,102,241,0.42);
             box-shadow: 0 20px 44px rgba(15,23,42,0.22);
+        }
+
+        .rare-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 10px rgba(15,23,42,0.24));
+            pointer-events: none;
         }
 
         .card-image-wrap {
@@ -323,6 +336,7 @@
         }
 
         .portrait-wrap {
+            position: relative;
             min-height: 280px;
             display: flex;
             align-items: center;
@@ -337,6 +351,30 @@
             aspect-ratio: 1;
             object-fit: contain;
             filter: drop-shadow(0 18px 24px rgba(15,23,42,0.28));
+        }
+
+        .portrait-rare-toggle {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 2;
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            filter: drop-shadow(0 8px 14px rgba(15,23,42,0.28));
+        }
+
+        .portrait-rare-toggle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .portrait-rare-toggle.is-active {
+            transform: scale(1.08);
         }
 
         .detail-number {
@@ -909,6 +947,10 @@
                     <div class="filter-label">蛋组</div>
                     <div id="eggFilters" class="filters"></div>
                 </div>
+                <div class="filter-block">
+                    <div class="filter-label">异色</div>
+                    <div id="rareFilters" class="filters"></div>
+                </div>
             </section>
 
             <section id="cardGrid" class="card-grid">
@@ -943,6 +985,7 @@
             baseStarlightValue: './web_images/values/base-starlight-value.png',
             baseReviewRockCoin: './web_images/values/base-review-rock-coin.png'
         };
+        const RARE_BADGE = './web_images/rare.png';
         const ATTRIBUTE_COLORS = {
             '普通': '#3F89B4',
             '草': '#4EBC73',
@@ -971,12 +1014,14 @@
         let selectedId = '';
         let activeAttribute = '';
         let activeEggGroup = '';
+        let activeRareFilter = '';
         let galleryScrollY = 0;
 
         const searchInput = document.getElementById('searchInput');
         const clearSearch = document.getElementById('clearSearch');
         const filters = document.getElementById('filters');
         const eggFilters = document.getElementById('eggFilters');
+        const rareFilters = document.getElementById('rareFilters');
         const cardGrid = document.getElementById('cardGrid');
         const detailPanel = document.getElementById('detailPanel');
         const resultCount = document.getElementById('resultCount');
@@ -1038,6 +1083,12 @@
 
         function portraitSmallPath(record) {
             return String(record && record.portrait ? record.portrait : '').replace('/portrait/', '/portrait-small/');
+        }
+
+        function renderRareBadge(record, className = 'rare-badge') {
+            return record && record.rare
+                ? `<img class="${escapeHtml(className)}" src="${escapeHtml(RARE_BADGE)}" alt="异色" loading="lazy" onerror="this.style.display='none'">`
+                : '';
         }
 
         function renderAttributeLogo(attr) {
@@ -1192,6 +1243,19 @@
                     applyFilters();
                 });
             });
+
+            rareFilters.innerHTML = [
+                `<button class="filter-chip ${activeRareFilter === 'yes' ? 'active' : ''}" type="button" data-rare="yes">有异色</button>`,
+                `<button class="filter-chip ${activeRareFilter === 'no' ? 'active' : ''}" type="button" data-rare="no">无异色</button>`
+            ].join('');
+
+            rareFilters.querySelectorAll('.filter-chip').forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.dataset.rare || '';
+                    activeRareFilter = activeRareFilter === value ? '' : value;
+                    applyFilters();
+                });
+            });
         }
 
         function applyFilters() {
@@ -1201,7 +1265,8 @@
                 const matchesKeyword = !keyword || searchableText.includes(keyword);
                 const matchesAttribute = !activeAttribute || recordAttributes(record).includes(activeAttribute);
                 const matchesEggGroup = !activeEggGroup || recordEggGroups(record).includes(activeEggGroup);
-                return matchesKeyword && matchesAttribute && matchesEggGroup;
+                const matchesRare = !activeRareFilter || (activeRareFilter === 'yes' ? Boolean(record.rare) : !record.rare);
+                return matchesKeyword && matchesAttribute && matchesEggGroup && matchesRare;
             });
             renderFilters();
             renderCards();
@@ -1216,6 +1281,7 @@
 
             cardGrid.innerHTML = filteredRecords.map(record => `
                 <button class="sprite-card" type="button" data-id="${escapeHtml(record.id)}" style="${recordBackgroundStyle(record)}">
+                    ${renderRareBadge(record)}
                     <div class="card-image-wrap">
                         <img class="card-image" src="${escapeHtml(portraitSmallPath(record))}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
                     </div>
@@ -1265,7 +1331,12 @@
             detailPanel.innerHTML = `
                 <div class="detail-hero" style="${recordBackgroundStyle(record, 'detail')}">
                     <div class="portrait-wrap">
-                        <img class="portrait" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" onerror="this.style.display='none'">
+                        ${record.rare ? `
+                            <button class="portrait-rare-toggle" type="button" aria-label="切换异色" data-normal="${escapeHtml(record.portrait)}" data-rare="${escapeHtml(record.rarePath)}">
+                                <img src="${escapeHtml(RARE_BADGE)}" alt="异色" onerror="this.style.display='none'">
+                            </button>
+                        ` : ''}
+                        <img class="portrait" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" data-variant="normal" onerror="this.style.display='none'">
                     </div>
                     <div>
                         <div class="detail-header-row">
@@ -1367,6 +1438,17 @@
                     </div>
                 </div>
             `;
+
+            const rareToggle = detailPanel.querySelector('.portrait-rare-toggle');
+            const portrait = detailPanel.querySelector('.portrait');
+            if (rareToggle && portrait) {
+                rareToggle.addEventListener('click', () => {
+                    const isRare = portrait.dataset.variant === 'rare';
+                    portrait.src = isRare ? rareToggle.dataset.normal : rareToggle.dataset.rare;
+                    portrait.dataset.variant = isRare ? 'normal' : 'rare';
+                    rareToggle.classList.toggle('is-active', !isRare);
+                });
+            }
         }
 
         async function loadHandbook() {
@@ -1397,6 +1479,7 @@
             searchInput.value = '';
             activeAttribute = '';
             activeEggGroup = '';
+            activeRareFilter = '';
             applyFilters();
         });
         backToGallery.addEventListener('click', () => showGallery(true, true));
