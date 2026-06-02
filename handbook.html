@@ -986,6 +986,7 @@
             baseReviewRockCoin: './web_images/values/base-review-rock-coin.png'
         };
         const RARE_BADGE = './web_images/rare.png';
+        const NO_RARE_BADGE = './web_images/no-rare.png';
         const ATTRIBUTE_COLORS = {
             '普通': '#3F89B4',
             '草': '#4EBC73',
@@ -1332,8 +1333,8 @@
                 <div class="detail-hero" style="${recordBackgroundStyle(record, 'detail')}">
                     <div class="portrait-wrap">
                         ${record.rare ? `
-                            <button class="portrait-rare-toggle" type="button" aria-label="切换异色" data-normal="${escapeHtml(record.portrait)}" data-rare="${escapeHtml(record.rarePath)}">
-                                <img src="${escapeHtml(RARE_BADGE)}" alt="异色" onerror="this.style.display='none'">
+                            <button class="portrait-rare-toggle" type="button" aria-label="切换异色" data-normal="${escapeHtml(record.portrait)}" data-rare="${escapeHtml(record.rarePath)}" data-normal-badge="${escapeHtml(NO_RARE_BADGE)}" data-rare-badge="${escapeHtml(RARE_BADGE)}">
+                                <img src="${escapeHtml(NO_RARE_BADGE)}" alt="普通形态" onerror="this.style.display='none'">
                             </button>
                         ` : ''}
                         <img class="portrait" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" data-variant="normal" onerror="this.style.display='none'">
@@ -1440,6 +1441,7 @@
             `;
 
             const rareToggle = detailPanel.querySelector('.portrait-rare-toggle');
+            const rareToggleImage = rareToggle ? rareToggle.querySelector('img') : null;
             const portrait = detailPanel.querySelector('.portrait');
             if (rareToggle && portrait) {
                 rareToggle.addEventListener('click', () => {
@@ -1447,6 +1449,10 @@
                     portrait.src = isRare ? rareToggle.dataset.normal : rareToggle.dataset.rare;
                     portrait.dataset.variant = isRare ? 'normal' : 'rare';
                     rareToggle.classList.toggle('is-active', !isRare);
+                    if (rareToggleImage) {
+                        rareToggleImage.src = isRare ? rareToggle.dataset.normalBadge : rareToggle.dataset.rareBadge;
+                        rareToggleImage.alt = isRare ? '普通形态' : '异色';
+                    }
                 });
             }
         }
