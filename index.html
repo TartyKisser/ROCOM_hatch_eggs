@@ -464,7 +464,7 @@
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 18px;
             margin-bottom: 28px;
         }
@@ -556,6 +556,10 @@
 
         .adventure-card {
             --feature-image: url('./web_images/adventure.png');
+        }
+
+        .pair-card {
+            --feature-image: url('./web_images/handbook.png');
         }
 
         .feature-card.placeholder {
@@ -925,6 +929,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .feature-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .merchant-card {
                 grid-template-columns: 76px minmax(0, 1fr);
                 min-height: 112px;
@@ -1050,6 +1058,15 @@
                     <p class="feature-copy">根据系别、蛋组和星光值，推荐更快触发奇遇精灵的混抓方案。</p>
                 </div>
                 <span class="feature-action">查看推荐 <span>›</span></span>
+            </a>
+
+            <a class="feature-card visual-card pair-card" href="pair.html">
+                <div>
+                    <span class="feature-mark">配</span>
+                    <h2 class="feature-title">精灵配对</h2>
+                    <p class="feature-copy">从全图鉴候选中拖拽选择精灵，实时查看家园配对关系。</p>
+                </div>
+                <span class="feature-action">开始配对 <span>›</span></span>
             </a>
         </main>
     </div>

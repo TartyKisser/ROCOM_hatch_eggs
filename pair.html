@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精灵配对 - 洛克王国世界工具站</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: rgba(226,232,240,0.9);
+            --panel: rgba(255,255,255,0.92);
+            --panel-soft: rgba(248,250,252,0.88);
+            --shadow: 0 18px 45px rgba(15,23,42,0.18);
+            --success: #16a34a;
+            --danger: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            background: url('./web_images/bg.jpg') no-repeat center center fixed,
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+        }
+
+        .container {
+            width: 96%;
+            max-width: 1680px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 42px 20px 28px;
+            color: white;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.32);
+            border-radius: 999px;
+            background: rgba(15,23,42,0.22);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .main-title {
+            font-size: 2.6rem;
+            line-height: 1.12;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-shadow: 0 4px 18px rgba(15,23,42,0.45);
+        }
+
+        .desc-font {
+            max-width: 760px;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.94);
+            text-shadow: 0 2px 8px rgba(15,23,42,0.28);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 10px 16px;
+            border: 1px solid rgba(255,255,255,0.48);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-dark);
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(15,23,42,0.12);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99,102,241,0.48);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(420px, 0.95fr) minmax(560px, 1.25fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel {
+            border: 1px solid rgba(255,255,255,0.58);
+            border-radius: 18px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(226,232,240,0.9);
+            background: rgba(255,255,255,0.68);
+        }
+
+        .panel-title {
+            color: var(--primary-dark);
+            font-size: 1.18rem;
+            font-weight: 950;
+        }
+
+        .panel-subtitle {
+            margin-top: 4px;
+            color: var(--text-secondary);
+            font-size: 0.86rem;
+            font-weight: 750;
+        }
+
+        .count-pill {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(99,102,241,0.1);
+            color: var(--primary-dark);
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
+        .selected-body {
+            padding: 18px;
+        }
+
+        .drop-zone {
+            min-height: 420px;
+            border: 2px dashed rgba(99,102,241,0.22);
+            border-radius: 16px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248,250,252,0.72)),
+                radial-gradient(circle at 18% 18%, rgba(236,72,153,0.12), transparent 28%);
+            padding: 14px;
+            overflow: auto;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .drop-zone.is-drag-over {
+            border-color: rgba(99,102,241,0.68);
+            background:
+                linear-gradient(180deg, rgba(238,242,255,0.92), rgba(255,255,255,0.82)),
+                radial-gradient(circle at 18% 18%, rgba(236,72,153,0.16), transparent 28%);
+        }
+
+        .empty-state {
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .selected-grid {
+            position: relative;
+            min-width: 390px;
+            min-height: 380px;
+        }
+
+        .selected-card {
+            position: absolute;
+            z-index: 6;
+            width: 58px;
+            height: 58px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            transition: transform 0.18s ease, filter 0.18s ease;
+        }
+
+        .selected-card:hover {
+            transform: translateY(-3px) scale(1.04);
+        }
+
+        .selected-card.is-active {
+            filter: drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 12px rgba(236,72,153,0.72));
+        }
+
+        .selected-card.is-active .sprite-image-wrap {
+            outline: 3px solid rgba(236,72,153,0.72);
+            outline-offset: 2px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            z-index: 8;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(239,68,68,0.28);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            color: var(--danger);
+            font-size: 0.78rem;
+            font-weight: 950;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.18s ease;
+        }
+
+        .selected-card:hover .remove-btn {
+            opacity: 1;
+        }
+
+        .sprite-image-wrap {
+            width: 92px;
+            height: 92px;
+            margin: 8px auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.72);
+        }
+
+        .sprite-image {
+            width: 86px;
+            height: 86px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 10px rgba(15,23,42,0.18));
+        }
+
+        .rare-mark {
+            position: absolute;
+            top: -7px;
+            left: -7px;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 10px rgba(15,23,42,0.24));
+            pointer-events: none;
+            z-index: 7;
+        }
+
+        .selected-card .sprite-image-wrap {
+            width: 58px;
+            height: 58px;
+            margin: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            box-shadow: 0 7px 16px rgba(15,23,42,0.16);
+        }
+
+        .selected-card .sprite-image {
+            width: 56px;
+            height: 56px;
+            filter: drop-shadow(0 7px 8px rgba(15,23,42,0.22));
+        }
+
+        .group-region {
+            position: absolute;
+            z-index: 1;
+            border: 2px solid var(--group-border);
+            background: var(--group-fill);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.38);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
+        }
+
+        .group-label {
+            position: absolute;
+            z-index: 5;
+            min-height: 28px;
+            padding: 5px 10px;
+            border: 1px solid var(--group-border);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.86);
+            color: rgba(15,23,42,0.86);
+            font-family: inherit;
+            font-size: 0.86rem;
+            font-weight: 950;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 7px 16px rgba(15,23,42,0.12);
+            cursor: pointer;
+        }
+
+        .group-label.is-active {
+            color: white;
+            background: var(--group-border);
+            box-shadow: 0 9px 18px rgba(15,23,42,0.18);
+        }
+
+        .sprite-name {
+            min-height: 2.4em;
+            color: var(--text);
+            font-size: 0.96rem;
+            font-weight: 950;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .sprite-number {
+            color: var(--primary-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .chip-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .type-chip,
+        .egg-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            min-height: 24px;
+            padding: 4px 7px;
+            border: 1px solid rgba(99,102,241,0.14);
+            border-radius: 999px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font-size: 0.73rem;
+            font-weight: 850;
+        }
+
+        .candidate-panel {
+            min-height: 680px;
+        }
+
+        .candidate-controls {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(226,232,240,0.9);
+            background: rgba(248,250,252,0.7);
+        }
+
+        .search-input {
+            width: 100%;
+            min-height: 42px;
+            padding: 10px 12px;
+            border: 1px solid rgba(99,102,241,0.18);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.92);
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: rgba(99,102,241,0.58);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        .candidate-filter-row {
+            grid-column: 1 / -1;
+        }
+
+        .filter-label {
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 28px;
+            padding: 5px 9px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 999px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+        }
+
+        .candidate-grid {
+            max-height: 680px;
+            overflow: auto;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+            gap: 10px;
+        }
+
+        .candidate-card {
+            position: relative;
+            min-height: 188px;
+            padding: 10px;
+            border: 1px solid rgba(226,232,240,0.9);
+            border-radius: 14px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.78)),
+                linear-gradient(135deg, var(--type-a, #6366f1), var(--type-b, #ec4899));
+            box-shadow: 0 10px 24px rgba(15,23,42,0.1);
+            cursor: grab;
+            transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        .candidate-card:active {
+            cursor: grabbing;
+        }
+
+        .candidate-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99,102,241,0.42);
+            box-shadow: 0 14px 30px rgba(15,23,42,0.16);
+        }
+
+        .candidate-card.is-incompatible {
+            opacity: 0.42;
+        }
+
+        .candidate-card .sprite-image-wrap {
+            width: 74px;
+            height: 74px;
+        }
+
+        .candidate-card .sprite-image {
+            width: 68px;
+            height: 68px;
+        }
+
+        .candidate-card .sprite-name {
+            font-size: 0.86rem;
+        }
+
+        .add-btn {
+            width: 100%;
+            min-height: 30px;
+            margin-top: 8px;
+            border: 1px solid rgba(99,102,241,0.18);
+            border-radius: 10px;
+            background: rgba(99,102,241,0.1);
+            color: var(--primary-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .footer-beian {
+            text-align: center;
+            margin-top: 40px;
+            padding-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .footer-beian a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .footer-beian a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 1120px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .candidate-grid {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 16px;
+            }
+
+            header {
+                padding: 30px 12px 22px;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .topbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .candidate-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .candidate-grid {
+                grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hero-eyebrow">ROCOM PAIRING</div>
+            <h1 class="main-title">精灵配对</h1>
+            <p class="desc-font">先选定家园里的精灵，再实时查看它们能和谁组成小窝配对。</p>
+        </header>
+
+        <div class="topbar">
+            <div class="topbar-actions">
+                <a class="btn" href="index.html">‹ 返回首页</a>
+                <a id="openHatch" class="btn" href="hatch.html">进入小窝排布</a>
+            </div>
+            <button id="clearSelected" class="btn" type="button">清空已选</button>
+        </div>
+
+        <main class="layout">
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="panel-title">当前家园选择</h2>
+                        <p class="panel-subtitle" id="focusText">拖入精灵后，点击左侧卡片可多选筛选右侧可配对对象。</p>
+                    </div>
+                    <div class="count-pill" id="selectedCount">0 只</div>
+                </div>
+                <div class="selected-body">
+                    <div id="dropZone" class="drop-zone">
+                        <div id="selectedGrid" class="selected-grid"></div>
+                        <div id="emptySelected" class="empty-state">从右侧拖入精灵，或点击候选卡片上的“加入”。</div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="panel candidate-panel">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="panel-title">候选精灵</h2>
+                        <p class="panel-subtitle" id="candidateHint">未选中左侧精灵时显示全部可繁殖精灵。</p>
+                    </div>
+                    <div class="count-pill" id="candidateCount">0 项</div>
+                </div>
+                <div class="candidate-controls">
+                    <input id="searchInput" class="search-input" type="search" placeholder="按编号或精灵名称搜索..." autocomplete="off">
+                    <button id="clearSearch" class="btn" type="button">清空</button>
+                    <div class="candidate-filter-row">
+                        <div class="filter-label">异色</div>
+                        <div id="rareFilters" class="filters"></div>
+                    </div>
+                </div>
+                <div id="candidateGrid" class="candidate-grid">
+                    <div class="empty-state">正在加载精灵数据...</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="footer-beian">
+        <a href="https://beian.mps.gov.cn/#/query/webSearch?code=32058102002843" rel="noreferrer" target="_blank">
+            <img src="https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png" alt="" style="width: 20px; height: 20px;">
+            苏公网安备32058102002843号
+        </a>
+    </div>
+
+    <script>
+        const ATTRIBUTES = ['普通', '草', '火', '水', '光', '地', '冰', '龙', '电', '毒', '虫', '武', '翼', '萌', '幽', '恶', '机械', '幻'];
+        const ATTRIBUTE_COLORS = {
+            '普通': '#3F89B4',
+            '草': '#4EBC73',
+            '火': '#DB5525',
+            '水': '#6AA9FE',
+            '光': '#4FC0FF',
+            '地': '#9A7E3F',
+            '冰': '#5FADDD',
+            '龙': '#ED4962',
+            '电': '#E7C506',
+            '毒': '#BA62E0',
+            '虫': '#9ECE21',
+            '武': '#FF9636',
+            '翼': '#3EC7CA',
+            '萌': '#FC7CAC',
+            '幽': '#9446EC',
+            '恶': '#CF467A',
+            '机械': '#40CBA9',
+            '幻': '#9FA7F8'
+        };
+        const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
+        const RARE_BADGE = './web_images/rare.png';
+        const MAP_CELL_WIDTH = 76;
+        const MAP_CELL_HEIGHT = 72;
+        const MAP_ICON_SIZE = 58;
+        const MAP_REGION_PADDING_X = (MAP_CELL_WIDTH - MAP_ICON_SIZE) / 2;
+        const MAP_REGION_PADDING_Y = (MAP_CELL_HEIGHT - MAP_ICON_SIZE) / 2;
+        const MAX_SELECTED = 10;
+        const EGG_GROUP_COLORS = {
+            '动物组': ['rgba(244,114,182,0.26)', 'rgba(244,114,182,0.56)'],
+            '大地组': ['rgba(251,191,36,0.28)', 'rgba(217,119,6,0.5)'],
+            '天空组': ['rgba(148,163,184,0.28)', 'rgba(71,85,105,0.48)'],
+            '妖精组': ['rgba(45,212,191,0.24)', 'rgba(13,148,136,0.48)'],
+            '巨灵组': ['rgba(168,85,247,0.24)', 'rgba(126,34,206,0.48)'],
+            '拟人组': ['rgba(216,180,254,0.24)', 'rgba(147,51,234,0.46)'],
+            '机械组': ['rgba(148,163,184,0.3)', 'rgba(75,85,99,0.5)'],
+            '植物组': ['rgba(134,239,172,0.28)', 'rgba(22,163,74,0.48)'],
+            '海洋组': ['rgba(147,197,253,0.3)', 'rgba(37,99,235,0.5)'],
+            '爬行组': ['rgba(74,222,128,0.22)', 'rgba(21,128,61,0.46)'],
+            '虫组': ['rgba(253,186,116,0.28)', 'rgba(234,88,12,0.5)'],
+            '软体组': ['rgba(244,114,182,0.2)', 'rgba(219,39,119,0.42)'],
+            '魔力组': ['rgba(96,165,250,0.26)', 'rgba(37,99,235,0.48)'],
+            '龙组': ['rgba(248,113,113,0.26)', 'rgba(220,38,38,0.5)']
+        };
+
+        let candidates = [];
+        let selectedSprites = [];
+        let focusedSlotIds = new Set();
+        let nextSlotId = 1;
+        let activeRareFilter = '';
+
+        const selectedGrid = document.getElementById('selectedGrid');
+        const emptySelected = document.getElementById('emptySelected');
+        const dropZone = document.getElementById('dropZone');
+        const selectedCount = document.getElementById('selectedCount');
+        const focusText = document.getElementById('focusText');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const clearSelected = document.getElementById('clearSelected');
+        const openHatch = document.getElementById('openHatch');
+        const candidateGrid = document.getElementById('candidateGrid');
+        const candidateCount = document.getElementById('candidateCount');
+        const candidateHint = document.getElementById('candidateHint');
+        const rareFilters = document.getElementById('rareFilters');
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function normalize(value) {
+            return String(value || '').replace(/\s+/g, '').toLowerCase();
+        }
+
+        function cleanEggGroups(record) {
+            return Array.isArray(record.eggGroups)
+                ? record.eggGroups.filter(group => group && String(group).toLowerCase() !== 'null')
+                : [];
+        }
+
+        function recordAttributes(record) {
+            return Array.isArray(record.attributes) && record.attributes.length ? record.attributes : ['普通'];
+        }
+
+        function portraitSmallPath(record) {
+            return String(record && record.portrait ? record.portrait : '').replace('/portrait/', '/portrait-small/');
+        }
+
+        function rarePortraitSmallPath(record) {
+            return String(record && record.rarePath ? record.rarePath : '').replace('/portrait/', '/portrait-small/');
+        }
+
+        function candidateSearchText(candidate) {
+            return normalize([
+                candidate.number,
+                candidate.name,
+                candidate.baseTitle,
+                candidate.id,
+                candidate.eggGroups.join('')
+            ].join(''));
+        }
+
+        function candidateFromRecord(record, rare = false) {
+            const eggGroups = cleanEggGroups(record);
+            const title = rare ? `${record.title}异色` : record.title;
+            return {
+                id: rare ? `${record.id}-rare` : record.id,
+                baseId: record.id,
+                number: record.number,
+                name: title,
+                baseTitle: record.title,
+                imagePath: rare ? rarePortraitSmallPath(record) : portraitSmallPath(record),
+                fallbackImagePath: rare ? record.rarePath : '',
+                rare,
+                attributes: recordAttributes(record),
+                eggGroups,
+                searchText: ''
+            };
+        }
+
+        function buildCandidates(records) {
+            candidates = records.flatMap(record => {
+                const base = candidateFromRecord(record, false);
+                if (!base.eggGroups.length) return [];
+
+                const items = [base];
+                if (record.rare && record.rarePath) {
+                    items.push(candidateFromRecord(record, true));
+                }
+                items.forEach(item => {
+                    item.searchText = candidateSearchText(item);
+                });
+                return items;
+            });
+        }
+
+        function styleFor(sprite) {
+            const colors = sprite.attributes.slice(0, 2).map(attr => ATTRIBUTE_COLORS[attr] || FALLBACK_ATTRIBUTE_COLOR);
+            return `--type-a:${colors[0] || FALLBACK_ATTRIBUTE_COLOR};--type-b:${colors[1] || colors[0] || FALLBACK_ATTRIBUTE_COLOR};`;
+        }
+
+        function sharesEggGroup(a, b) {
+            const groups = new Set(a.eggGroups);
+            return b.eggGroups.some(group => groups.has(group));
+        }
+
+        function selectedFocuses() {
+            return selectedSprites.filter(sprite => focusedSlotIds.has(sprite.slotId));
+        }
+
+        function focusNames(focuses) {
+            if (focuses.length <= 3) return focuses.map(sprite => sprite.name).join('、');
+            return `${focuses.length} 只精灵`;
+        }
+
+        function canPairWithAllFocused(candidate, focuses) {
+            return focuses.every(focus => sharesEggGroup(focus, candidate));
+        }
+
+        function eggGroupColor(group) {
+            return EGG_GROUP_COLORS[group] || ['rgba(99,102,241,0.22)', 'rgba(79,70,229,0.46)'];
+        }
+
+        function visibleEggGroups(groupCounts) {
+            return [...groupCounts.entries()]
+                .filter(([, groupCount]) => groupCount > 1)
+                .map(([group]) => group);
+        }
+
+        function slotForIndex(index, columns) {
+            return {
+                col: index % columns,
+                row: Math.floor(index / columns)
+            };
+        }
+
+        function connectedComponentCount(members) {
+            const cells = new Set(members.map(member => `${member.col},${member.row}`));
+            let components = 0;
+
+            members.forEach(member => {
+                const startKey = `${member.col},${member.row}`;
+                if (!cells.has(startKey)) return;
+
+                components += 1;
+                const stack = [member];
+                cells.delete(startKey);
+
+                while (stack.length) {
+                    const current = stack.pop();
+                    [
+                        [current.col - 1, current.row],
+                        [current.col + 1, current.row],
+                        [current.col, current.row - 1],
+                        [current.col, current.row + 1]
+                    ].forEach(([col, row]) => {
+                        const key = `${col},${row}`;
+                        if (!cells.has(key)) return;
+                        cells.delete(key);
+                        stack.push({ col, row });
+                    });
+                }
+            });
+
+            return components;
+        }
+
+        function layoutOrderScore(order, columns, groups) {
+            if (!groups.length) return 0;
+
+            const slots = order.map((sprite, index) => ({
+                sprite,
+                ...slotForIndex(index, columns)
+            }));
+
+            return groups.reduce((score, group) => {
+                const members = slots.filter(slot => slot.sprite.eggGroups.includes(group));
+                if (members.length <= 1) return score;
+
+                const minCol = Math.min(...members.map(member => member.col));
+                const maxCol = Math.max(...members.map(member => member.col));
+                const minRow = Math.min(...members.map(member => member.row));
+                const maxRow = Math.max(...members.map(member => member.row));
+                const coveredCells = (maxCol - minCol + 1) * (maxRow - minRow + 1);
+                const coveredNonMembers = slots.filter(slot => (
+                    !slot.sprite.eggGroups.includes(group)
+                    && slot.col >= minCol
+                    && slot.col <= maxCol
+                    && slot.row >= minRow
+                    && slot.row <= maxRow
+                )).length;
+                const components = connectedComponentCount(members);
+                let memberDistance = 0;
+
+                for (let i = 0; i < members.length; i += 1) {
+                    for (let j = i + 1; j < members.length; j += 1) {
+                        memberDistance += Math.abs(members[i].col - members[j].col) + Math.abs(members[i].row - members[j].row);
+                    }
+                }
+
+                return score
+                    + coveredNonMembers * 100000
+                    + (components - 1) * 50000
+                    + (coveredCells - members.length) * 200
+                    + memberDistance * 10;
+            }, 0);
+        }
+
+        function displayOrderScore(order, columns, groups, originalIndex) {
+            const layoutScore = layoutOrderScore(order, columns, groups);
+            const orderDrift = order.reduce((total, sprite, index) => (
+                total + Math.abs(index - originalIndex.get(sprite.slotId))
+            ), 0);
+            return layoutScore + orderDrift * 0.01;
+        }
+
+        function exhaustiveDisplayOrder(columns, groups, originalIndex) {
+            const sprites = selectedSprites;
+            const used = new Array(sprites.length).fill(false);
+            const order = [];
+            let bestOrder = sprites;
+            let bestScore = Infinity;
+
+            function visit() {
+                if (order.length === sprites.length) {
+                    const score = displayOrderScore(order, columns, groups, originalIndex);
+                    if (score < bestScore) {
+                        bestScore = score;
+                        bestOrder = [...order];
+                    }
+                    return;
+                }
+
+                for (let i = 0; i < sprites.length; i += 1) {
+                    if (used[i]) continue;
+                    used[i] = true;
+                    order.push(sprites[i]);
+                    visit();
+                    order.pop();
+                    used[i] = false;
+                }
+            }
+
+            visit();
+            return bestOrder;
+        }
+
+        function beamDisplayOrder(columns, groups, originalIndex) {
+            const beamWidth = 260;
+            let beam = [{ order: [], rest: selectedSprites, score: 0 }];
+
+            for (let depth = 0; depth < selectedSprites.length; depth += 1) {
+                const nextBeam = [];
+                beam.forEach(state => {
+                    state.rest.forEach((sprite, index) => {
+                        const nextOrder = [...state.order, sprite];
+                        const nextRest = state.rest.filter((_, restIndex) => restIndex !== index);
+                        const roughScore = displayOrderScore(nextOrder, columns, groups, originalIndex);
+                        nextBeam.push({ order: nextOrder, rest: nextRest, score: roughScore });
+                    });
+                });
+
+                beam = nextBeam
+                    .sort((a, b) => a.score - b.score)
+                    .slice(0, beamWidth);
+            }
+
+            return beam
+                .map(state => ({
+                    order: state.order,
+                    score: displayOrderScore(state.order, columns, groups, originalIndex)
+                }))
+                .sort((a, b) => a.score - b.score)[0].order;
+        }
+
+        function optimizeDisplayOrder(columns, groupCounts) {
+            const groups = visibleEggGroups(groupCounts);
+            if (selectedSprites.length <= 2 || !groups.length) return selectedSprites;
+
+            const originalIndex = new Map(selectedSprites.map((sprite, index) => [sprite.slotId, index]));
+            if (selectedSprites.length <= 8) {
+                return exhaustiveDisplayOrder(columns, groups, originalIndex);
+            }
+
+            const seeds = [
+                selectedSprites,
+                beamDisplayOrder(columns, groups, originalIndex),
+                ...groups.map(group => [...selectedSprites].sort((a, b) => {
+                    const aInGroup = a.eggGroups.includes(group) ? 0 : 1;
+                    const bInGroup = b.eggGroups.includes(group) ? 0 : 1;
+                    return aInGroup - bInGroup || originalIndex.get(a.slotId) - originalIndex.get(b.slotId);
+                }))
+            ];
+
+            const improve = seed => {
+                const order = [...seed];
+                let bestScore = displayOrderScore(order, columns, groups, originalIndex);
+                let improved = true;
+
+                while (improved) {
+                    improved = false;
+                    for (let i = 0; i < order.length; i += 1) {
+                        for (let j = i + 1; j < order.length; j += 1) {
+                            [order[i], order[j]] = [order[j], order[i]];
+                            const nextScore = displayOrderScore(order, columns, groups, originalIndex);
+                            if (nextScore < bestScore) {
+                                bestScore = nextScore;
+                                improved = true;
+                            } else {
+                                [order[i], order[j]] = [order[j], order[i]];
+                            }
+                        }
+                    }
+                }
+
+                return { order, score: bestScore };
+            };
+
+            return seeds
+                .map(improve)
+                .sort((a, b) => a.score - b.score)[0].order;
+        }
+
+        function selectedMapLayout() {
+            const count = selectedSprites.length;
+            const columns = count <= 6 ? 4 : 5;
+            const groupCounts = selectedSprites.reduce((counts, sprite) => {
+                sprite.eggGroups.forEach(group => {
+                    counts.set(group, (counts.get(group) || 0) + 1);
+                });
+                return counts;
+            }, new Map());
+            const visibleGroupCount = visibleEggGroups(groupCounts).length;
+            const labelRows = visibleGroupCount ? Math.ceil(visibleGroupCount / 3) : 0;
+            const topPadding = 48 + labelRows * 34;
+            const positions = new Map();
+            const groupPositions = new Map();
+            const displaySprites = optimizeDisplayOrder(columns, groupCounts);
+
+            displaySprites.forEach((sprite, index) => {
+                const col = index % columns;
+                const row = Math.floor(index / columns);
+                const position = {
+                    x: 34 + col * MAP_CELL_WIDTH,
+                    y: topPadding + row * MAP_CELL_HEIGHT,
+                    width: MAP_ICON_SIZE,
+                    height: MAP_ICON_SIZE
+                };
+                positions.set(sprite.slotId, position);
+                sprite.eggGroups.forEach(group => {
+                    if ((groupCounts.get(group) || 0) <= 1) return;
+                    if (!groupPositions.has(group)) groupPositions.set(group, []);
+                    groupPositions.get(group).push({
+                        x: position.x - MAP_REGION_PADDING_X,
+                        y: position.y - MAP_REGION_PADDING_Y,
+                        width: MAP_CELL_WIDTH,
+                        height: MAP_CELL_HEIGHT,
+                        col,
+                        row
+                    });
+                });
+            });
+
+            const rows = Math.max(1, Math.ceil(count / columns));
+            const width = Math.max(390, columns * MAP_CELL_WIDTH + 82);
+            const height = Math.max(380, topPadding + rows * MAP_CELL_HEIGHT + 74);
+            const regions = [...groupPositions.entries()].map(([group, items]) => {
+                const [fill, border] = eggGroupColor(group);
+                const cellKeys = new Set(items.map(item => `${item.col},${item.row}`));
+                const cells = items.map(item => {
+                    const hasLeft = cellKeys.has(`${item.col - 1},${item.row}`);
+                    const hasRight = cellKeys.has(`${item.col + 1},${item.row}`);
+                    const hasTop = cellKeys.has(`${item.col},${item.row - 1}`);
+                    const hasBottom = cellKeys.has(`${item.col},${item.row + 1}`);
+                    const radius = 24;
+
+                    return {
+                        ...item,
+                        borderTop: hasTop ? 'transparent' : border,
+                        borderRight: hasRight ? 'transparent' : border,
+                        borderBottom: hasBottom ? 'transparent' : border,
+                        borderLeft: hasLeft ? 'transparent' : border,
+                        radius: [
+                            !hasTop && !hasLeft ? radius : 0,
+                            !hasTop && !hasRight ? radius : 0,
+                            !hasBottom && !hasRight ? radius : 0,
+                            !hasBottom && !hasLeft ? radius : 0
+                        ].map(value => `${value}px`).join(' ')
+                    };
+                });
+
+                return {
+                    group,
+                    cells,
+                    fill,
+                    border,
+                    area: items.length * MAP_CELL_WIDTH * MAP_CELL_HEIGHT
+                };
+            }).sort((a, b) => b.area - a.area || a.group.localeCompare(b.group, 'zh-CN'));
+
+            let labelX = 10;
+            let labelY = 10;
+            const labels = regions
+                .slice()
+                .sort((a, b) => a.group.localeCompare(b.group, 'zh-CN'))
+                .map(region => {
+                    const labelWidth = Math.max(70, region.group.length * 16 + 30);
+                    if (labelX + labelWidth > width - 10) {
+                        labelX = 10;
+                        labelY += 34;
+                    }
+                    const label = {
+                        group: region.group,
+                        x: labelX,
+                        y: labelY,
+                        width: labelWidth,
+                        border: region.border
+                    };
+                    labelX += labelWidth + 8;
+                    return label;
+                });
+
+            return { positions, regions, labels, width, height };
+        }
+
+        function visibleCandidates() {
+            const keyword = normalize(searchInput.value);
+            const focuses = selectedFocuses();
+            return candidates.filter(candidate => {
+                const matchesSearch = !keyword || candidate.searchText.includes(keyword);
+                const matchesFocus = !focuses.length || canPairWithAllFocused(candidate, focuses);
+                const matchesRare = !activeRareFilter
+                    || (activeRareFilter === 'yes' ? candidate.rare : !candidate.rare);
+                return matchesSearch && matchesFocus && matchesRare;
+            });
+        }
+
+        function addCandidate(candidateId) {
+            const candidate = candidates.find(item => item.id === candidateId);
+            if (!candidate) return;
+            if (selectedSprites.length >= MAX_SELECTED) {
+                focusText.textContent = `当前家园最多选择 ${MAX_SELECTED} 只精灵。`;
+                return;
+            }
+
+            selectedSprites.push({
+                ...candidate,
+                slotId: `slot-${nextSlotId++}`
+            });
+            focusedSlotIds = new Set([selectedSprites[selectedSprites.length - 1].slotId]);
+            renderAll();
+        }
+
+        function removeSelected(slotId) {
+            selectedSprites = selectedSprites.filter(sprite => sprite.slotId !== slotId);
+            focusedSlotIds.delete(slotId);
+            renderAll();
+        }
+
+        function compatibleCountFor(sprite) {
+            return selectedSprites.filter(other => other.slotId !== sprite.slotId && sharesEggGroup(sprite, other)).length;
+        }
+
+        function renderEggChips(sprite) {
+            return sprite.eggGroups.map(group => `<span class="egg-chip">${escapeHtml(group)}</span>`).join('');
+        }
+
+        function renderRareMark(sprite) {
+            return sprite.rare
+                ? `<img class="rare-mark" src="${escapeHtml(RARE_BADGE)}" alt="异色" onerror="this.style.display='none'">`
+                : '';
+        }
+
+        function groupMembers(group) {
+            return selectedSprites.filter(sprite => sprite.eggGroups.includes(group));
+        }
+
+        function isGroupFocused(group) {
+            const members = groupMembers(group);
+            return members.length > 0 && members.every(sprite => focusedSlotIds.has(sprite.slotId));
+        }
+
+        function toggleGroupFocus(group) {
+            const members = groupMembers(group);
+            if (!members.length) return;
+
+            const shouldClear = members.every(sprite => focusedSlotIds.has(sprite.slotId));
+            members.forEach(sprite => {
+                if (shouldClear) {
+                    focusedSlotIds.delete(sprite.slotId);
+                } else {
+                    focusedSlotIds.add(sprite.slotId);
+                }
+            });
+            renderAll();
+        }
+
+        function renderSelected() {
+            emptySelected.style.display = selectedSprites.length ? 'none' : 'flex';
+            if (!selectedSprites.length) {
+                selectedGrid.innerHTML = '';
+                selectedGrid.style.height = '';
+                selectedGrid.style.minWidth = '';
+                selectedGrid.style.display = 'none';
+                return;
+            }
+
+            const layout = selectedMapLayout();
+            selectedGrid.style.display = 'block';
+            selectedGrid.style.height = `${layout.height}px`;
+            selectedGrid.style.minWidth = `${layout.width}px`;
+            const groupRegions = layout.regions.flatMap(region => (
+                region.cells.map(cell => `
+                    <div class="group-region" style="left:${cell.x}px;top:${cell.y}px;width:${cell.width}px;height:${cell.height}px;--group-fill:${region.fill};--group-border:${region.border};border-top-color:${cell.borderTop};border-right-color:${cell.borderRight};border-bottom-color:${cell.borderBottom};border-left-color:${cell.borderLeft};border-radius:${cell.radius};"></div>
+                `)
+            )).join('');
+            const groupLabels = layout.labels.map(label => `
+                <button class="group-label ${isGroupFocused(label.group) ? 'is-active' : ''}" type="button" data-group="${escapeHtml(label.group)}" style="left:${label.x}px;top:${label.y}px;width:${label.width}px;--group-border:${label.border};" title="选中或取消选中${escapeHtml(label.group)}">${escapeHtml(label.group)}</button>
+            `).join('');
+
+            selectedGrid.innerHTML = selectedSprites.map(sprite => {
+                const position = layout.positions.get(sprite.slotId);
+                const compatibleCount = compatibleCountFor(sprite);
+                return `
+                    <article class="selected-card ${focusedSlotIds.has(sprite.slotId) ? 'is-active' : ''}" data-slot-id="${escapeHtml(sprite.slotId)}" title="${escapeHtml(`${sprite.name}｜可配对 ${compatibleCount}`)}" style="left:${position.x}px;top:${position.y}px;">
+                        ${renderRareMark(sprite)}
+                        <button class="remove-btn" type="button" data-remove="${escapeHtml(sprite.slotId)}" aria-label="移除">×</button>
+                        <div class="sprite-image-wrap">
+                            <img class="sprite-image" src="${escapeHtml(sprite.imagePath)}" data-fallback="${escapeHtml(sprite.fallbackImagePath || '')}" alt="${escapeHtml(sprite.name)}" onerror="if (this.dataset.fallback) { this.src = this.dataset.fallback; this.dataset.fallback = ''; } else { this.style.display='none'; }">
+                        </div>
+                    </article>
+                `;
+            }).join('');
+
+            selectedGrid.innerHTML = groupRegions + groupLabels + selectedGrid.innerHTML;
+
+            selectedGrid.querySelectorAll('.selected-card').forEach(card => {
+                card.addEventListener('click', event => {
+                    if (event.target.closest('.remove-btn')) return;
+                    if (focusedSlotIds.has(card.dataset.slotId)) {
+                        focusedSlotIds.delete(card.dataset.slotId);
+                    } else {
+                        focusedSlotIds.add(card.dataset.slotId);
+                    }
+                    renderAll();
+                });
+            });
+            selectedGrid.querySelectorAll('[data-remove]').forEach(button => {
+                button.addEventListener('click', event => {
+                    event.stopPropagation();
+                    removeSelected(button.dataset.remove);
+                });
+            });
+            selectedGrid.querySelectorAll('[data-group]').forEach(button => {
+                button.addEventListener('click', event => {
+                    event.stopPropagation();
+                    toggleGroupFocus(button.dataset.group);
+                });
+            });
+        }
+
+        function renderSummary() {
+            selectedCount.textContent = `${selectedSprites.length} / ${MAX_SELECTED} 只`;
+        }
+
+        function renderRareFilters() {
+            rareFilters.innerHTML = [
+                `<button class="filter-chip ${activeRareFilter === 'yes' ? 'active' : ''}" type="button" data-rare="yes">有异色</button>`,
+                `<button class="filter-chip ${activeRareFilter === 'no' ? 'active' : ''}" type="button" data-rare="no">无异色</button>`
+            ].join('');
+
+            rareFilters.querySelectorAll('.filter-chip').forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.dataset.rare;
+                    activeRareFilter = activeRareFilter === value ? '' : value;
+                    renderCandidates();
+                });
+            });
+        }
+
+        function updateHatchLink() {
+            if (!selectedSprites.length) {
+                openHatch.href = 'hatch.html';
+                return;
+            }
+
+            const ids = selectedSprites
+                .slice(0, MAX_SELECTED)
+                .map(sprite => sprite.id)
+                .filter(Boolean)
+                .join(',');
+            openHatch.href = ids ? `hatch.html?pair=${encodeURIComponent(ids)}` : 'hatch.html';
+        }
+
+        function renderCandidates() {
+            const focuses = selectedFocuses();
+            const visible = visibleCandidates();
+            renderRareFilters();
+            candidateCount.textContent = `${visible.length} 项`;
+            candidateHint.textContent = focuses.length
+                ? `当前筛选：可同时与 ${focusNames(focuses)} 配对的精灵。`
+                : '未选中左侧精灵时显示全部可繁殖精灵。';
+            focusText.textContent = focuses.length
+                ? `当前关注：${focusNames(focuses)}，右侧显示能同时配对的精灵。`
+                : '拖入精灵后，点击左侧卡片可多选筛选右侧可配对对象。';
+
+            if (!visible.length) {
+                candidateGrid.innerHTML = '<div class="empty-state">没有匹配的候选精灵。</div>';
+                return;
+            }
+
+            candidateGrid.innerHTML = visible.map(candidate => {
+                const isIncompatible = focuses.length > 0 && !canPairWithAllFocused(candidate, focuses);
+                return `
+                    <article class="candidate-card ${isIncompatible ? 'is-incompatible' : ''}" draggable="true" data-id="${escapeHtml(candidate.id)}" style="${styleFor(candidate)}">
+                        ${renderRareMark(candidate)}
+                        <div class="sprite-image-wrap">
+                            <img class="sprite-image" src="${escapeHtml(candidate.imagePath)}" data-fallback="${escapeHtml(candidate.fallbackImagePath || '')}" alt="${escapeHtml(candidate.name)}" loading="lazy" onerror="if (this.dataset.fallback) { this.src = this.dataset.fallback; this.dataset.fallback = ''; } else { this.style.display='none'; }">
+                        </div>
+                        <div class="sprite-number">NO.${escapeHtml(candidate.number)}</div>
+                        <div class="sprite-name">${escapeHtml(candidate.name)}</div>
+                        <div class="chip-row">${renderEggChips(candidate)}</div>
+                        <button class="add-btn" type="button" data-add="${escapeHtml(candidate.id)}">加入</button>
+                    </article>
+                `;
+            }).join('');
+
+            candidateGrid.querySelectorAll('.candidate-card').forEach(card => {
+                card.addEventListener('dragstart', event => {
+                    event.dataTransfer.setData('text/plain', card.dataset.id);
+                    event.dataTransfer.effectAllowed = 'copy';
+                });
+            });
+            candidateGrid.querySelectorAll('[data-add]').forEach(button => {
+                button.addEventListener('click', () => addCandidate(button.dataset.add));
+            });
+        }
+
+        function renderAll() {
+            renderSelected();
+            renderSummary();
+            renderCandidates();
+            updateHatchLink();
+        }
+
+        dropZone.addEventListener('dragover', event => {
+            event.preventDefault();
+            dropZone.classList.add('is-drag-over');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('is-drag-over');
+        });
+        dropZone.addEventListener('drop', event => {
+            event.preventDefault();
+            dropZone.classList.remove('is-drag-over');
+            const candidateId = event.dataTransfer.getData('text/plain');
+            addCandidate(candidateId);
+        });
+
+        searchInput.addEventListener('input', renderCandidates);
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            renderCandidates();
+        });
+        clearSelected.addEventListener('click', () => {
+            selectedSprites = [];
+            focusedSlotIds = new Set();
+            renderAll();
+        });
+
+        async function loadData() {
+            try {
+                const response = await fetch('handbook_data.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                buildCandidates(Array.isArray(data.records) ? data.records : []);
+                renderAll();
+            } catch (error) {
+                console.error(error);
+                candidateGrid.innerHTML = '<div class="empty-state">加载失败，请确认 handbook_data.json 存在并可访问。</div>';
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

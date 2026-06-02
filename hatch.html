@@ -1415,8 +1415,45 @@
             }
         });
 
+        function applyImportedSprite(index, sprite) {
+            const input = document.getElementById(`spriteName${index}`);
+            if (!input) return;
+
+            input.value = spriteInputLabel(sprite);
+            selectedSprites[index].id = sprite.id;
+            selectedSprites[index].name = sprite.name;
+            selectedSprites[index].imagePath = sprite.imagePath;
+            selectedSprites[index].fallbackImagePath = sprite.fallbackImagePath;
+            selectedSprites[index].numberedImagePath = sprite.numberedImagePath;
+            selectedSprites[index].eggGroups = sprite.eggGroups;
+            selectedSprites[index].gender = 'male';
+            selectGender(index, 'male');
+        }
+
+        function importPairSelectionFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const rawPair = params.get('pair');
+            if (!rawPair) return false;
+
+            const importedSprites = rawPair
+                .split(',')
+                .map(id => spriteData.find(sprite => sprite.id === id))
+                .filter(Boolean)
+                .slice(0, 10);
+
+            if (!importedSprites.length) return false;
+
+            const count = Math.max(2, importedSprites.length);
+            document.getElementById('nestCount').value = String(count);
+            createSpriteInputs(count);
+            importedSprites.forEach((sprite, index) => applyImportedSprite(index, sprite));
+            return true;
+        }
+
         loadSpriteData().then(() => {
-            createSpriteInputs(2);
+            if (!importPairSelectionFromUrl()) {
+                createSpriteInputs(2);
+            }
         });
 
         function syncBackToTop() {
