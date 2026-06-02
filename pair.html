@@ -451,18 +451,19 @@
         .candidate-grid {
             max-height: 680px;
             overflow: auto;
-            padding: 16px;
+            padding: 12px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 8px;
         }
 
         .candidate-card {
             position: relative;
-            min-height: 188px;
-            padding: 10px;
+            min-width: 0;
+            min-height: 144px;
+            padding: 7px;
             border: 1px solid rgba(226,232,240,0.9);
-            border-radius: 14px;
+            border-radius: 12px;
             background:
                 linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.78)),
                 linear-gradient(135deg, var(--type-a, #6366f1), var(--type-b, #ec4899));
@@ -486,28 +487,47 @@
         }
 
         .candidate-card .sprite-image-wrap {
-            width: 74px;
-            height: 74px;
+            width: min(62px, 100%);
+            height: auto;
+            aspect-ratio: 1;
+            margin: 2px auto 5px;
+            border-radius: 12px;
         }
 
         .candidate-card .sprite-image {
-            width: 68px;
-            height: 68px;
+            width: 88%;
+            height: 88%;
         }
 
         .candidate-card .sprite-name {
-            font-size: 0.86rem;
+            min-height: 2.25em;
+            font-size: 0.76rem;
+            line-height: 1.12;
+            overflow: hidden;
+            overflow-wrap: anywhere;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+
+        .candidate-card .sprite-number {
+            font-size: 0.66rem;
+            margin-bottom: 2px;
+        }
+
+        .candidate-card .chip-row {
+            display: none;
         }
 
         .add-btn {
             width: 100%;
-            min-height: 30px;
-            margin-top: 8px;
+            min-height: 26px;
+            margin-top: 6px;
             border: 1px solid rgba(99,102,241,0.18);
-            border-radius: 10px;
+            border-radius: 8px;
             background: rgba(99,102,241,0.1);
             color: var(--primary-dark);
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 900;
             cursor: pointer;
         }
@@ -564,8 +584,54 @@
                 grid-template-columns: 1fr;
             }
 
+            .selected-body {
+                padding: 10px;
+            }
+
+            .drop-zone {
+                min-height: 210px;
+                padding: 8px;
+            }
+
+            .empty-state {
+                min-height: 118px;
+                padding: 16px;
+            }
+
+            .selected-grid {
+                min-height: 210px;
+            }
+
             .candidate-grid {
-                grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+                padding: 8px;
+                gap: 6px;
+            }
+
+            .candidate-card {
+                min-height: 116px;
+                padding: 5px;
+                border-radius: 9px;
+            }
+
+            .candidate-card .sprite-image-wrap {
+                width: min(42px, 100%);
+                margin-bottom: 3px;
+                border-radius: 9px;
+            }
+
+            .candidate-card .sprite-name {
+                font-size: 0.62rem;
+                min-height: 2.25em;
+            }
+
+            .candidate-card .sprite-number {
+                font-size: 0.56rem;
+            }
+
+            .add-btn {
+                min-height: 22px;
+                margin-top: 4px;
+                font-size: 0.62rem;
             }
         }
     </style>
@@ -802,6 +868,10 @@
 
         function eggGroupColor(group) {
             return EGG_GROUP_COLORS[group] || ['rgba(99,102,241,0.22)', 'rgba(79,70,229,0.46)'];
+        }
+
+        function isCompactViewport() {
+            return window.matchMedia('(max-width: 720px)').matches;
         }
 
         function visibleEggGroups(groupCounts) {
@@ -1046,7 +1116,8 @@
 
             const rows = Math.max(1, Math.ceil(count / columns));
             const width = Math.max(390, columns * MAP_CELL_WIDTH + 82);
-            const height = Math.max(380, topPadding + rows * MAP_CELL_HEIGHT + 74);
+            const minHeight = isCompactViewport() ? 210 : 380;
+            const height = Math.max(minHeight, topPadding + rows * MAP_CELL_HEIGHT + 50);
             const regions = [...groupPositions.entries()].map(([group, items]) => {
                 const [fill, border] = eggGroupColor(group);
                 const cellKeys = new Set(items.map(item => `${item.col},${item.row}`));
@@ -1349,6 +1420,9 @@
             selectedSprites = [];
             focusedSlotIds = new Set();
             renderAll();
+        });
+        window.addEventListener('resize', () => {
+            if (selectedSprites.length) renderSelected();
         });
 
         async function loadData() {
