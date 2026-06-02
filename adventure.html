@@ -1105,6 +1105,10 @@
             return cleanList(record.eggGroups);
         }
 
+        function portraitSmallPath(record) {
+            return String(record && record.portrait ? record.portrait : '').replace('/portrait/', '/portrait-small/');
+        }
+
         function recordStarlight(record) {
             const value = Number(record && record.baseStarlightValue);
             return Number.isFinite(value) ? value : 0;
@@ -1260,7 +1264,7 @@
         function renderCandidateSuggestOption(record) {
             return `
                 <button class="suggest-option" type="button" data-number="${escapeHtml(record.number)}">
-                    <img src="${escapeHtml(record.portrait)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <img src="${escapeHtml(portraitSmallPath(record))}" alt="" loading="lazy" onerror="this.style.display='none'">
                     <span>
                         <span class="suggest-name">${escapeHtml(record.title)}</span>
                         <span class="suggest-number">${formatNo(record.number)}</span>
@@ -1306,7 +1310,7 @@
             return `
                 <div class="sprite-card" style="${spriteStyle(record)}">
                     <div class="sprite-image-wrap">
-                        <img class="sprite-image" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                        <img class="sprite-image" src="${escapeHtml(portraitSmallPath(record))}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
                     </div>
                     <div class="sprite-number">${formatNo(record.number)}</div>
                     <div class="sprite-name">${escapeHtml(record.title)}</div>
@@ -1318,7 +1322,7 @@
         function renderOtherTarget(target) {
             return `
                 <span class="other-item" title="${formatNo(target.number)} ${escapeHtml(target.title)}">
-                    <img src="${escapeHtml(target.portrait)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <img src="${escapeHtml(portraitSmallPath(target))}" alt="" loading="lazy" onerror="this.style.display='none'">
                     <span>${formatNo(target.number)} ${escapeHtml(target.title)}</span>
                 </span>
             `;
@@ -1344,7 +1348,7 @@
                 <article class="panel strategy-card">
                     <div class="strategy-head">
 	                        <div class="target-mini">
-	                            <img class="mini-img" src="${escapeHtml(strategy.target.portrait)}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
+	                            <img class="mini-img" src="${escapeHtml(portraitSmallPath(strategy.target))}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
                             <div>
                                 <div class="mini-label">目标奇遇</div>
 	                                <div class="mini-name">${formatNo(strategy.target.number)} ${escapeHtml(strategy.target.title)}</div>
@@ -1468,7 +1472,7 @@
                 `<button class="target-chip ${activeTarget === '' ? 'active' : ''}" type="button" data-target="">全部</button>`,
                 ...adventureTargets.map(target => `
                     <button class="target-chip ${activeTarget === target.key ? 'active' : ''}" type="button" data-target="${escapeHtml(target.key)}">
-                        <img src="${escapeHtml(target.portrait)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                        <img src="${escapeHtml(portraitSmallPath(target))}" alt="" loading="lazy" onerror="this.style.display='none'">
                         <span>${escapeHtml(target.title)}</span>
                     </button>
                 `)

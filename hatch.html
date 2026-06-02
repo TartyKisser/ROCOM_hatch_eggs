@@ -847,41 +847,46 @@
         let selectedSprites = [];
         const backToTop = document.getElementById('backToTop');
 
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function recordEggGroups(record) {
+            return Array.isArray(record.eggGroups)
+                ? record.eggGroups.filter(group => group && String(group).toLowerCase() !== 'null')
+                : [];
+        }
+
+        function portraitSmallPath(record) {
+            const portrait = String(record && record.portrait ? record.portrait : '');
+            if (portrait) return portrait.replace('/portrait/', '/portrait-small/');
+            return `sprite_imgs/portrait-small/${record.id}-portrait.png`;
+        }
+
         async function loadSpriteData() {
             try {
-                const response = await fetch('handbook.csv');
-                const text = await response.text();
-                const lines = text.trim().split(/\r?\n/);  
-                const headers = lines[0].split(',');
-                const firstNamesById = new Map();
+                const response = await fetch('handbook_data.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                const records = Array.isArray(data.records) ? data.records : [];
 
-                for (let i = 1; i < lines.length; i++) {
-                    const parts = lines[i].split(',');
-                    if (parts.length >= 4) {
-                        const eggGroups = [];
-                        const rawId = parts[0].trim();
-                        const paddedId = String(rawId).padStart(3, '0');
-                        const name = parts[1].trim();
-                        const group1 = parts[2] ? parts[2].trim() : '';
-                        const group2 = parts[3] ? parts[3].trim() : '';
-
-                        if (group1 && group1 !== 'null') eggGroups.push(group1);
-                        if (group2 && group2 !== 'null') eggGroups.push(group2);
-                        if (!firstNamesById.has(paddedId)) firstNamesById.set(paddedId, name);
-
-                        const exactImageFileName = `${paddedId}${name}.png`;
-                        const firstImageFileName = `${paddedId}${firstNamesById.get(paddedId)}.png`;
-
-                        spriteData.push({
-                            id: paddedId,
-                            name: name,
-                            imagePath: `rocom_imgs_standard/${encodeURIComponent(exactImageFileName)}`,
-                            fallbackImagePath: `rocom_imgs_standard/${encodeURIComponent(firstImageFileName)}`,
-                            numberedImagePath: `rocom_imgs/${paddedId}.png`,
-                            eggGroups: eggGroups
-                        });
-                    }
-                }
+                spriteData = records
+                    .map(record => ({
+                        id: record.id,
+                        number: record.number,
+                        name: record.title,
+                        imagePath: portraitSmallPath(record),
+                        fallbackImagePath: '',
+                        numberedImagePath: '',
+                        eggGroups: recordEggGroups(record)
+                    }))
+                    .filter(sprite => sprite.eggGroups.length > 0);
             } catch (error) {
                 console.error('加载数据失败:', error);
             }
@@ -1292,11 +1297,10 @@
                 const fallbackImagePath = sprite.fallbackImagePath || '';
                 const numberedImagePath = sprite.numberedImagePath || '';
 
-                // 写入数字角标和中心图片
-                // onerror：精确图失败时回退到同编号首条图片，再失败则回退到旧编号图片
+                // 写入数字角标和中心小图，精确形态缺失时回退到同编号默认小图。
                 nest.innerHTML = `
                     <span class="nest-badge">${index + 1}</span>
-                    <img class="nest-sprite-img" src="${imagePath}" data-fallback="${fallbackImagePath}" data-numbered-fallback="${numberedImagePath}" alt="${sprite.name}" onerror="if (this.dataset.fallback && this.src !== new URL(this.dataset.fallback, document.baseURI).href) { this.src = this.dataset.fallback; this.dataset.fallback = ''; } else if (this.dataset.numberedFallback) { this.src = this.dataset.numberedFallback; this.dataset.numberedFallback = ''; } else { this.style.display='none'; }">
+                    <img class="nest-sprite-img" src="${escapeHtml(imagePath)}" data-fallback="${escapeHtml(fallbackImagePath)}" data-numbered-fallback="${escapeHtml(numberedImagePath)}" alt="${escapeHtml(sprite.name)}" onerror="if (this.dataset.fallback && this.src !== new URL(this.dataset.fallback, document.baseURI).href) { this.src = this.dataset.fallback; this.dataset.fallback = ''; } else if (this.dataset.numberedFallback) { this.src = this.dataset.numberedFallback; this.dataset.numberedFallback = ''; } else { this.style.display='none'; }">
                 `;
 
                 gridDisplay.appendChild(nest);

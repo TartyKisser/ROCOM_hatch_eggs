@@ -1036,6 +1036,10 @@
             return `--sprite-bg: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.72)), linear-gradient(135deg, ${hexToRgba(firstColor, 1)}, ${hexToRgba(secondColor, 1)});`;
         }
 
+        function portraitSmallPath(record) {
+            return String(record && record.portrait ? record.portrait : '').replace('/portrait/', '/portrait-small/');
+        }
+
         function renderAttributeLogo(attr) {
             const logo = ATTRIBUTE_LOGOS[attr] || '';
             return logo
@@ -1121,7 +1125,7 @@
                         return `
                             <div class="evolution-item" style="${recordBackgroundStyle(evolutionRecord)}">
                                 <div class="evolution-image-wrap">
-                                    <img class="evolution-image" src="${escapeHtml(evolutionRecord.portrait)}" alt="${escapeHtml(evolutionRecord.title)}" loading="lazy" onerror="this.style.display='none'">
+                                    <img class="evolution-image" src="${escapeHtml(portraitSmallPath(evolutionRecord))}" alt="${escapeHtml(evolutionRecord.title)}" loading="lazy" onerror="this.style.display='none'">
                                 </div>
                                 <div class="evolution-number">NO.${escapeHtml(evolutionRecord.number)}</div>
                                 <div class="evolution-name">${escapeHtml(evolutionRecord.title)}</div>
@@ -1213,7 +1217,7 @@
             cardGrid.innerHTML = filteredRecords.map(record => `
                 <button class="sprite-card" type="button" data-id="${escapeHtml(record.id)}" style="${recordBackgroundStyle(record)}">
                     <div class="card-image-wrap">
-                        <img class="card-image" src="${escapeHtml(record.portrait)}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                        <img class="card-image" src="${escapeHtml(portraitSmallPath(record))}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
                     </div>
                     <div class="card-number">NO.${escapeHtml(record.number)}</div>
                     <div class="card-title">${escapeHtml(record.title)}</div>
@@ -1299,7 +1303,7 @@
                             <h3 class="section-title">精灵果实</h3>
                             <div class="fruit-card">
                                 <div class="fruit-image-wrap">
-                                    <img class="fruit-image" src="${escapeHtml(record.icon || record.portrait)}" alt="${escapeHtml(record.title)} 精灵果实" onerror="this.style.display='none'">
+                                    <img class="fruit-image" src="${escapeHtml(record.icon || portraitSmallPath(record))}" alt="${escapeHtml(record.title)} 精灵果实" onerror="this.style.display='none'">
                                 </div>
                                 <p class="ability-desc">${escapeHtml(record.title)} 对应的精灵果实图片。</p>
                             </div>
