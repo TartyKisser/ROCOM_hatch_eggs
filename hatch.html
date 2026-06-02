@@ -869,6 +869,35 @@
             return `sprite_imgs/portrait-small/${record.id}-portrait.png`;
         }
 
+        function rarePortraitSmallPath(record) {
+            return String(record && record.rarePath ? record.rarePath : '').replace('/portrait/', '/portrait-small/');
+        }
+
+        function eggGroupLabel(eggGroups) {
+            return eggGroups.length ? eggGroups.join('、') : '无';
+        }
+
+        function spriteInputLabel(sprite) {
+            return `${sprite.name}｜蛋组: ${eggGroupLabel(sprite.eggGroups)}`;
+        }
+
+        function spriteSearchText(sprite) {
+            return `${sprite.name}${sprite.number || ''}${sprite.id || ''}${eggGroupLabel(sprite.eggGroups)}`.toLowerCase();
+        }
+
+        function baseSpriteFromRecord(record) {
+            const eggGroups = recordEggGroups(record);
+            return {
+                id: record.id,
+                number: record.number,
+                name: record.title,
+                imagePath: portraitSmallPath(record),
+                fallbackImagePath: '',
+                numberedImagePath: '',
+                eggGroups
+            };
+        }
+
         async function loadSpriteData() {
             try {
                 const response = await fetch('handbook_data.json');
@@ -876,17 +905,23 @@
                 const data = await response.json();
                 const records = Array.isArray(data.records) ? data.records : [];
 
-                spriteData = records
-                    .map(record => ({
-                        id: record.id,
-                        number: record.number,
-                        name: record.title,
-                        imagePath: portraitSmallPath(record),
-                        fallbackImagePath: '',
-                        numberedImagePath: '',
-                        eggGroups: recordEggGroups(record)
-                    }))
-                    .filter(sprite => sprite.eggGroups.length > 0);
+                spriteData = records.flatMap(record => {
+                    const baseSprite = baseSpriteFromRecord(record);
+                    if (baseSprite.eggGroups.length === 0) return [];
+
+                    const sprites = [baseSprite];
+                    if (record.rare && record.rarePath) {
+                        const rareSmallPath = rarePortraitSmallPath(record);
+                        sprites.push({
+                            ...baseSprite,
+                            id: `${record.id}-rare`,
+                            name: `${record.title}异色`,
+                            imagePath: rareSmallPath || record.rarePath,
+                            fallbackImagePath: record.rarePath
+                        });
+                    }
+                    return sprites;
+                });
             } catch (error) {
                 console.error('加载数据失败:', error);
             }
@@ -945,13 +980,19 @@
             input.addEventListener('input', function() {
                 const value = this.value.toLowerCase().trim();
                 list.innerHTML = '';
+                selectedSprites[index].id = '';
+                selectedSprites[index].name = '';
+                selectedSprites[index].imagePath = '';
+                selectedSprites[index].fallbackImagePath = '';
+                selectedSprites[index].numberedImagePath = '';
+                selectedSprites[index].eggGroups = [];
 
                 if (value.length === 0) {
                     list.style.display = 'none';
                     return;
                 }
 
-                const matches = spriteData.filter(s => s.name.toLowerCase().includes(value));
+                const matches = spriteData.filter(s => spriteSearchText(s).includes(value));
 
                 if (matches.length === 0) {
                     list.style.display = 'none';
@@ -963,10 +1004,10 @@
                     item.className = 'autocomplete-item';
                     item.innerHTML = `
                         <div>${sprite.name}</div>
-                        <div class="egg-groups">蛋组: ${sprite.eggGroups.join(', ') || '无'}</div>
+                        <div class="egg-groups">蛋组: ${eggGroupLabel(sprite.eggGroups)}</div>
                     `;
                     item.addEventListener('click', function() {
-                        input.value = sprite.name;
+                        input.value = spriteInputLabel(sprite);
                         // 保存选中精灵的 ID
                         selectedSprites[index].id = sprite.id; 
                         selectedSprites[index].name = sprite.name;
@@ -1185,8 +1226,11 @@
                 const inputValue = input.value.trim();
 
                 if (inputValue) {
-                    // 只要输入框有字，就强制去数据库里查最新的信息，覆盖旧信息
-                    const found = spriteData.find(s => s.name === inputValue);
+                    const current = selectedSprites[i];
+                    const isCurrentSelection = current.id && inputValue === spriteInputLabel(current);
+                    const found = isCurrentSelection
+                        ? current
+                        : spriteData.find(s => s.name === inputValue || spriteInputLabel(s) === inputValue);
                     if (found) {
                         selectedSprites[i].id = found.id;
                         selectedSprites[i].name = found.name;
@@ -1343,7 +1387,8 @@
                 const input = document.getElementById(`spriteName${i}`);
                 return {
                     id: sprite.id, // 保留备份 ID
-                    name: input ? input.value : sprite.name,
+                    name: sprite.name,
+                    inputValue: input ? input.value : spriteInputLabel(sprite),
                     imagePath: sprite.imagePath,
                     fallbackImagePath: sprite.fallbackImagePath,
                     numberedImagePath: sprite.numberedImagePath,
@@ -1358,7 +1403,7 @@
             for (let i = 0; i < Math.min(newCount, backupData.length); i++) {
                 const input = document.getElementById(`spriteName${i}`);
                 if(input && backupData[i].name) {
-                    input.value = backupData[i].name;
+                    input.value = backupData[i].inputValue || spriteInputLabel(backupData[i]);
                     selectedSprites[i].id = backupData[i].id; // 恢复 ID
                     selectedSprites[i].name = backupData[i].name;
                     selectedSprites[i].imagePath = backupData[i].imagePath;
