@@ -663,6 +663,222 @@
             color: #ffffff;
         }
 
+        .feedback-fab {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 30;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 0 16px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.92);
+            color: var(--primary-dark);
+            font: inherit;
+            font-size: 0.92rem;
+            font-weight: 950;
+            box-shadow: 0 16px 34px rgba(15,23,42,0.22);
+            cursor: pointer;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .feedback-fab:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99,102,241,0.45);
+            box-shadow: 0 20px 42px rgba(15,23,42,0.28);
+        }
+
+        .feedback-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 70;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15,23,42,0.46);
+        }
+
+        .feedback-modal.is-open {
+            display: flex;
+        }
+
+        .feedback-dialog {
+            width: min(560px, 100%);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.62);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.96);
+            box-shadow: 0 28px 70px rgba(15,23,42,0.32);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .feedback-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 18px 18px 14px;
+            border-bottom: 1px solid rgba(226,232,240,0.88);
+            background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08));
+        }
+
+        .feedback-title {
+            color: var(--primary-dark);
+            font-size: 1.15rem;
+            font-weight: 950;
+        }
+
+        .feedback-desc {
+            margin-top: 4px;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .feedback-close {
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 50%;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font: inherit;
+            font-size: 1.2rem;
+            font-weight: 950;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .feedback-form {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+        }
+
+        .feedback-field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .feedback-label {
+            color: var(--text);
+            font-size: 0.86rem;
+            font-weight: 950;
+        }
+
+        .feedback-input,
+        .feedback-textarea {
+            width: 100%;
+            border: 2px solid rgba(99,102,241,0.16);
+            border-radius: 12px;
+            background: rgba(248,250,252,0.92);
+            color: var(--text);
+            font: inherit;
+            outline: none;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .feedback-input {
+            min-height: 42px;
+            padding: 10px 12px;
+        }
+
+        .feedback-textarea {
+            min-height: 132px;
+            resize: vertical;
+            padding: 12px;
+            line-height: 1.65;
+        }
+
+        .feedback-input:focus,
+        .feedback-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        .feedback-type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .feedback-type {
+            min-height: 38px;
+            border: 1px solid rgba(99,102,241,0.14);
+            border-radius: 12px;
+            background: rgba(99,102,241,0.06);
+            color: var(--text);
+            font: inherit;
+            font-size: 0.86rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .feedback-type.active {
+            color: #ffffff;
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 10px 22px rgba(99,102,241,0.22);
+        }
+
+        .feedback-honeypot {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .feedback-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-submit {
+            min-height: 42px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+            font: inherit;
+            font-size: 0.92rem;
+            font-weight: 950;
+            cursor: pointer;
+            box-shadow: 0 12px 26px rgba(99,102,241,0.24);
+        }
+
+        .feedback-submit:disabled {
+            cursor: wait;
+            opacity: 0.7;
+        }
+
+        .feedback-status {
+            min-height: 22px;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            font-weight: 850;
+        }
+
+        .feedback-status.is-success {
+            color: #15803d;
+        }
+
+        .feedback-status.is-error {
+            color: #be123c;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 16px;
@@ -755,6 +971,21 @@
                 min-height: 210px;
                 border-radius: 14px;
             }
+
+            .feedback-fab {
+                right: 16px;
+                bottom: 16px;
+                min-height: 42px;
+            }
+
+            .feedback-dialog {
+                max-height: min(90vh, 720px);
+                overflow: auto;
+            }
+
+            .feedback-type-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -843,6 +1074,47 @@
             苏公网安备32058102002843号
         </a>
     </div>
+
+    <button id="feedbackButton" class="feedback-fab" type="button">反馈建议</button>
+
+    <div id="feedbackModal" class="feedback-modal" aria-hidden="true">
+        <div class="feedback-dialog" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+            <div class="feedback-head">
+                <div>
+                    <div id="feedbackTitle" class="feedback-title">反馈建议</div>
+                    <div class="feedback-desc">遇到错误、想要新功能，或者有更顺手的用法，都可以直接告诉我。</div>
+                </div>
+                <button id="feedbackClose" class="feedback-close" type="button" aria-label="关闭反馈窗口">×</button>
+            </div>
+            <form id="feedbackForm" class="feedback-form">
+                <div class="feedback-field">
+                    <div class="feedback-label">反馈类型</div>
+                    <div class="feedback-type-grid" id="feedbackTypeGroup" role="radiogroup" aria-label="反馈类型">
+                        <button class="feedback-type active" type="button" data-type="改进建议" role="radio" aria-checked="true">改进建议</button>
+                        <button class="feedback-type" type="button" data-type="问题反馈" role="radio" aria-checked="false">问题反馈</button>
+                        <button class="feedback-type" type="button" data-type="想要功能" role="radio" aria-checked="false">想要功能</button>
+                    </div>
+                </div>
+                <label class="feedback-field">
+                    <span class="feedback-label">想说什么</span>
+                    <textarea id="feedbackMessage" class="feedback-textarea" name="message" maxlength="1600" required placeholder="例如：哪个页面不好用、希望增加什么筛选、哪里显示不准确..."></textarea>
+                </label>
+                <label class="feedback-field">
+                    <span class="feedback-label">联系方式（可选）</span>
+                    <input id="feedbackContact" class="feedback-input" name="contact" maxlength="120" placeholder="QQ / 邮箱 / B站昵称，方便需要时追问">
+                </label>
+                <label class="feedback-honeypot" aria-hidden="true">
+                    <span>请不要填写这里</span>
+                    <input id="feedbackWebsite" name="website" tabindex="-1" autocomplete="off">
+                </label>
+                <div class="feedback-actions">
+                    <div id="feedbackStatus" class="feedback-status">提交后会自动保存，不会公开显示。</div>
+                    <button id="feedbackSubmit" class="feedback-submit" type="submit">提交反馈</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const merchantShopConfig = {
             sourceUrl: './merchant_proxy.php',
@@ -1060,6 +1332,17 @@
         const rewardImageRight = document.getElementById('rewardImageRight');
         const rewardLabelLeft = document.getElementById('rewardLabelLeft');
         const rewardLabelRight = document.getElementById('rewardLabelRight');
+        const feedbackButton = document.getElementById('feedbackButton');
+        const feedbackModal = document.getElementById('feedbackModal');
+        const feedbackClose = document.getElementById('feedbackClose');
+        const feedbackForm = document.getElementById('feedbackForm');
+        const feedbackTypeGroup = document.getElementById('feedbackTypeGroup');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const feedbackContact = document.getElementById('feedbackContact');
+        const feedbackWebsite = document.getElementById('feedbackWebsite');
+        const feedbackStatus = document.getElementById('feedbackStatus');
+        const feedbackSubmit = document.getElementById('feedbackSubmit');
+        let activeFeedbackType = '改进建议';
 
         function applyRewardImages(config = {}) {
             rewardImageLeft.src = config.left || rewardPlaceholder;
@@ -1089,7 +1372,90 @@
             if (event.key === 'Escape') {
                 rewardWidget.classList.remove('is-open');
                 rewardButton.setAttribute('aria-expanded', 'false');
-                rewardButton.focus();
+                if (feedbackModal.classList.contains('is-open')) {
+                    closeFeedbackModal();
+                } else {
+                    rewardButton.focus();
+                }
+            }
+        });
+
+        function setFeedbackStatus(message, state = '') {
+            feedbackStatus.textContent = message;
+            feedbackStatus.classList.toggle('is-success', state === 'success');
+            feedbackStatus.classList.toggle('is-error', state === 'error');
+        }
+
+        function openFeedbackModal() {
+            feedbackModal.classList.add('is-open');
+            feedbackModal.setAttribute('aria-hidden', 'false');
+            setFeedbackStatus('提交后会自动保存，不会公开显示。');
+            setTimeout(() => feedbackMessage.focus(), 0);
+        }
+
+        function closeFeedbackModal() {
+            feedbackModal.classList.remove('is-open');
+            feedbackModal.setAttribute('aria-hidden', 'true');
+            feedbackButton.focus();
+        }
+
+        feedbackButton.addEventListener('click', openFeedbackModal);
+        feedbackClose.addEventListener('click', closeFeedbackModal);
+        feedbackModal.addEventListener('click', function (event) {
+            if (event.target === feedbackModal) closeFeedbackModal();
+        });
+
+        feedbackTypeGroup.addEventListener('click', function (event) {
+            const button = event.target.closest('.feedback-type');
+            if (!button || button.dataset.type === activeFeedbackType) return;
+
+            activeFeedbackType = button.dataset.type;
+            feedbackTypeGroup.querySelectorAll('.feedback-type').forEach(option => {
+                const isActive = option.dataset.type === activeFeedbackType;
+                option.classList.toggle('active', isActive);
+                option.setAttribute('aria-checked', String(isActive));
+            });
+        });
+
+        feedbackForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const message = feedbackMessage.value.trim();
+            const contact = feedbackContact.value.trim();
+
+            if (message.length < 5) {
+                setFeedbackStatus('再多写一点点，我才能更准确地理解你的想法。', 'error');
+                feedbackMessage.focus();
+                return;
+            }
+
+            feedbackSubmit.disabled = true;
+            setFeedbackStatus('正在提交...');
+
+            try {
+                const response = await fetch('./feedback_submit.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: activeFeedbackType,
+                        message,
+                        contact,
+                        website: feedbackWebsite.value
+                    })
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || data.ok !== true) {
+                    throw new Error(data.message || '提交失败');
+                }
+
+                feedbackForm.reset();
+                feedbackWebsite.value = '';
+                setFeedbackStatus('收到啦，感谢你的反馈！', 'success');
+                setTimeout(closeFeedbackModal, 900);
+            } catch (error) {
+                console.error(error);
+                setFeedbackStatus('提交失败了，请稍后再试。', 'error');
+            } finally {
+                feedbackSubmit.disabled = false;
             }
         });
 

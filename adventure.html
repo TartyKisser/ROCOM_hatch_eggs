@@ -133,14 +133,14 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            min-height: 36px;
+            padding: 8px 14px;
             border: 1px solid rgba(255,255,255,0.48);
-            border-radius: 50%;
+            border-radius: 999px;
             background: rgba(255,255,255,0.9);
             color: var(--primary-dark);
             font: inherit;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 950;
             box-shadow: 0 8px 22px rgba(15,23,42,0.12);
             cursor: pointer;
@@ -207,6 +207,37 @@
         .search-input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        .sort-toggle {
+            display: inline-grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            width: min(420px, 100%);
+            gap: 6px;
+            padding: 5px;
+            border: 1px solid rgba(99,102,241,0.14);
+            border-radius: 13px;
+            background: rgba(255,255,255,0.94);
+        }
+
+        .sort-option {
+            min-height: 38px;
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 950;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .sort-option.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(99,102,241,0.22);
         }
 
         .suggest-menu {
@@ -322,30 +353,6 @@
             object-fit: contain;
             border-radius: 50%;
             background: rgba(255,255,255,0.82);
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .summary-tile {
-            padding: 15px;
-        }
-
-        .summary-label {
-            color: var(--text-secondary);
-            font-size: 0.78rem;
-            font-weight: 900;
-            margin-bottom: 6px;
-        }
-
-        .summary-value {
-            color: var(--primary-dark);
-            font-size: 1.35rem;
-            font-weight: 950;
         }
 
         .strategy-grid {
@@ -670,8 +677,84 @@
             padding: 18px;
             color: var(--text);
             font-size: 0.95rem;
-            line-height: 1.75;
-            white-space: pre-wrap;
+            line-height: 1.7;
+            background:
+                linear-gradient(180deg, rgba(99,102,241,0.05), transparent 180px),
+                rgba(255,255,255,0.72);
+        }
+
+        .rules-intro {
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border: 1px solid rgba(99,102,241,0.12);
+            border-radius: 14px;
+            background: rgba(99,102,241,0.07);
+            color: var(--primary-dark);
+            font-weight: 900;
+        }
+
+        .rules-section {
+            padding: 14px;
+            border: 1px solid rgba(226,232,240,0.92);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.86);
+            box-shadow: 0 10px 22px rgba(15,23,42,0.06);
+        }
+
+        .rules-section + .rules-section {
+            margin-top: 12px;
+        }
+
+        .rules-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+            font-size: 1rem;
+            font-weight: 950;
+        }
+
+        .rules-section-title::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            flex: 0 0 auto;
+        }
+
+        .rules-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .rules-list li {
+            position: relative;
+            padding-left: 18px;
+            color: var(--text-secondary);
+            font-weight: 750;
+        }
+
+        .rules-list li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 0.78em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(99,102,241,0.48);
+        }
+
+        .rules-message {
+            padding: 22px;
+            color: var(--text-secondary);
+            font-weight: 900;
+            text-align: center;
         }
 
         .back-to-top {
@@ -709,12 +792,6 @@
         .back-to-top:hover {
             border-color: rgba(99,102,241,0.48);
             transform: translateY(-2px);
-        }
-
-        @media (max-width: 980px) {
-            .summary-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
         }
 
         @media (max-width: 768px) {
@@ -761,24 +838,24 @@
         <header>
             <div class="hero-eyebrow">ADVENTURE</div>
             <h1 class="main-title">奇遇混抓推荐</h1>
-            <p class="desc-font">按星光值之和排序，寻找更快触发奇遇事件的混抓组合。</p>
+            <p class="desc-font">按家族平均星光值之和排序，寻找更快触发奇遇事件的混抓组合。</p>
         </header>
 
         <div class="topbar">
             <a class="btn" href="index.html">‹ 返回主页</a>
             <div class="topbar-actions">
                 <div class="count-pill" id="resultCount">数据加载中</div>
-                <button id="rulesHelp" class="help-button" type="button" aria-label="查看推荐规则">？</button>
+                <button id="rulesHelp" class="help-button" type="button">推荐规则说明</button>
             </div>
         </div>
 
         <section class="panel controls">
             <div class="adventure-control-section">
-                <div class="control-title">选择奇遇精灵</div>
+                <div class="control-title">选择奇遇家族</div>
                 <div id="targetStrip" class="target-strip"></div>
             </div>
             <div class="adventure-control-section">
-                <div class="control-title">限定混抓精灵（可选）</div>
+                <div class="control-title">限定混抓家族（可选）</div>
                 <div class="candidate-search-grid">
                     <div class="candidate-field">
                         <input id="candidateInputA" class="search-input" type="search" placeholder="输入第一只精灵名称或编号" autocomplete="off" aria-controls="candidateSuggestA">
@@ -790,28 +867,16 @@
                     </div>
                 </div>
             </div>
+            <div class="adventure-control-section">
+                <div class="control-title">排序方式</div>
+                <div id="sortMode" class="sort-toggle" role="radiogroup" aria-label="排序方式">
+                    <button class="sort-option active" type="button" data-sort="score_then_rare" role="radio" aria-checked="true">星光值优先</button>
+                    <button class="sort-option" type="button" data-sort="rare_then_score" role="radio" aria-checked="false">少歪异色优先</button>
+                </div>
+            </div>
             <div class="controls-actions">
                 <button id="startSearch" class="btn btn-primary" type="button">开始搜索</button>
                 <button id="clearSearch" class="btn" type="button">清空条件</button>
-            </div>
-        </section>
-
-        <section class="summary-grid">
-            <div class="panel summary-tile">
-                <div class="summary-label">奇遇目标</div>
-                <div id="targetTotal" class="summary-value">-</div>
-            </div>
-            <div class="panel summary-tile">
-                <div class="summary-label">候选混抓精灵</div>
-                <div id="candidateTotal" class="summary-value">-</div>
-            </div>
-            <div class="panel summary-tile">
-                <div class="summary-label">可触发组合</div>
-                <div id="pairTotal" class="summary-value">-</div>
-            </div>
-            <div class="panel summary-tile">
-                <div class="summary-label">当前策略</div>
-                <div id="strategyTotal" class="summary-value">-</div>
             </div>
         </section>
 
@@ -837,7 +902,7 @@
     <div id="rulesModal" class="rules-modal" aria-hidden="true">
         <div class="rules-dialog" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
             <div class="rules-head">
-                <div id="rulesTitle" class="rules-title">推荐规则</div>
+                <div id="rulesTitle" class="rules-title">推荐规则说明</div>
                 <button id="rulesClose" class="rules-close" type="button" aria-label="关闭推荐规则">×</button>
             </div>
             <div id="rulesContent" class="rules-content">正在加载推荐规则...</div>
@@ -887,14 +952,18 @@
         const PAGE_SIZE = 80;
 
         let records = [];
+        let canonicalRecordByNumber = new Map();
         let adventureTargets = [];
         let adventureNumbers = new Set();
+        let rareTargets = [];
         let candidates = [];
         let allStrategies = [];
         let filteredStrategies = [];
         let visibleCount = PAGE_SIZE;
         let activeTarget = '';
+        let activeSortMode = 'score_then_rare';
 
+        const sortModeGroup = document.getElementById('sortMode');
         const candidateInputA = document.getElementById('candidateInputA');
         const candidateInputB = document.getElementById('candidateInputB');
         const candidateSuggestA = document.getElementById('candidateSuggestA');
@@ -905,10 +974,6 @@
         const strategyGrid = document.getElementById('strategyGrid');
         const resultCount = document.getElementById('resultCount');
         const loadMore = document.getElementById('loadMore');
-        const targetTotal = document.getElementById('targetTotal');
-        const candidateTotal = document.getElementById('candidateTotal');
-        const pairTotal = document.getElementById('pairTotal');
-        const strategyTotal = document.getElementById('strategyTotal');
         const backToTop = document.getElementById('backToTop');
         const rulesHelp = document.getElementById('rulesHelp');
         const rulesModal = document.getElementById('rulesModal');
@@ -933,6 +998,20 @@
         function normalizeNumber(value) {
             const digits = String(value || '').replace(/\D/g, '');
             return digits ? digits.padStart(3, '0') : '';
+        }
+
+        function leadingNumber(value) {
+            const match = String(value || '').match(/^(\d+)/);
+            return match ? match[1].padStart(3, '0') : '';
+        }
+
+        function buildFirstRecordIndex(sourceRecords) {
+            const index = new Map();
+            sourceRecords.forEach(record => {
+                const number = normalizeNumber(record.number);
+                if (number && !index.has(number)) index.set(number, record);
+            });
+            return index;
         }
 
         function parseCsv(text) {
@@ -1026,6 +1105,114 @@
             return cleanList(record.eggGroups);
         }
 
+        function recordStarlight(record) {
+            const value = Number(record && record.baseStarlightValue);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        function familyKey(record) {
+            const evolution = Array.isArray(record.evolution) && record.evolution.length
+                ? record.evolution
+                : [record.id];
+            return uniqueList(evolution.map(id => {
+                const number = leadingNumber(id);
+                return (number && canonicalRecordByNumber.get(number))
+                    ? canonicalRecordByNumber.get(number).id
+                    : id;
+            })).join('|');
+        }
+
+        function familyRepresentative(members, evolutionIds) {
+            const firstEvolutionId = evolutionIds[0];
+            return (
+                members.find(member => member.id === firstEvolutionId)
+                || members.slice().sort((a, b) => a.number.localeCompare(b.number))[0]
+            );
+        }
+
+        function weightedFamilyStarlight(members, evolutionIds) {
+            const orderedMembers = evolutionIds
+                .map(id => members.find(member => member.id === id))
+                .filter(Boolean);
+            const usableMembers = orderedMembers.length ? orderedMembers : members;
+
+            if (usableMembers.length === 1) {
+                return recordStarlight(usableMembers[0]);
+            }
+            if (usableMembers.length === 2) {
+                return (recordStarlight(usableMembers[0]) * 3.5 + recordStarlight(usableMembers[1]) * 1.5) / 5;
+            }
+            if (usableMembers.length === 3) {
+                return (
+                    recordStarlight(usableMembers[0]) * 2.5
+                    + recordStarlight(usableMembers[1]) * 1.5
+                    + recordStarlight(usableMembers[2])
+                ) / 5;
+            }
+
+            return usableMembers.reduce((sum, member) => sum + recordStarlight(member), 0) / usableMembers.length;
+        }
+
+        function formatScore(score) {
+            const value = Number(score);
+            if (!Number.isFinite(value)) return '-';
+            return Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, '');
+        }
+
+        function uniqueList(values) {
+            return [...new Set(values.filter(Boolean))];
+        }
+
+        function buildCandidateFamilies(sourceRecords) {
+            const familyMap = new Map();
+            sourceRecords.forEach(record => {
+                const key = familyKey(record);
+                if (!familyMap.has(key)) {
+                    familyMap.set(key, {
+                        key,
+                        evolutionIds: key.split('|').filter(Boolean),
+                        members: []
+                    });
+                }
+                familyMap.get(key).members.push(record);
+            });
+
+            return [...familyMap.values()].map(family => {
+                const representative = familyRepresentative(family.members, family.evolutionIds);
+                const sortedMembers = family.evolutionIds
+                    .map(id => family.members.find(member => member.id === id))
+                    .filter(Boolean);
+                const members = sortedMembers.length ? sortedMembers : family.members;
+                const memberNames = members.map(member => member.title);
+                const memberNumbers = members.map(member => member.number);
+                const attributes = uniqueList(members.flatMap(recordAttributes));
+                const eggGroups = uniqueList(members.flatMap(recordEggGroups));
+                const score = weightedFamilyStarlight(family.members, family.evolutionIds);
+                const title = members.length > 1 ? `${representative.title}家族` : representative.title;
+
+                return {
+                    id: family.key,
+                    key: family.key,
+                    number: representative.number,
+                    title,
+                    portrait: representative.portrait,
+                    attributes,
+                    eggGroups,
+                    baseStarlightValue: score,
+                    members,
+                    memberNames,
+                    memberNumbers,
+                    searchText: normalize([
+                        title,
+                        representative.number,
+                        representative.title,
+                        ...memberNames,
+                        ...memberNumbers
+                    ].join(' '))
+                };
+            }).sort((a, b) => a.number.localeCompare(b.number));
+        }
+
         function attributeColor(attr) {
             return ATTRIBUTE_COLORS[attr] || FALLBACK_ATTRIBUTE_COLOR;
         }
@@ -1057,7 +1244,13 @@
         }
 
         function candidateSearchText(record) {
-            return normalize(`${record.number} ${record.title}`);
+            return normalize([
+                record.number,
+                record.title,
+                record.title,
+                record.number,
+                record.searchText || ''
+            ].join(' '));
         }
 
         function candidateMatchesTerm(record, term) {
@@ -1092,7 +1285,7 @@
                 .slice(0, 10);
 
             if (!matches.length) {
-                menu.innerHTML = '<div class="empty-state" style="padding:12px;">没有匹配的候选精灵。</div>';
+                menu.innerHTML = '<div class="empty-state" style="padding:12px;">没有匹配的候选家族。</div>';
                 menu.classList.add('is-open');
                 return;
             }
@@ -1132,10 +1325,11 @@
         }
 
         function renderScoreBadge(score) {
+            const scoreText = formatScore(score);
             return `
-                <div class="score-badge" title="星光值之和：${escapeHtml(score)}" aria-label="星光值之和：${escapeHtml(score)}">
+                <div class="score-badge" title="家族星光值之和：${escapeHtml(scoreText)}" aria-label="家族星光值之和：${escapeHtml(scoreText)}">
                     <img class="score-badge-image" src="${escapeHtml(STARLIGHT_BADGE)}" alt="" aria-hidden="true" onerror="this.style.display='none'">
-                    <span class="score-badge-number">${escapeHtml(score)}</span>
+                    <span class="score-badge-number">${escapeHtml(scoreText)}</span>
                 </div>
             `;
         }
@@ -1175,79 +1369,107 @@
         }
 
         function buildStrategies() {
-            const { attributeIndex, eggBoxIndex } = buildTargetIndex(adventureTargets);
+            const adventureIndex = buildTargetIndex(adventureTargets);
+            const rareIndex = buildTargetIndex(rareTargets);
             const strategies = [];
-            let triggeredPairCount = 0;
-
             for (let i = 0; i < candidates.length; i += 1) {
                 for (let j = i + 1; j < candidates.length; j += 1) {
                     const first = candidates[i];
                     const second = candidates[j];
-                    if (first.number === second.number) continue;
+                    if (first.key === second.key) continue;
 
                     const attributeKey = setKey(intersect(recordAttributes(first), recordAttributes(second)));
                     const commonEggBoxes = eggBoxes(intersect(recordEggGroups(first), recordEggGroups(second)));
                     const targetRuleMap = new Map();
+                    const rareTargetRuleMap = new Map();
 
-                    (attributeIndex.get(attributeKey) || []).forEach(target => targetRuleMap.set(target.number, {
+                    (adventureIndex.attributeIndex.get(attributeKey) || []).forEach(target => targetRuleMap.set(target.key, {
+                        target,
+                        rules: ['系别交集']
+                    }));
+                    (rareIndex.attributeIndex.get(attributeKey) || []).forEach(target => rareTargetRuleMap.set(target.key, {
                         target,
                         rules: ['系别交集']
                     }));
 
                     commonEggBoxes.forEach(box => {
-                        (eggBoxIndex.get(box) || []).forEach(target => {
-                            const item = targetRuleMap.get(target.number) || { target, rules: [] };
-                            const boxRule = `蛋组：${EGG_BOX_LABELS[box] || box}`;
+                        const boxRule = `蛋组：${EGG_BOX_LABELS[box] || box}`;
+                        (adventureIndex.eggBoxIndex.get(box) || []).forEach(target => {
+                            const item = targetRuleMap.get(target.key) || { target, rules: [] };
                             if (!item.rules.includes(boxRule)) item.rules.push(boxRule);
-                            targetRuleMap.set(target.number, item);
+                            targetRuleMap.set(target.key, item);
+                        });
+                        (rareIndex.eggBoxIndex.get(box) || []).forEach(target => {
+                            const item = rareTargetRuleMap.get(target.key) || { target, rules: [] };
+                            if (!item.rules.includes(boxRule)) item.rules.push(boxRule);
+                            rareTargetRuleMap.set(target.key, item);
                         });
                     });
 
                     if (!targetRuleMap.size) continue;
 
-                    triggeredPairCount += 1;
-                    const triggeredTargets = [...targetRuleMap.values()].map(item => item.target);
+                    const rareTriggeredTargets = [...rareTargetRuleMap.values()].map(item => item.target);
+                    const score = first.baseStarlightValue + second.baseStarlightValue;
 
                     targetRuleMap.forEach(item => {
                         strategies.push({
                             target: item.target,
                             first,
                             second,
-                            score: first.baseStarlightValue + second.baseStarlightValue,
+                            score,
                             rules: item.rules,
-                            otherTargets: triggeredTargets.filter(target => target.number !== item.target.number),
+                            otherTargets: rareTriggeredTargets.filter(target => target.key !== item.target.key),
                             searchText: normalize([
                                 item.target.number,
                                 item.target.title,
+                                item.target.searchText,
                                 first.number,
                                 first.title,
+                                first.searchText,
                                 second.number,
                                 second.title,
-                                ...triggeredTargets.map(target => `${target.number}${target.title}`)
+                                second.searchText,
+                                ...rareTriggeredTargets.map(target => `${target.number}${target.title}${target.searchText}`)
                             ].join(' '))
                         });
                     });
                 }
             }
 
-            strategies.sort((a, b) => (
-                b.score - a.score
-                || a.target.number.localeCompare(b.target.number)
+            return strategies;
+        }
+
+        function compareStrategyFallback(a, b) {
+            return (
+                a.target.number.localeCompare(b.target.number)
+                || a.target.key.localeCompare(b.target.key, 'zh-CN')
                 || a.first.number.localeCompare(b.first.number)
                 || a.second.number.localeCompare(b.second.number)
-            ));
+            );
+        }
 
-            pairTotal.textContent = String(triggeredPairCount);
-            return strategies;
+        function compareStrategies(a, b) {
+            const scoreCompare = b.score - a.score;
+            const rareCompare = a.otherTargets.length - b.otherTargets.length;
+
+            if (activeSortMode === 'rare_then_score') {
+                return rareCompare || scoreCompare || compareStrategyFallback(a, b);
+            }
+
+            return scoreCompare || rareCompare || compareStrategyFallback(a, b);
+        }
+
+        function sortStrategies(strategies) {
+            return strategies.slice().sort(compareStrategies);
         }
 
         function renderTargetControls() {
             targetStrip.innerHTML = [
                 `<button class="target-chip ${activeTarget === '' ? 'active' : ''}" type="button" data-target="">全部</button>`,
                 ...adventureTargets.map(target => `
-                    <button class="target-chip ${activeTarget === target.number ? 'active' : ''}" type="button" data-target="${escapeHtml(target.number)}">
+                    <button class="target-chip ${activeTarget === target.key ? 'active' : ''}" type="button" data-target="${escapeHtml(target.key)}">
                         <img src="${escapeHtml(target.portrait)}" alt="" loading="lazy" onerror="this.style.display='none'">
-                        <span>${formatNo(target.number)} ${escapeHtml(target.title)}</span>
+                        <span>${escapeHtml(target.title)}</span>
                     </button>
                 `)
             ].join('');
@@ -1264,7 +1486,7 @@
             const firstTerm = normalize(candidateInputA.value);
             const secondTerm = normalize(candidateInputB.value);
             filteredStrategies = allStrategies.filter(strategy => {
-                const matchesTarget = !activeTarget || strategy.target.number === activeTarget;
+                const matchesTarget = !activeTarget || strategy.target.key === activeTarget;
                 const matchesFirstCandidate = candidateMatchesTerm(strategy.first, firstTerm);
                 const matchesSecondCandidate = candidateMatchesTerm(strategy.second, secondTerm);
                 const matchesReverseFirst = candidateMatchesTerm(strategy.first, secondTerm);
@@ -1280,8 +1502,8 @@
                 );
                 return matchesTarget && matchesCandidates;
             });
+            filteredStrategies = sortStrategies(filteredStrategies);
 
-            strategyTotal.textContent = String(filteredStrategies.length);
             resultCount.textContent = `共 ${filteredStrategies.length} 条推荐`;
             renderTargetControls();
             renderStrategies();
@@ -1302,39 +1524,52 @@
 
         async function init() {
             try {
-                const [handbookResponse, adventureResponse] = await Promise.all([
+                const [handbookResponse, adventureResponse, rareResponse] = await Promise.all([
                     fetch('handbook_data.json'),
-                    fetch('adventure.csv')
+                    fetch('adventure.csv'),
+                    fetch('rare.csv')
                 ]);
                 const handbook = await handbookResponse.json();
                 const adventureRows = parseCsv(await adventureResponse.text());
+                const rareRows = parseCsv(await rareResponse.text());
 
-                records = handbook.records || [];
+                canonicalRecordByNumber = buildFirstRecordIndex(handbook.records || []);
+                records = [...canonicalRecordByNumber.values()];
                 adventureNumbers = new Set(adventureRows.map(row => normalizeNumber(row['图鉴编号'])));
-                adventureTargets = adventureRows
-                    .map(row => records.find(record => record.number === normalizeNumber(row['图鉴编号'])))
-                    .filter(Boolean);
-                candidates = records.filter(record => (
-                    !adventureNumbers.has(record.number)
-                    && Number.isFinite(record.baseStarlightValue)
-                ));
+                const rareNumbers = new Set(rareRows.map(row => normalizeNumber(row['图鉴编号'])));
+                const allFamilies = buildCandidateFamilies(records);
+                adventureTargets = allFamilies.filter(family => family.members.some(member => adventureNumbers.has(member.number)));
+                rareTargets = allFamilies.filter(family => family.members.some(member => rareNumbers.has(member.number)));
+                candidates = buildCandidateFamilies(records.filter(record => Number.isFinite(record.baseStarlightValue)))
+                    .filter(family => !family.members.some(member => adventureNumbers.has(member.number)));
 
-                targetTotal.textContent = String(adventureTargets.length);
-                candidateTotal.textContent = String(candidates.length);
                 renderTargetControls();
                 allStrategies = buildStrategies();
-                filteredStrategies = allStrategies;
-                strategyTotal.textContent = String(filteredStrategies.length);
+                filteredStrategies = sortStrategies(allStrategies);
                 resultCount.textContent = `共 ${filteredStrategies.length} 条推荐`;
                 renderStrategies();
             } catch (error) {
                 console.error(error);
                 resultCount.textContent = '加载失败';
-                strategyGrid.innerHTML = '<div class="panel empty-state">请确认 handbook_data.json 和 adventure.csv 存在并可访问。</div>';
+                strategyGrid.innerHTML = '<div class="panel empty-state">推荐数据暂时加载失败，请稍后刷新重试。</div>';
             }
         }
 
         startSearch.addEventListener('click', () => {
+            visibleCount = PAGE_SIZE;
+            applyFilters();
+        });
+
+        sortModeGroup.addEventListener('click', event => {
+            const button = event.target.closest('.sort-option');
+            if (!button || button.dataset.sort === activeSortMode) return;
+
+            activeSortMode = button.dataset.sort;
+            sortModeGroup.querySelectorAll('.sort-option').forEach(option => {
+                const isActive = option.dataset.sort === activeSortMode;
+                option.classList.toggle('active', isActive);
+                option.setAttribute('aria-checked', String(isActive));
+            });
             visibleCount = PAGE_SIZE;
             applyFilters();
         });
@@ -1373,24 +1608,67 @@
             renderStrategies();
         });
 
+        function renderRulesText(text) {
+            const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+            const sections = [];
+            let intro = '';
+            let current = null;
+
+            lines.forEach(line => {
+                const sectionMatch = line.match(/^[一二三四五六七八九十]+、(.+)$/);
+                const itemMatch = line.match(/^\d+\.\s*(.+)$/);
+
+                if (sectionMatch) {
+                    current = { title: sectionMatch[1], items: [] };
+                    sections.push(current);
+                    return;
+                }
+
+                if (itemMatch && current) {
+                    current.items.push(itemMatch[1]);
+                    return;
+                }
+
+                if (current) {
+                    current.items.push(line.replace(/^-\s*/, ''));
+                } else {
+                    intro = intro ? `${intro} ${line}` : line;
+                }
+            });
+
+            const introHtml = intro
+                ? `<div class="rules-intro">${escapeHtml(intro)}</div>`
+                : '';
+            const sectionHtml = sections.map(section => `
+                <section class="rules-section">
+                    <div class="rules-section-title">${escapeHtml(section.title)}</div>
+                    <ul class="rules-list">
+                        ${section.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+                    </ul>
+                </section>
+            `).join('');
+
+            return introHtml + sectionHtml;
+        }
+
         async function openRulesModal() {
             rulesModal.classList.add('is-open');
             rulesModal.setAttribute('aria-hidden', 'false');
 
             if (rulesTextCache) {
-                rulesContent.textContent = rulesTextCache;
+                rulesContent.innerHTML = renderRulesText(rulesTextCache);
                 return;
             }
 
-            rulesContent.textContent = '正在加载推荐规则...';
+            rulesContent.innerHTML = '<div class="rules-message">正在加载推荐规则...</div>';
             try {
                 const response = await fetch('adventure_rules.txt', { cache: 'no-store' });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 rulesTextCache = await response.text();
-                rulesContent.textContent = rulesTextCache;
+                rulesContent.innerHTML = renderRulesText(rulesTextCache);
             } catch (error) {
                 console.error(error);
-                rulesContent.textContent = '推荐规则加载失败，请确认 adventure_rules.txt 存在并可访问。';
+                rulesContent.innerHTML = '<div class="rules-message">推荐规则暂时加载失败，请稍后再试。</div>';
             }
         }
 
