@@ -971,6 +971,7 @@
         let selectedId = '';
         let activeAttribute = '';
         let activeEggGroup = '';
+        let galleryScrollY = 0;
 
         const searchInput = document.getElementById('searchInput');
         const clearSearch = document.getElementById('clearSearch');
@@ -1131,16 +1132,24 @@
             `;
         }
 
-        function showGallery(updateHash = true) {
+        function showGallery(updateHash = true, restoreScroll = true) {
             galleryView.classList.add('active');
             detailView.classList.remove('active');
             homeLink.style.display = 'inline-flex';
             backToGallery.style.display = 'none';
             if (updateHash) history.pushState('', document.title, location.pathname + location.search);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            requestAnimationFrame(() => {
+                window.scrollTo({
+                    top: restoreScroll ? galleryScrollY : 0,
+                    behavior: 'auto'
+                });
+            });
         }
 
         function showDetail(id, updateHash = true) {
+            if (galleryView.classList.contains('active')) {
+                galleryScrollY = window.scrollY;
+            }
             selectedId = id;
             renderDetail();
             galleryView.classList.remove('active');
@@ -1386,13 +1395,13 @@
             activeEggGroup = '';
             applyFilters();
         });
-        backToGallery.addEventListener('click', () => showGallery());
+        backToGallery.addEventListener('click', () => showGallery(true, true));
         window.addEventListener('hashchange', () => {
             const hashId = decodeURIComponent(location.hash.replace(/^#/, ''));
             if (hashId && records.some(record => record.id === hashId)) {
                 showDetail(hashId, false);
             } else {
-                showGallery(false);
+                showGallery(false, true);
             }
         });
 
