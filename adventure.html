@@ -950,6 +950,7 @@
         );
         const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
         const PAGE_SIZE = 80;
+        const EGG_GROUP_ONLY_TARGET_NUMBERS = new Set(['362', '365', '369']);
 
         let records = [];
         let canonicalRecordByNumber = new Map();
@@ -1085,12 +1086,19 @@
             return [...new Set(cleanList(groups).map(group => EGG_GROUP_TO_BOX[group]).filter(Boolean))];
         }
 
+        function targetRequiresEggGroupRule(target) {
+            const numbers = target && Array.isArray(target.memberNumbers) ? target.memberNumbers : [target && target.number];
+            return numbers.some(number => EGG_GROUP_ONLY_TARGET_NUMBERS.has(normalizeNumber(number)));
+        }
+
         function buildTargetIndex(targets) {
             const attributeIndex = new Map();
             const eggBoxIndex = new Map();
 
             targets.forEach(target => {
-                subsets(target.attributes).forEach(items => addToIndex(attributeIndex, setKey(items), target));
+                if (!targetRequiresEggGroupRule(target)) {
+                    subsets(target.attributes).forEach(items => addToIndex(attributeIndex, setKey(items), target));
+                }
                 eggBoxes(target.eggGroups).forEach(box => addToIndex(eggBoxIndex, box, target));
             });
 
