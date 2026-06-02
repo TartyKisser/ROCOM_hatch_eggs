@@ -58,7 +58,7 @@ if (function_exists('mb_substr')) {
     $contact = substr($contact, 0, 120);
 }
 
-$storageDir = __DIR__ . '/feedback_submissions';
+$storageDir = dirname(__DIR__) . '/feedback_submissions';
 if (!is_dir($storageDir) && !mkdir($storageDir, 0755, true) && !is_dir($storageDir)) {
     http_response_code(500);
     echo json_encode(['ok' => false, 'message' => 'storage unavailable'], JSON_UNESCAPED_UNICODE);
