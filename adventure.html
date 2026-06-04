@@ -209,35 +209,62 @@
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
         }
 
-        .sort-toggle {
-            display: inline-grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            width: min(420px, 100%);
-            gap: 6px;
-            padding: 5px;
+        .sort-priority {
+            display: grid;
+            width: min(560px, 100%);
+            gap: 8px;
+        }
+
+        .sort-priority-item {
+            display: grid;
+            grid-template-columns: 32px minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 6px 8px;
             border: 1px solid rgba(99,102,241,0.14);
             border-radius: 13px;
             background: rgba(255,255,255,0.94);
-        }
-
-        .sort-option {
-            min-height: 38px;
-            padding: 8px 12px;
-            border: 0;
-            border-radius: 10px;
-            background: transparent;
             color: var(--text);
-            font: inherit;
-            font-size: 0.9rem;
-            font-weight: 950;
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .sort-option.active {
+        .sort-rank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #ffffff;
-            box-shadow: 0 8px 18px rgba(99,102,241,0.22);
+            font-size: 0.8rem;
+            font-weight: 950;
+        }
+
+        .sort-label {
+            min-width: 0;
+            overflow: hidden;
+            font-size: 0.9rem;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sort-move {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 9px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font: inherit;
+            font-weight: 950;
+            cursor: pointer;
+        }
+
+        .sort-move:disabled {
+            opacity: 0.36;
+            cursor: default;
         }
 
         .suggest-menu {
@@ -573,6 +600,36 @@
             font-weight: 800;
         }
 
+        .other-info {
+            min-width: 0;
+            display: grid;
+            gap: 3px;
+        }
+
+        .other-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .other-rules {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+
+        .other-rule {
+            display: inline-flex;
+            align-items: center;
+            min-height: 18px;
+            padding: 2px 5px;
+            border-radius: 999px;
+            background: rgba(99,102,241,0.09);
+            color: var(--primary-dark);
+            font-size: 0.66rem;
+            font-weight: 900;
+        }
+
         .other-item img {
             width: 30px;
             height: 30px;
@@ -838,7 +895,7 @@
         <header>
             <div class="hero-eyebrow">ADVENTURE</div>
             <h1 class="main-title">奇遇混抓推荐</h1>
-            <p class="desc-font">按家族平均星光值之和排序，寻找更快触发奇遇事件的混抓组合。</p>
+            <p class="desc-font">按自定义优先级排序，寻找更快触发奇遇事件且更少歪异色的混抓组合。</p>
         </header>
 
         <div class="topbar">
@@ -868,11 +925,8 @@
                 </div>
             </div>
             <div class="adventure-control-section">
-                <div class="control-title">排序方式</div>
-                <div id="sortMode" class="sort-toggle" role="radiogroup" aria-label="排序方式">
-                    <button class="sort-option active" type="button" data-sort="score_then_rare" role="radio" aria-checked="true">星光值优先</button>
-                    <button class="sort-option" type="button" data-sort="rare_then_score" role="radio" aria-checked="false">少歪异色优先</button>
-                </div>
+                <div class="control-title">排序优先级</div>
+                <div id="sortPriority" class="sort-priority" aria-label="排序优先级"></div>
             </div>
             <div class="controls-actions">
                 <button id="startSearch" class="btn btn-primary" type="button">开始搜索</button>
@@ -962,9 +1016,15 @@
         let filteredStrategies = [];
         let visibleCount = PAGE_SIZE;
         let activeTarget = '';
-        let activeSortMode = 'score_then_rare';
+        let sortPriority = ['score', 'rare', 'pool'];
 
-        const sortModeGroup = document.getElementById('sortMode');
+        const SORT_LABELS = {
+            score: '星光值',
+            rare: '少歪异色',
+            pool: '触发池子数量'
+        };
+
+        const sortPriorityGroup = document.getElementById('sortPriority');
         const candidateInputA = document.getElementById('candidateInputA');
         const candidateInputB = document.getElementById('candidateInputB');
         const candidateSuggestA = document.getElementById('candidateSuggestA');
@@ -1327,11 +1387,16 @@
             `;
         }
 
-        function renderOtherTarget(target) {
+        function renderOtherTarget(item) {
+            const target = item.target;
+            const rules = item.rules.map(rule => `<span class="other-rule">${escapeHtml(rule)}</span>`).join('');
             return `
                 <span class="other-item" title="${formatNo(target.number)} ${escapeHtml(target.title)}">
                     <img src="${escapeHtml(portraitSmallPath(target))}" alt="" loading="lazy" onerror="this.style.display='none'">
-                    <span>${formatNo(target.number)} ${escapeHtml(target.title)}</span>
+                    <span class="other-info">
+                        <span class="other-name">${formatNo(target.number)} ${escapeHtml(target.title)}</span>
+                        <span class="other-rules">${rules}</span>
+                    </span>
                 </span>
             `;
         }
@@ -1420,17 +1485,22 @@
 
                     if (!targetRuleMap.size) continue;
 
-                    const rareTriggeredTargets = [...rareTargetRuleMap.values()].map(item => item.target);
+                    const rareTriggeredItems = [...rareTargetRuleMap.values()].map(item => ({
+                        target: item.target,
+                        rules: item.rules
+                    }));
                     const score = first.baseStarlightValue + second.baseStarlightValue;
 
                     targetRuleMap.forEach(item => {
+                        const otherTargets = rareTriggeredItems.filter(rareItem => rareItem.target.key !== item.target.key);
                         strategies.push({
                             target: item.target,
                             first,
                             second,
                             score,
                             rules: item.rules,
-                            otherTargets: rareTriggeredTargets.filter(target => target.key !== item.target.key),
+                            triggerPoolCount: item.rules.length,
+                            otherTargets,
                             searchText: normalize([
                                 item.target.number,
                                 item.target.title,
@@ -1441,7 +1511,7 @@
                                 second.number,
                                 second.title,
                                 second.searchText,
-                                ...rareTriggeredTargets.map(target => `${target.number}${target.title}${target.searchText}`)
+                                ...otherTargets.map(rareItem => `${rareItem.target.number}${rareItem.target.title}${rareItem.target.searchText}${rareItem.rules.join('')}`)
                             ].join(' '))
                         });
                     });
@@ -1460,19 +1530,55 @@
             );
         }
 
-        function compareStrategies(a, b) {
-            const scoreCompare = b.score - a.score;
-            const rareCompare = a.otherTargets.length - b.otherTargets.length;
+        function otherTriggerMethodCount(strategy) {
+            return strategy.otherTargets.reduce((total, item) => total + item.rules.length, 0);
+        }
 
-            if (activeSortMode === 'rare_then_score') {
-                return rareCompare || scoreCompare || compareStrategyFallback(a, b);
+        function compareBySortKey(a, b, sortKey) {
+            if (sortKey === 'score') return b.score - a.score;
+            if (sortKey === 'pool') return b.triggerPoolCount - a.triggerPoolCount;
+            if (sortKey === 'rare') {
+                return (a.otherTargets.length - b.otherTargets.length)
+                    || (otherTriggerMethodCount(a) - otherTriggerMethodCount(b));
             }
 
-            return scoreCompare || rareCompare || compareStrategyFallback(a, b);
+            return 0;
+        }
+
+        function compareStrategies(a, b) {
+            for (const sortKey of sortPriority) {
+                const result = compareBySortKey(a, b, sortKey);
+                if (result) return result;
+            }
+            return compareStrategyFallback(a, b);
         }
 
         function sortStrategies(strategies) {
             return strategies.slice().sort(compareStrategies);
+        }
+
+        function renderSortPriority() {
+            sortPriorityGroup.innerHTML = sortPriority.map((sortKey, index) => `
+                <div class="sort-priority-item" data-sort="${escapeHtml(sortKey)}">
+                    <span class="sort-rank">${index + 1}</span>
+                    <span class="sort-label">${escapeHtml(SORT_LABELS[sortKey])}</span>
+                    <button class="sort-move" type="button" data-sort="${escapeHtml(sortKey)}" data-move="up" ${index === 0 ? 'disabled' : ''} aria-label="上移${escapeHtml(SORT_LABELS[sortKey])}">↑</button>
+                    <button class="sort-move" type="button" data-sort="${escapeHtml(sortKey)}" data-move="down" ${index === sortPriority.length - 1 ? 'disabled' : ''} aria-label="下移${escapeHtml(SORT_LABELS[sortKey])}">↓</button>
+                </div>
+            `).join('');
+        }
+
+        function moveSortPriority(sortKey, direction) {
+            const index = sortPriority.indexOf(sortKey);
+            if (index < 0) return;
+
+            const nextIndex = direction === 'up' ? index - 1 : index + 1;
+            if (nextIndex < 0 || nextIndex >= sortPriority.length) return;
+
+            [sortPriority[index], sortPriority[nextIndex]] = [sortPriority[nextIndex], sortPriority[index]];
+            renderSortPriority();
+            visibleCount = PAGE_SIZE;
+            applyFilters();
         }
 
         function renderTargetControls() {
@@ -1555,6 +1661,7 @@
                 candidates = buildCandidateFamilies(records.filter(record => Number.isFinite(record.baseStarlightValue)))
                     .filter(family => !family.members.some(member => adventureNumbers.has(member.number)));
 
+                renderSortPriority();
                 renderTargetControls();
                 allStrategies = buildStrategies();
                 filteredStrategies = sortStrategies(allStrategies);
@@ -1572,18 +1679,10 @@
             applyFilters();
         });
 
-        sortModeGroup.addEventListener('click', event => {
-            const button = event.target.closest('.sort-option');
-            if (!button || button.dataset.sort === activeSortMode) return;
-
-            activeSortMode = button.dataset.sort;
-            sortModeGroup.querySelectorAll('.sort-option').forEach(option => {
-                const isActive = option.dataset.sort === activeSortMode;
-                option.classList.toggle('active', isActive);
-                option.setAttribute('aria-checked', String(isActive));
-            });
-            visibleCount = PAGE_SIZE;
-            applyFilters();
+        sortPriorityGroup.addEventListener('click', event => {
+            const button = event.target.closest('.sort-move');
+            if (!button || button.disabled) return;
+            moveSortPriority(button.dataset.sort, button.dataset.move);
         });
 
         candidateInputA.addEventListener('input', () => updateCandidateSuggestions(candidateInputA, candidateSuggestA));
