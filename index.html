@@ -1218,10 +1218,10 @@
             }).filter(item => item.name);
 
             const periodClass = `show_${remotePeriod}`;
-            let currentItems = items.filter(item => item.visible);
-            if (!currentItems.length && remotePeriod) {
-                currentItems = items.filter(item => item.className.includes(periodClass));
-            }
+            const periodItems = remotePeriod
+                ? items.filter(item => item.className.split(/\s+/).includes(periodClass))
+                : [];
+            let currentItems = periodItems.length ? periodItems : items.filter(item => item.visible);
 
             return {
                 items: currentItems,
