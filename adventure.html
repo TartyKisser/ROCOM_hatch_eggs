@@ -1169,6 +1169,10 @@
             return cleanList(record.attributes).length ? cleanList(record.attributes) : ['普通'];
         }
 
+        function primaryAttribute(record) {
+            return recordAttributes(record)[0] || '普通';
+        }
+
         function recordEggGroups(record) {
             return cleanList(record.eggGroups);
         }
@@ -1261,6 +1265,7 @@
                 const eggGroups = uniqueList(members.flatMap(recordEggGroups));
                 const score = weightedFamilyStarlight(family.members, family.evolutionIds);
                 const title = members.length > 1 ? `${representative.title}家族` : representative.title;
+                const firstAttribute = primaryAttribute(representative);
 
                 return {
                     id: family.key,
@@ -1269,6 +1274,7 @@
                     title,
                     portrait: representative.portrait,
                     attributes,
+                    firstAttribute,
                     eggGroups,
                     baseStarlightValue: score,
                     members,
@@ -1455,7 +1461,7 @@
                     const second = candidates[j];
                     if (first.key === second.key) continue;
 
-                    const attributeKey = setKey(intersect(recordAttributes(first), recordAttributes(second)));
+                    const attributeKey = mixedAttributeKey(first, second);
                     const commonEggBoxes = eggBoxes(intersect(recordEggGroups(first), recordEggGroups(second)));
                     const targetRuleMap = new Map();
                     const rareTargetRuleMap = new Map();
@@ -1543,6 +1549,12 @@
             }
 
             return 0;
+        }
+
+        function mixedAttributeKey(first, second) {
+            return first.firstAttribute && first.firstAttribute === second.firstAttribute
+                ? first.firstAttribute
+                : '';
         }
 
         function compareStrategies(a, b) {
