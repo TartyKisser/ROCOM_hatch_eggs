@@ -716,7 +716,7 @@
     <script>
         const TILE_SIZE = 256;
         const DEFAULT_CATEGORY_KEYWORDS = ['炼金台', '眠枭庇护所', '魔力之源', '稀兽花种', 'BOSS'];
-        const WHEEL_ZOOM_STEP = 280;
+        const WHEEL_ZOOM_COOLDOWN = 140;
 
         const state = {
             metadata: null,
@@ -736,7 +736,7 @@
             maxZoom: 13,
             bounds: [-1.4, 0, 0, 1.4],
             dragging: null,
-            wheelRemainder: 0,
+            lastWheelZoomAt: 0,
         };
 
         const elements = {
@@ -1085,6 +1085,28 @@
             renderMap();
         }
 
+        function canScrollInside(element, deltaY) {
+            const scrollable = element.closest('.group-list');
+            if (!scrollable) return false;
+            if (deltaY < 0) return scrollable.scrollTop > 0;
+            if (deltaY > 0) return scrollable.scrollTop + scrollable.clientHeight < scrollable.scrollHeight - 1;
+            return false;
+        }
+
+        function handleWheelZoom(event) {
+            if (canScrollInside(event.target, event.deltaY)) return;
+            event.preventDefault();
+            const now = performance.now();
+            if (now - mapView.lastWheelZoomAt < WHEEL_ZOOM_COOLDOWN) return;
+            mapView.lastWheelZoomAt = now;
+
+            const rect = elements.mapCanvas.getBoundingClientRect();
+            const anchorX = Math.min(rect.width, Math.max(0, event.clientX - rect.left));
+            const anchorY = Math.min(rect.height, Math.max(0, event.clientY - rect.top));
+            const direction = event.deltaY < 0 ? 1 : -1;
+            setZoom(mapView.zoom + direction, anchorX, anchorY);
+        }
+
         function setupMapView() {
             const map = state.metadata?.map || {};
             if (Array.isArray(map.bounds) && map.bounds.length === 4) {
@@ -1218,15 +1240,7 @@
             renderMarkers();
         });
 
-        elements.mapCanvas.addEventListener('wheel', event => {
-            event.preventDefault();
-            mapView.wheelRemainder += event.deltaY;
-            if (Math.abs(mapView.wheelRemainder) < WHEEL_ZOOM_STEP) return;
-            const rect = elements.mapCanvas.getBoundingClientRect();
-            const direction = mapView.wheelRemainder < 0 ? 1 : -1;
-            mapView.wheelRemainder = 0;
-            setZoom(mapView.zoom + direction, event.clientX - rect.left, event.clientY - rect.top);
-        }, { passive: false });
+        window.addEventListener('wheel', handleWheelZoom, { passive: false, capture: true });
 
         elements.mapCanvas.addEventListener('pointerdown', event => {
             if (event.target.closest('.map-marker, .location-popup')) return;
