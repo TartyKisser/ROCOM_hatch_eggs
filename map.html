@@ -100,16 +100,17 @@
 
         .map-marker {
             position: absolute;
-            width: 31px;
-            height: 31px;
-            padding: 3px;
-            border: 1px solid rgba(255,255,255,0.88);
-            border-radius: 50%;
-            background: rgba(255,255,255,0.92);
-            box-shadow: 0 7px 16px rgba(15,23,42,0.24);
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            appearance: none;
+            -webkit-appearance: none;
+            filter: drop-shadow(0 7px 10px rgba(15,23,42,0.28));
             transform: translate(-50%, -50%);
             cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.15s ease, filter 0.15s ease;
         }
 
         .map-marker img {
@@ -123,7 +124,7 @@
         .map-marker.is-active {
             z-index: 3;
             transform: translate(-50%, -50%) scale(1.18);
-            box-shadow: 0 12px 24px rgba(15,23,42,0.3);
+            filter: drop-shadow(0 11px 16px rgba(15,23,42,0.34));
         }
 
         .panel {
@@ -187,10 +188,7 @@
             line-height: 1.55;
             font-weight: 750;
             text-shadow: 0 2px 8px rgba(15,23,42,0.3);
-            isolation: isolate;
-            transform: translateZ(0);
-            will-change: backdrop-filter, -webkit-backdrop-filter;
-            box-shadow: 0 14px 35px rgba(15,23,42,var(--glass-refresh, 0.16));
+            box-shadow: 0 14px 35px rgba(15,23,42,0.16);
         }
 
         .source-card strong {
@@ -223,10 +221,7 @@
             border-color: rgba(255,255,255,0.28);
             color: #ffffff;
             text-shadow: 0 2px 8px rgba(15,23,42,0.3);
-            isolation: isolate;
-            transform: translateZ(0);
-            will-change: backdrop-filter, -webkit-backdrop-filter;
-            box-shadow: 0 14px 35px rgba(15,23,42,var(--glass-refresh, 0.16));
+            box-shadow: 0 14px 35px rgba(15,23,42,0.16);
         }
 
         .panel-head {
@@ -662,6 +657,7 @@
             bounds: [-1.4, 0, 0, 1.4],
             dragging: null,
             wheelRemainder: 0,
+            renderFrame: null,
         };
 
         const elements = {
@@ -974,6 +970,14 @@
             renderPopup();
         }
 
+        function scheduleRenderMap() {
+            if (mapView.renderFrame !== null) return;
+            mapView.renderFrame = requestAnimationFrame(() => {
+                mapView.renderFrame = null;
+                renderMap();
+            });
+        }
+
         function setZoom(nextZoom, anchorX = null, anchorY = null) {
             const oldZoom = mapView.zoom;
             const zoom = Math.min(mapView.maxZoom, Math.max(mapView.minZoom, nextZoom));
@@ -1153,9 +1157,8 @@
             if (!drag || drag.id !== event.pointerId) return;
             const dx = event.clientX - drag.x;
             const dy = event.clientY - drag.y;
-            document.documentElement.style.setProperty('--glass-refresh', `${0.155 + (Math.abs(dx + dy) % 10) / 1000}`);
             mapView.center = clampCenter(unproject(drag.centerPx.x - dx, drag.centerPx.y - dy));
-            renderMap();
+            scheduleRenderMap();
         });
 
         function endMapDrag(event) {
@@ -1163,10 +1166,10 @@
             if (!drag || drag.id !== event.pointerId) return;
             mapView.dragging = null;
             elements.mapCanvas.classList.remove('is-dragging');
-            document.documentElement.style.removeProperty('--glass-refresh');
             if (elements.mapCanvas.hasPointerCapture(event.pointerId)) {
                 elements.mapCanvas.releasePointerCapture(event.pointerId);
             }
+            renderMap();
         }
 
         elements.mapCanvas.addEventListener('pointerup', endMapDrag);
