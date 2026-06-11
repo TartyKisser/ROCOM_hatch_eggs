@@ -1,0 +1,37 @@
+{
+  "source_page": "https://map.17173.com/rocom/maps/shijie",
+  "fetched_at": "2026-06-11T07:32:11.160180+00:00",
+  "game_id": 1731003,
+  "map_id": 4010,
+  "map": {
+    "id": 4010,
+    "name": "洛克王国世界",
+    "gameName": "rocom",
+    "gameTitle": "洛克王国世界互动地图",
+    "minZoom": 9,
+    "maxZoom": 13,
+    "initialZoom": 11,
+    "mapMaxzoom": 13,
+    "bounds": [
+      -1.4,
+      0,
+      0,
+      1.4
+    ],
+    "logo": "https://ue.17173cdn.com/a/terra/web/assets/recom-logo.png",
+    "showMapNav": true,
+    "showArea": false,
+    "version": "v3_7f2d9c"
+  },
+  "bootstrap_url": "https://ue.17173cdn.com/a/terra/web/bootstrap.js",
+  "bundle_url": "https://ue.17173cdn.com/a/terra/web/assets/index-BXt9VFCD.js",
+  "css_urls": [
+    "https://ue.17173cdn.com/a/terra/web/assets/index-DTSQKQVt.css"
+  ],
+  "locations_url": "https://terra-api.17173.com/app/location/list?mapIds=4010",
+  "regions_url": "https://terra-api.17173.com/app/region/list?mapId=4010",
+  "location_count": 4284,
+  "category_count": 85,
+  "group_count": 8,
+  "region_count": 0
+}
