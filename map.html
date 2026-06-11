@@ -32,14 +32,16 @@
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text);
-            background: #dbeafe;
+            background: #e2e8f0;
         }
 
         .map-shell {
             position: fixed;
             inset: 0;
             overflow: hidden;
-            background: #dbeafe;
+            background:
+                radial-gradient(circle at 50% 45%, rgba(255,255,255,0.72), rgba(226,232,240,0.74) 48%, rgba(148,163,184,0.46)),
+                linear-gradient(135deg, #cbd5e1, #e0f2fe);
         }
 
         .map-canvas {
@@ -52,6 +54,18 @@
 
         .map-canvas.is-dragging {
             cursor: grabbing;
+        }
+
+        .map-canvas::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                linear-gradient(rgba(99,102,241,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.08) 1px, transparent 1px);
+            background-size: 42px 42px;
+            pointer-events: none;
         }
 
         .map-layer,
@@ -164,16 +178,31 @@
 
         .source-card {
             max-width: min(520px, 44vw);
-            padding: 11px 14px;
-            color: var(--text-secondary);
-            font-size: 0.84rem;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.16);
+            border-color: rgba(255,255,255,0.28);
+            color: #ffffff;
+            font-size: 0.86rem;
             line-height: 1.55;
             font-weight: 750;
+            text-shadow: 0 2px 8px rgba(15,23,42,0.3);
         }
 
         .source-card strong {
-            color: var(--primary-dark);
+            color: #ffffff;
             font-weight: 950;
+        }
+
+        .source-link {
+            display: inline-flex;
+            margin-top: 8px;
+            color: #ffffff;
+            font-weight: 900;
+            text-decoration: none;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.16);
         }
 
         .filter-panel {
@@ -186,12 +215,16 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background: rgba(255,255,255,0.16);
+            border-color: rgba(255,255,255,0.28);
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(15,23,42,0.3);
         }
 
         .panel-head {
             padding: 16px 16px 12px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.7);
+            border-bottom: 1px solid rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.08);
         }
 
         .panel-title-row {
@@ -202,7 +235,7 @@
         }
 
         .panel-title {
-            color: var(--primary-dark);
+            color: #ffffff;
             font-size: 1.12rem;
             font-weight: 950;
         }
@@ -212,15 +245,15 @@
             min-height: 28px;
             padding: 5px 9px;
             border-radius: 999px;
-            background: rgba(99,102,241,0.1);
-            color: var(--primary-dark);
+            background: rgba(255,255,255,0.16);
+            color: #ffffff;
             font-size: 0.78rem;
             font-weight: 950;
         }
 
         .panel-subtitle {
             margin-top: 6px;
-            color: var(--text-secondary);
+            color: rgba(255,255,255,0.88);
             font-size: 0.82rem;
             font-weight: 760;
         }
@@ -230,15 +263,15 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
             padding: 12px 14px;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(255,255,255,0.22);
         }
 
         .action-btn {
             min-height: 34px;
-            border: 1px solid rgba(99,102,241,0.16);
+            border: 1px solid rgba(255,255,255,0.3);
             border-radius: 11px;
-            background: rgba(99,102,241,0.08);
-            color: var(--primary-dark);
+            background: rgba(255,255,255,0.16);
+            color: #ffffff;
             font: inherit;
             font-size: 0.84rem;
             font-weight: 950;
@@ -257,24 +290,42 @@
 
         .group-head {
             display: grid;
-            grid-template-columns: auto minmax(0, 1fr) auto;
+            grid-template-columns: auto auto minmax(0, 1fr) auto;
             align-items: center;
             gap: 9px;
             width: 100%;
             min-height: 38px;
             padding: 8px 10px;
-            border: 1px solid rgba(99,102,241,0.14);
+            border: 1px solid rgba(255,255,255,0.26);
             border-radius: 12px;
-            background: rgba(255,255,255,0.72);
-            color: var(--text);
+            background: rgba(255,255,255,0.14);
+            color: #ffffff;
             font: inherit;
             cursor: pointer;
             text-align: left;
         }
 
         .group-head.is-active {
-            border-color: rgba(99,102,241,0.34);
-            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.1));
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.22);
+        }
+
+        .group-toggle {
+            width: 22px;
+            height: 22px;
+            border: 1px solid rgba(255,255,255,0.32);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            color: #ffffff;
+            font: inherit;
+            font-size: 0.74rem;
+            font-weight: 950;
+            cursor: pointer;
+            transition: transform 0.18s ease, background 0.18s ease;
+        }
+
+        .group-toggle.is-collapsed {
+            transform: rotate(-90deg);
         }
 
         .group-name {
@@ -284,7 +335,7 @@
         }
 
         .group-count {
-            color: var(--text-secondary);
+            color: rgba(255,255,255,0.78);
             font-size: 0.76rem;
             font-weight: 900;
         }
@@ -315,10 +366,10 @@
             min-height: 30px;
             max-width: 100%;
             padding: 5px 8px;
-            border: 1px solid rgba(99,102,241,0.16);
+            border: 1px solid rgba(255,255,255,0.24);
             border-radius: 999px;
-            background: rgba(99,102,241,0.06);
-            color: var(--text);
+            background: rgba(255,255,255,0.12);
+            color: #ffffff;
             font: inherit;
             font-size: 0.8rem;
             font-weight: 850;
@@ -327,7 +378,7 @@
 
         .category-chip.is-active {
             color: white;
-            border-color: transparent;
+            border-color: rgba(255,255,255,0.42);
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             box-shadow: 0 8px 18px rgba(99,102,241,0.2);
         }
@@ -556,11 +607,11 @@
         <div class="topbar">
             <div class="topbar-left">
                 <a class="btn" href="index.html">返回首页</a>
-                <a class="btn" href="https://map.17173.com/rocom/maps/shijie" target="_blank" rel="noreferrer">打开原地图</a>
             </div>
             <div class="topbar-right">
                 <div class="panel source-card">
                     <strong>数据来源与感谢：</strong>地图点位和底图来自 17173 洛克王国世界互动地图，感谢 17173 与地图贡献者维护公开资料。
+                    <a class="source-link" href="https://map.17173.com/rocom/maps/shijie" target="_blank" rel="noreferrer">查看原网站</a>
                 </div>
             </div>
         </div>
@@ -590,6 +641,8 @@
 
     <script>
         const TILE_SIZE = 256;
+        const DEFAULT_CATEGORY_KEYWORDS = ['炼金台', '眠枭庇护所', '魔力之源', '稀兽花种', 'BOSS'];
+        const WHEEL_ZOOM_STEP = 280;
 
         const state = {
             metadata: null,
@@ -597,6 +650,7 @@
             groups: [],
             locations: [],
             selectedCategoryIds: new Set(),
+            collapsedGroups: new Set(),
             popupLocation: null,
         };
 
@@ -607,6 +661,7 @@
             maxZoom: 13,
             bounds: [-1.4, 0, 0, 1.4],
             dragging: null,
+            wheelRemainder: 0,
         };
 
         const elements = {
@@ -689,15 +744,17 @@
                 const selectedCount = groupIds.filter(id => state.selectedCategoryIds.has(id)).length;
                 const pointCount = groupIds.reduce((sum, id) => sum + (counts.get(id) || 0), 0);
                 const isActive = selectedCount > 0;
+                const isCollapsed = state.collapsedGroups.has(groupName);
 
                 return `
                     <section class="group-block">
-                        <button class="group-head ${isActive ? 'is-active' : ''}" type="button" data-group="${escapeHtml(groupName)}" title="选择或取消 ${escapeHtml(groupName)} 下全部小类">
+                        <div class="group-head ${isActive ? 'is-active' : ''}" data-group="${escapeHtml(groupName)}" title="选择或取消 ${escapeHtml(groupName)} 下全部小类">
+                            <button class="group-toggle ${isCollapsed ? 'is-collapsed' : ''}" type="button" data-toggle-group="${escapeHtml(groupName)}" aria-label="${isCollapsed ? '展开' : '收起'}${escapeHtml(groupName)}">⌄</button>
                             <span class="group-icon">${groupIndex + 1}</span>
                             <span class="group-name">${escapeHtml(groupName)}</span>
                             <span class="group-count">${selectedCount}/${groupIds.length} · ${formatNumber(pointCount)}</span>
-                        </button>
-                        <div class="category-grid">
+                        </div>
+                        <div class="category-grid" ${isCollapsed ? 'hidden' : ''}>
                             ${sortedCategories.map(category => {
                                 const id = String(category.id || '');
                                 const active = state.selectedCategoryIds.has(id);
@@ -778,12 +835,20 @@
             const { width, height, leftPx, topPx } = viewportState();
             const zoom = mapView.zoom;
             const maxTile = 2 ** zoom - 1;
-            const minTileX = Math.max(0, Math.floor(leftPx / TILE_SIZE));
-            const maxTileX = Math.min(maxTile, Math.floor((leftPx + width) / TILE_SIZE));
-            const minTileY = Math.max(0, Math.floor(topPx / TILE_SIZE));
-            const maxTileY = Math.min(maxTile, Math.floor((topPx + height) / TILE_SIZE));
+            const [west, south, east, north] = mapView.bounds;
+            const boundsNw = project(west, north, zoom);
+            const boundsSe = project(east, south, zoom);
+            const minTileX = Math.max(0, Math.floor(leftPx / TILE_SIZE), Math.floor(boundsNw.x / TILE_SIZE));
+            const maxTileX = Math.min(maxTile, Math.floor((leftPx + width) / TILE_SIZE), Math.floor((boundsSe.x - 1) / TILE_SIZE));
+            const minTileY = Math.max(0, Math.floor(topPx / TILE_SIZE), Math.floor(boundsNw.y / TILE_SIZE));
+            const maxTileY = Math.min(maxTile, Math.floor((topPx + height) / TILE_SIZE), Math.floor((boundsSe.y - 1) / TILE_SIZE));
             const base = tileBasePath();
             const fragment = document.createDocumentFragment();
+
+            if (minTileX > maxTileX || minTileY > maxTileY) {
+                elements.mapLayer.replaceChildren();
+                return;
+            }
 
             for (let x = minTileX; x <= maxTileX; x += 1) {
                 for (let y = minTileY; y <= maxTileY; y += 1) {
@@ -792,6 +857,7 @@
                     img.alt = '';
                     img.draggable = false;
                     img.src = `${base}/${zoom}/${y}_${x}.png?v1`;
+                    img.onerror = () => img.remove();
                     img.style.left = `${Math.round(x * TILE_SIZE - leftPx)}px`;
                     img.style.top = `${Math.round(y * TILE_SIZE - topPx)}px`;
                     fragment.appendChild(img);
@@ -855,7 +921,6 @@
             const group = location.group_name || location.category_group_title || '未分组';
             const image = location.image || (location.images && location.images[0]) || '';
             const desc = location.description || '暂无文字说明';
-            const author = location.author?.nickName || '';
             const latitude = Number.isFinite(location.latitude) ? Number(location.latitude).toFixed(6) : '-';
             const longitude = Number.isFinite(location.longitude) ? Number(location.longitude).toFixed(6) : '-';
 
@@ -878,7 +943,6 @@
                     <div class="popup-tags">
                         <span class="tag">经度 ${escapeHtml(longitude)}</span>
                         <span class="tag">纬度 ${escapeHtml(latitude)}</span>
-                        ${author ? `<span class="tag">贡献者 ${escapeHtml(author)}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -976,6 +1040,24 @@
             renderMap();
         }
 
+        function toggleGroupCollapse(groupName) {
+            if (state.collapsedGroups.has(groupName)) {
+                state.collapsedGroups.delete(groupName);
+            } else {
+                state.collapsedGroups.add(groupName);
+            }
+            renderCategoryPanel();
+        }
+
+        function applyDefaultCategories() {
+            state.selectedCategoryIds = new Set(
+                state.categories
+                    .filter(category => DEFAULT_CATEGORY_KEYWORDS.some(keyword => String(category.title || '').includes(keyword)))
+                    .map(category => String(category.id || ''))
+                    .filter(Boolean)
+            );
+        }
+
         async function init() {
             try {
                 const [metadata, categoryData, locations] = await Promise.all([
@@ -988,6 +1070,7 @@
                 state.groups = categoryData.groups || [];
                 state.locations = locations || [];
                 setupMapView();
+                applyDefaultCategories();
                 renderCategoryPanel();
                 renderMap();
                 elements.loading.classList.add('is-hidden');
@@ -997,6 +1080,12 @@
         }
 
         elements.groupList.addEventListener('click', event => {
+            const toggleButton = event.target.closest('.group-toggle');
+            if (toggleButton) {
+                event.stopPropagation();
+                toggleGroupCollapse(toggleButton.dataset.toggleGroup || '');
+                return;
+            }
             const categoryButton = event.target.closest('.category-chip');
             if (categoryButton) {
                 toggleCategory(categoryButton.dataset.category || '');
@@ -1029,8 +1118,11 @@
 
         elements.mapCanvas.addEventListener('wheel', event => {
             event.preventDefault();
+            mapView.wheelRemainder += event.deltaY;
+            if (Math.abs(mapView.wheelRemainder) < WHEEL_ZOOM_STEP) return;
             const rect = elements.mapCanvas.getBoundingClientRect();
-            const direction = event.deltaY < 0 ? 1 : -1;
+            const direction = mapView.wheelRemainder < 0 ? 1 : -1;
+            mapView.wheelRemainder = 0;
             setZoom(mapView.zoom + direction, event.clientX - rect.left, event.clientY - rect.top);
         }, { passive: false });
 
