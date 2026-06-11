@@ -280,6 +280,12 @@
             gap: 10px;
         }
 
+        .panel-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         .panel-title {
             color: #ffffff;
             font-size: 1.12rem;
@@ -683,8 +689,10 @@
             <div class="panel-head">
                 <div class="panel-title-row">
                     <div class="panel-title">分类分组</div>
-                    <div class="visible-count" id="visibleCount">0 个点位</div>
-                    <button class="panel-fold-btn" id="foldFilterButton" type="button">收起</button>
+                    <div class="panel-actions">
+                        <div class="visible-count" id="visibleCount">0 个点位</div>
+                        <button class="panel-fold-btn" id="foldFilterButton" type="button">收起</button>
+                    </div>
                 </div>
                 <div class="panel-subtitle">默认隐藏点位，选择对应类别后显示图标。</div>
             </div>
