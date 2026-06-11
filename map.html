@@ -13,8 +13,7 @@
             --text-secondary: #64748b;
             --border: rgba(226,232,240,0.9);
             --panel: rgba(255,255,255,0.92);
-            --panel-soft: rgba(248,250,252,0.88);
-            --shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+            --shadow: 0 18px 45px rgba(15,23,42,0.2);
         }
 
         * {
@@ -23,304 +22,41 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
-            min-height: 100vh;
-            padding: 20px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
             font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text);
-            background: url('./web_images/bg.jpg') no-repeat center center fixed,
-                        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background-size: cover;
+            background: #dbeafe;
         }
 
-        .container {
-            width: 96%;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 42px 20px 28px;
-            color: white;
-        }
-
-        .hero-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px 12px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.32);
-            border-radius: 999px;
-            background: rgba(15,23,42,0.22);
-            color: rgba(255,255,255,0.9);
-            font-size: 0.78rem;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-        }
-
-        .main-title {
-            font-size: 2.6rem;
-            line-height: 1.12;
-            margin-bottom: 10px;
-            font-weight: 900;
-            text-shadow: 0 4px 18px rgba(15,23,42,0.45);
-        }
-
-        .desc-font {
-            max-width: 760px;
-            font-size: 1.05rem;
-            color: rgba(255,255,255,0.94);
-            text-shadow: 0 2px 8px rgba(15,23,42,0.28);
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 18px;
-        }
-
-        .topbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 42px;
-            padding: 10px 16px;
-            border: 1px solid rgba(255,255,255,0.48);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.9);
-            color: var(--primary-dark);
-            font-size: 0.95rem;
-            font-weight: 800;
-            text-decoration: none;
-            cursor: pointer;
-            box-shadow: 0 8px 22px rgba(15,23,42,0.12);
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            border-color: rgba(99,102,241,0.48);
-        }
-
-        .count-pill {
-            display: inline-flex;
-            align-items: center;
-            min-height: 36px;
-            padding: 8px 12px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.84);
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 800;
-        }
-
-        .panel {
-            background: var(--panel);
-            border: 1px solid rgba(255,255,255,0.55);
-            border-radius: 18px;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-        .source-panel {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 16px;
-            align-items: center;
-            padding: 16px 18px;
-            margin-bottom: 18px;
-            background:
-                linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,255,255,0.84)),
-                radial-gradient(circle at top right, rgba(34,197,94,0.14), transparent 44%);
-        }
-
-        .source-title {
-            color: var(--primary-dark);
-            font-size: 1.08rem;
-            font-weight: 950;
-            margin-bottom: 5px;
-        }
-
-        .source-copy {
-            color: var(--text-secondary);
-            line-height: 1.65;
-            font-size: 0.92rem;
-            font-weight: 700;
-        }
-
-        .source-link {
-            white-space: nowrap;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .stat-card {
-            padding: 16px;
-            background: rgba(255,255,255,0.9);
-        }
-
-        .stat-value {
-            color: var(--primary-dark);
-            font-size: 1.55rem;
-            line-height: 1;
-            font-weight: 950;
-        }
-
-        .stat-label {
-            margin-top: 7px;
-            color: var(--text-secondary);
-            font-size: 0.84rem;
-            font-weight: 850;
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: minmax(270px, 0.34fr) minmax(0, 1fr);
-            gap: 18px;
-            align-items: start;
-        }
-
-        .sidebar {
-            position: sticky;
-            top: 18px;
-            overflow: hidden;
-        }
-
-        .panel-head {
-            padding: 17px 18px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.7);
-        }
-
-        .panel-title {
-            color: var(--primary-dark);
-            font-size: 1.12rem;
-            font-weight: 950;
-        }
-
-        .panel-subtitle {
-            margin-top: 4px;
-            color: var(--text-secondary);
-            font-size: 0.84rem;
-            font-weight: 750;
-        }
-
-        .group-list {
-            display: grid;
-            gap: 8px;
-            max-height: calc(100vh - 210px);
-            overflow: auto;
-            padding: 14px;
-        }
-
-        .group-btn {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            align-items: center;
-            gap: 10px;
-            min-height: 38px;
-            padding: 9px 11px;
-            border: 1px solid rgba(99,102,241,0.14);
-            border-radius: 12px;
-            background: rgba(99,102,241,0.06);
-            color: var(--text);
-            font: inherit;
-            font-size: 0.9rem;
-            font-weight: 900;
-            cursor: pointer;
-            text-align: left;
-        }
-
-        .group-btn.active {
-            color: white;
-            border-color: transparent;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            box-shadow: 0 10px 22px rgba(99,102,241,0.22);
-        }
-
-        .group-count {
-            color: inherit;
-            opacity: 0.76;
-            font-size: 0.78rem;
-            font-weight: 900;
-        }
-
-        .content {
-            min-width: 0;
-        }
-
-        .controls {
-            padding: 16px;
-            margin-bottom: 18px;
-        }
-
-        .search-row {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(220px, 0.36fr) auto;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .search-input,
-        .select-input {
-            width: 100%;
-            min-height: 46px;
-            padding: 12px 14px;
-            border: 2px solid var(--border);
-            border-radius: 13px;
-            font: inherit;
-            font-size: 0.95rem;
-            color: var(--text);
-            background: rgba(255,255,255,0.94);
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .search-input:focus,
-        .select-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
-        }
-
-        .map-preview {
-            position: relative;
-            height: min(64vh, 620px);
-            min-height: 430px;
-            margin-bottom: 18px;
+        .map-shell {
+            position: fixed;
+            inset: 0;
             overflow: hidden;
             background: #dbeafe;
+        }
+
+        .map-canvas {
+            position: absolute;
+            inset: 0;
             cursor: grab;
             user-select: none;
             touch-action: none;
         }
 
-        .map-preview.is-dragging {
+        .map-canvas.is-dragging {
             cursor: grabbing;
         }
 
         .map-layer,
-        .marker-layer {
+        .marker-layer,
+        .popup-layer {
             position: absolute;
             inset: 0;
         }
@@ -331,6 +67,11 @@
 
         .marker-layer {
             z-index: 2;
+        }
+
+        .popup-layer {
+            z-index: 6;
+            pointer-events: none;
         }
 
         .map-tile {
@@ -345,13 +86,13 @@
 
         .map-marker {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 31px;
+            height: 31px;
             padding: 3px;
-            border: 1px solid rgba(255,255,255,0.86);
+            border: 1px solid rgba(255,255,255,0.88);
             border-radius: 50%;
-            background: rgba(255,255,255,0.9);
-            box-shadow: 0 6px 14px rgba(15,23,42,0.22);
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 7px 16px rgba(15,23,42,0.24);
             transform: translate(-50%, -50%);
             cursor: pointer;
             transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -364,78 +105,313 @@
             object-fit: contain;
         }
 
-        .map-marker:hover {
-            z-index: 4;
+        .map-marker:hover,
+        .map-marker.is-active {
+            z-index: 3;
             transform: translate(-50%, -50%) scale(1.18);
-            box-shadow: 0 10px 22px rgba(15,23,42,0.28);
+            box-shadow: 0 12px 24px rgba(15,23,42,0.3);
         }
 
-        .preview-label {
+        .panel {
+            border: 1px solid rgba(255,255,255,0.62);
+            border-radius: 18px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .topbar {
             position: absolute;
-            left: 16px;
-            top: 14px;
-            z-index: 5;
+            top: 18px;
+            left: 18px;
+            right: 18px;
+            z-index: 8;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            pointer-events: none;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            pointer-events: auto;
+        }
+
+        .btn {
             display: inline-flex;
             align-items: center;
-            min-height: 32px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.88);
+            justify-content: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 9px 14px;
+            border: 1px solid rgba(255,255,255,0.58);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.92);
             color: var(--primary-dark);
-            font-size: 0.82rem;
+            font: inherit;
+            font-size: 0.92rem;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(15,23,42,0.16);
+        }
+
+        .source-card {
+            max-width: min(520px, 44vw);
+            padding: 11px 14px;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            line-height: 1.55;
+            font-weight: 750;
+        }
+
+        .source-card strong {
+            color: var(--primary-dark);
             font-weight: 950;
-            box-shadow: 0 8px 18px rgba(15,23,42,0.12);
+        }
+
+        .filter-panel {
+            position: absolute;
+            left: 18px;
+            top: 76px;
+            bottom: 18px;
+            z-index: 7;
+            width: min(390px, calc(100vw - 36px));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-head {
+            padding: 16px 16px 12px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.7);
+        }
+
+        .panel-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title {
+            color: var(--primary-dark);
+            font-size: 1.12rem;
+            font-weight: 950;
+        }
+
+        .visible-count {
+            flex: 0 0 auto;
+            min-height: 28px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: rgba(99,102,241,0.1);
+            color: var(--primary-dark);
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .panel-subtitle {
+            margin-top: 6px;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 760;
+        }
+
+        .filter-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .action-btn {
+            min-height: 34px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 11px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font: inherit;
+            font-size: 0.84rem;
+            font-weight: 950;
+            cursor: pointer;
+        }
+
+        .group-list {
+            flex: 1;
+            overflow: auto;
+            padding: 12px 14px 16px;
+        }
+
+        .group-block + .group-block {
+            margin-top: 12px;
+        }
+
+        .group-head {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 9px;
+            width: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            border: 1px solid rgba(99,102,241,0.14);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.72);
+            color: var(--text);
+            font: inherit;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .group-head.is-active {
+            border-color: rgba(99,102,241,0.34);
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(236,72,153,0.1));
+        }
+
+        .group-name {
+            min-width: 0;
+            font-size: 0.92rem;
+            font-weight: 950;
+        }
+
+        .group-count {
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            font-weight: 900;
+        }
+
+        .group-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 0.78rem;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 950;
+        }
+
+        .category-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            padding: 9px 2px 0;
+        }
+
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 30px;
+            max-width: 100%;
+            padding: 5px 8px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 999px;
+            background: rgba(99,102,241,0.06);
+            color: var(--text);
+            font: inherit;
+            font-size: 0.8rem;
+            font-weight: 850;
+            cursor: pointer;
+        }
+
+        .category-chip.is-active {
+            color: white;
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 8px 18px rgba(99,102,241,0.2);
+        }
+
+        .category-chip img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            flex: 0 0 auto;
+        }
+
+        .chip-text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .map-tools {
             position: absolute;
-            right: 14px;
-            top: 14px;
-            z-index: 5;
+            right: 18px;
+            top: 92px;
+            z-index: 7;
             display: grid;
             gap: 8px;
         }
 
         .map-tool-btn {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border: 1px solid rgba(255,255,255,0.72);
-            border-radius: 11px;
-            background: rgba(255,255,255,0.92);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.93);
             color: var(--primary-dark);
             font: inherit;
-            font-size: 1.18rem;
+            font-size: 1.2rem;
             font-weight: 950;
-            box-shadow: 0 8px 18px rgba(15,23,42,0.14);
+            box-shadow: 0 10px 22px rgba(15,23,42,0.16);
             cursor: pointer;
         }
 
         .map-tip {
             position: absolute;
-            left: 16px;
-            bottom: 14px;
-            z-index: 5;
-            max-width: calc(100% - 32px);
-            padding: 6px 10px;
+            right: 18px;
+            bottom: 18px;
+            z-index: 7;
+            max-width: min(520px, calc(100vw - 36px));
+            padding: 8px 12px;
             border-radius: 999px;
-            background: rgba(15,23,42,0.64);
+            background: rgba(15,23,42,0.66);
             color: rgba(255,255,255,0.94);
-            font-size: 0.78rem;
-            font-weight: 800;
+            font-size: 0.8rem;
+            font-weight: 850;
+            pointer-events: none;
         }
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 14px;
-        }
-
-        .location-card {
+        .location-popup {
+            position: absolute;
+            width: min(340px, calc(100vw - 32px));
             overflow: hidden;
-            background: rgba(255,255,255,0.93);
+            border: 1px solid rgba(255,255,255,0.68);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.96);
+            box-shadow: 0 18px 45px rgba(15,23,42,0.28);
+            transform: translate(-50%, calc(-100% - 22px));
+            pointer-events: auto;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
 
-        .location-image {
+        .location-popup::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -8px;
+            width: 16px;
+            height: 16px;
+            background: rgba(255,255,255,0.96);
+            border-right: 1px solid rgba(255,255,255,0.68);
+            border-bottom: 1px solid rgba(255,255,255,0.68);
+            transform: translateX(-50%) rotate(45deg);
+        }
+
+        .popup-image {
             width: 100%;
             aspect-ratio: 16 / 9;
             display: block;
@@ -443,19 +419,19 @@
             object-fit: cover;
         }
 
-        .location-body {
-            padding: 14px;
+        .popup-body {
+            padding: 13px 14px 14px;
         }
 
-        .location-top {
+        .popup-head {
             display: grid;
-            grid-template-columns: 34px minmax(0, 1fr);
-            gap: 10px;
+            grid-template-columns: 34px minmax(0, 1fr) auto;
+            gap: 9px;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 9px;
         }
 
-        .category-icon {
+        .popup-icon {
             width: 34px;
             height: 34px;
             padding: 5px;
@@ -464,7 +440,7 @@
             object-fit: contain;
         }
 
-        .location-title {
+        .popup-title {
             overflow: hidden;
             color: var(--text);
             font-size: 1rem;
@@ -474,25 +450,37 @@
             white-space: nowrap;
         }
 
-        .location-meta {
+        .popup-meta {
             margin-top: 3px;
             color: var(--text-secondary);
-            font-size: 0.8rem;
-            font-weight: 800;
+            font-size: 0.78rem;
+            font-weight: 850;
         }
 
-        .location-desc {
-            min-height: 22px;
+        .popup-close {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(99,102,241,0.14);
+            border-radius: 50%;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font: inherit;
+            font-size: 1rem;
+            font-weight: 950;
+            cursor: pointer;
+        }
+
+        .popup-desc {
             color: var(--text-secondary);
             font-size: 0.86rem;
             line-height: 1.55;
         }
 
-        .location-foot {
+        .popup-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 7px;
-            margin-top: 12px;
+            margin-top: 10px;
         }
 
         .tag {
@@ -507,185 +495,111 @@
             font-weight: 900;
         }
 
-        .empty {
-            padding: 28px;
-            color: var(--text-secondary);
-            font-weight: 850;
-            text-align: center;
+        .loading {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 9;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.94);
+            color: var(--primary-dark);
+            font-size: 0.9rem;
+            font-weight: 950;
+            box-shadow: var(--shadow);
+            transform: translate(-50%, -50%);
         }
 
-        @media (max-width: 980px) {
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-            }
-
-            .group-list {
-                grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-                max-height: none;
-            }
-
-            .search-row,
-            .source-panel,
-            .stats {
-                grid-template-columns: 1fr;
-            }
+        .loading.is-hidden {
+            display: none;
         }
 
-        @media (max-width: 640px) {
-            body {
-                padding: 16px;
-            }
-
-            header {
-                padding: 30px 10px 22px;
-            }
-
-            .main-title {
-                font-size: 1.9rem;
-            }
-
+        @media (max-width: 760px) {
             .topbar {
-                align-items: stretch;
-                flex-direction: column;
+                top: 10px;
+                left: 10px;
+                right: 10px;
             }
 
-            .topbar-actions {
-                width: 100%;
+            .topbar-right {
+                display: none;
             }
 
-            .btn,
-            .source-link {
-                flex: 1 1 auto;
+            .filter-panel {
+                left: 10px;
+                right: 10px;
+                top: auto;
+                bottom: 10px;
+                width: auto;
+                max-height: 42vh;
             }
 
-            .map-preview {
-                height: 360px;
-                min-height: 360px;
+            .map-tools {
+                right: 10px;
+                top: 64px;
             }
 
-            .card-grid {
-                grid-template-columns: 1fr;
+            .map-tip {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="hero-eyebrow">WORLD MAP</div>
-            <h1 class="main-title">洛克王国世界地图资料</h1>
-            <p class="desc-font">按分类浏览地图点位、坐标、图片与采集信息。</p>
-        </header>
+    <main class="map-shell">
+        <section class="map-canvas" id="mapCanvas" aria-label="洛克王国世界地图">
+            <div class="map-layer" id="mapLayer"></div>
+            <div class="marker-layer" id="markerLayer"></div>
+            <div class="popup-layer" id="popupLayer"></div>
+        </section>
 
         <div class="topbar">
-            <div class="topbar-actions">
+            <div class="topbar-left">
                 <a class="btn" href="index.html">返回首页</a>
                 <a class="btn" href="https://map.17173.com/rocom/maps/shijie" target="_blank" rel="noreferrer">打开原地图</a>
             </div>
-            <div class="count-pill" id="resultCount">正在加载地图数据...</div>
-        </div>
-
-        <section class="panel source-panel" aria-label="数据来源">
-            <div>
-                <div class="source-title">数据来源与感谢</div>
-                <div class="source-copy">
-                    本页地图点位数据整理自 17173 洛克王国世界互动地图。感谢 17173 与地图贡献者提供和维护这些公开资料，本工具站仅做本地化浏览与筛选展示。
+            <div class="topbar-right">
+                <div class="panel source-card">
+                    <strong>数据来源与感谢：</strong>地图点位和底图来自 17173 洛克王国世界互动地图，感谢 17173 与地图贡献者维护公开资料。
                 </div>
             </div>
-            <a class="btn source-link" href="https://map.17173.com/rocom/maps/shijie" target="_blank" rel="noreferrer">查看来源</a>
-        </section>
+        </div>
 
-        <section class="stats" aria-label="地图数据统计">
-            <article class="panel stat-card">
-                <div class="stat-value" id="statLocations">-</div>
-                <div class="stat-label">地图点位</div>
-            </article>
-            <article class="panel stat-card">
-                <div class="stat-value" id="statCategories">-</div>
-                <div class="stat-label">点位分类</div>
-            </article>
-            <article class="panel stat-card">
-                <div class="stat-value" id="statGroups">-</div>
-                <div class="stat-label">分类分组</div>
-            </article>
-            <article class="panel stat-card">
-                <div class="stat-value" id="statUpdated">-</div>
-                <div class="stat-label">数据更新时间</div>
-            </article>
-        </section>
-
-        <main class="layout">
-            <aside class="panel sidebar">
-                <div class="panel-head">
+        <aside class="panel filter-panel" aria-label="分类筛选">
+            <div class="panel-head">
+                <div class="panel-title-row">
                     <div class="panel-title">分类分组</div>
-                    <div class="panel-subtitle">点击后筛选右侧全部点位</div>
+                    <div class="visible-count" id="visibleCount">0 个点位</div>
                 </div>
-                <div class="group-list" id="groupList"></div>
-            </aside>
+                <div class="panel-subtitle">默认隐藏点位，选择大类或小类后显示图标。数据来自 17173 互动地图，感谢地图贡献者。</div>
+            </div>
+            <div class="filter-actions">
+                <button class="action-btn" id="showAllButton" type="button">全部显示</button>
+                <button class="action-btn" id="hideAllButton" type="button">全部隐藏</button>
+            </div>
+            <div class="group-list" id="groupList"></div>
+        </aside>
 
-            <section class="content">
-                <div class="panel controls">
-                    <div class="search-row">
-                        <input class="search-input" id="searchInput" type="search" placeholder="搜索点位、分类、作者或坐标" autocomplete="off">
-                        <select class="select-input" id="categorySelect" aria-label="选择分类">
-                            <option value="">全部分类</option>
-                        </select>
-                        <button class="btn" id="clearButton" type="button">清空</button>
-                    </div>
-                </div>
-
-                <div class="panel map-preview" id="mapPreview" aria-label="地图预览">
-                    <div class="map-layer" id="mapLayer"></div>
-                    <div class="marker-layer" id="markerLayer"></div>
-                    <div class="preview-label" id="previewLabel">地图预览</div>
-                    <div class="map-tools" aria-label="地图缩放">
-                        <button class="map-tool-btn" id="zoomInButton" type="button" aria-label="放大地图">+</button>
-                        <button class="map-tool-btn" id="zoomOutButton" type="button" aria-label="缩小地图">-</button>
-                    </div>
-                    <div class="map-tip">拖拽移动地图，滚轮缩放，点击图标定位到点位卡片</div>
-                </div>
-
-                <div class="card-grid" id="locationGrid"></div>
-            </section>
-        </main>
-    </div>
+        <div class="map-tools" aria-label="地图缩放">
+            <button class="map-tool-btn" id="zoomInButton" type="button" aria-label="放大地图">+</button>
+            <button class="map-tool-btn" id="zoomOutButton" type="button" aria-label="缩小地图">-</button>
+        </div>
+        <div class="map-tip">拖拽移动地图，滚轮缩放，点击图标查看点位详情</div>
+        <div class="loading" id="loading">正在加载地图数据...</div>
+    </main>
 
     <script>
+        const TILE_SIZE = 256;
+
         const state = {
             metadata: null,
             categories: [],
             groups: [],
             locations: [],
-            filtered: [],
-            activeGroup: '',
-            activeCategory: '',
-            query: '',
+            selectedCategoryIds: new Set(),
+            popupLocation: null,
         };
 
-        const elements = {
-            resultCount: document.getElementById('resultCount'),
-            statLocations: document.getElementById('statLocations'),
-            statCategories: document.getElementById('statCategories'),
-            statGroups: document.getElementById('statGroups'),
-            statUpdated: document.getElementById('statUpdated'),
-            groupList: document.getElementById('groupList'),
-            searchInput: document.getElementById('searchInput'),
-            categorySelect: document.getElementById('categorySelect'),
-            clearButton: document.getElementById('clearButton'),
-            mapPreview: document.getElementById('mapPreview'),
-            mapLayer: document.getElementById('mapLayer'),
-            markerLayer: document.getElementById('markerLayer'),
-            previewLabel: document.getElementById('previewLabel'),
-            zoomInButton: document.getElementById('zoomInButton'),
-            zoomOutButton: document.getElementById('zoomOutButton'),
-            locationGrid: document.getElementById('locationGrid'),
-        };
-
-        const TILE_SIZE = 256;
         const mapView = {
             zoom: 11,
             center: { lng: -0.7, lat: 0.7 },
@@ -693,6 +607,20 @@
             maxZoom: 13,
             bounds: [-1.4, 0, 0, 1.4],
             dragging: null,
+        };
+
+        const elements = {
+            mapCanvas: document.getElementById('mapCanvas'),
+            mapLayer: document.getElementById('mapLayer'),
+            markerLayer: document.getElementById('markerLayer'),
+            popupLayer: document.getElementById('popupLayer'),
+            groupList: document.getElementById('groupList'),
+            visibleCount: document.getElementById('visibleCount'),
+            showAllButton: document.getElementById('showAllButton'),
+            hideAllButton: document.getElementById('hideAllButton'),
+            zoomInButton: document.getElementById('zoomInButton'),
+            zoomOutButton: document.getElementById('zoomOutButton'),
+            loading: document.getElementById('loading'),
         };
 
         async function loadJson(path) {
@@ -717,105 +645,80 @@
             return Number(value || 0).toLocaleString('zh-CN');
         }
 
-        function formatDate(value) {
-            if (!value) return '-';
-            const date = new Date(value);
-            if (Number.isNaN(date.getTime())) return '-';
-            return date.toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-            });
+        function categoryId(location) {
+            return String(location.category_id || '');
         }
 
-        function buildCounts() {
-            const groupCounts = new Map();
-            const categoryCounts = new Map();
+        function visibleLocations() {
+            if (!state.selectedCategoryIds.size) return [];
+            return state.locations.filter(location => state.selectedCategoryIds.has(categoryId(location)));
+        }
+
+        function buildCategoryCounts() {
+            const counts = new Map();
             state.locations.forEach(location => {
-                const group = location.group_name || location.category_group_title || '未分组';
-                const categoryId = String(location.category_id || '');
-                groupCounts.set(group, (groupCounts.get(group) || 0) + 1);
-                categoryCounts.set(categoryId, (categoryCounts.get(categoryId) || 0) + 1);
+                const id = categoryId(location);
+                counts.set(id, (counts.get(id) || 0) + 1);
             });
-            return { groupCounts, categoryCounts };
+            return counts;
         }
 
-        function renderStats() {
-            elements.statLocations.textContent = formatNumber(state.locations.length);
-            elements.statCategories.textContent = formatNumber(state.categories.length);
-            elements.statGroups.textContent = formatNumber(state.groups.length);
-            elements.statUpdated.textContent = formatDate(state.metadata?.fetched_at);
-        }
-
-        function renderGroups() {
-            const { groupCounts } = buildCounts();
-            const groupNames = Array.from(new Set([
-                ...state.groups.map(group => group.title).filter(Boolean),
-                ...state.locations.map(location => location.group_name || location.category_group_title).filter(Boolean),
-            ]));
-
-            const buttons = [
-                `<button class="group-btn ${state.activeGroup ? '' : 'active'}" type="button" data-group="">
-                    <span>全部分组</span>
-                    <span class="group-count">${formatNumber(state.locations.length)}</span>
-                </button>`,
-                ...groupNames.map(name => `
-                    <button class="group-btn ${state.activeGroup === name ? 'active' : ''}" type="button" data-group="${escapeHtml(name)}">
-                        <span>${escapeHtml(name)}</span>
-                        <span class="group-count">${formatNumber(groupCounts.get(name) || 0)}</span>
-                    </button>
-                `),
-            ];
-            elements.groupList.innerHTML = buttons.join('');
-        }
-
-        function renderCategories() {
-            const { categoryCounts } = buildCounts();
-            const selected = state.activeCategory;
-            const categories = state.categories
-                .slice()
-                .sort((a, b) => String(a.group_title || '').localeCompare(String(b.group_title || ''), 'zh-CN') || String(a.title || '').localeCompare(String(b.title || ''), 'zh-CN'));
-
-            elements.categorySelect.innerHTML = [
-                '<option value="">全部分类</option>',
-                ...categories.map(category => {
-                    const id = String(category.id || '');
-                    const label = `${category.group_title || '未分组'} / ${category.title || id} (${formatNumber(categoryCounts.get(id) || 0)})`;
-                    return `<option value="${escapeHtml(id)}" ${selected === id ? 'selected' : ''}>${escapeHtml(label)}</option>`;
-                }),
-            ].join('');
-        }
-
-        function getSearchText(location) {
-            const parts = [
-                location.title,
-                location.description,
-                location.category_name,
-                location.category_title,
-                location.group_name,
-                location.category_group_title,
-                location.author?.nickName,
-                location.latitude,
-                location.longitude,
-            ];
-            return parts.filter(value => value !== undefined && value !== null).join(' ').toLowerCase();
-        }
-
-        function applyFilters() {
-            const query = state.query.trim().toLowerCase();
-            state.filtered = state.locations.filter(location => {
-                const group = location.group_name || location.category_group_title || '';
-                const categoryId = String(location.category_id || '');
-                if (state.activeGroup && group !== state.activeGroup) return false;
-                if (state.activeCategory && categoryId !== state.activeCategory) return false;
-                if (query && !getSearchText(location).includes(query)) return false;
-                return true;
+        function categoriesByGroup() {
+            const groupOrder = state.groups.map(group => group.title).filter(Boolean);
+            const groupMap = new Map();
+            state.categories.forEach(category => {
+                const name = category.group_title || '未分组';
+                if (!groupMap.has(name)) groupMap.set(name, []);
+                groupMap.get(name).push(category);
             });
+            return Array.from(groupMap.entries()).sort((a, b) => {
+                const ai = groupOrder.indexOf(a[0]);
+                const bi = groupOrder.indexOf(b[0]);
+                if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+                return a[0].localeCompare(b[0], 'zh-CN');
+            });
+        }
 
-            renderGroups();
-            renderCategories();
-            renderPreview();
-            renderLocations();
+        function renderCategoryPanel() {
+            const counts = buildCategoryCounts();
+            elements.groupList.innerHTML = categoriesByGroup().map(([groupName, categories], groupIndex) => {
+                const sortedCategories = categories
+                    .slice()
+                    .sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''), 'zh-CN'));
+                const groupIds = sortedCategories.map(category => String(category.id || ''));
+                const selectedCount = groupIds.filter(id => state.selectedCategoryIds.has(id)).length;
+                const pointCount = groupIds.reduce((sum, id) => sum + (counts.get(id) || 0), 0);
+                const isActive = selectedCount > 0;
+
+                return `
+                    <section class="group-block">
+                        <button class="group-head ${isActive ? 'is-active' : ''}" type="button" data-group="${escapeHtml(groupName)}" title="选择或取消 ${escapeHtml(groupName)} 下全部小类">
+                            <span class="group-icon">${groupIndex + 1}</span>
+                            <span class="group-name">${escapeHtml(groupName)}</span>
+                            <span class="group-count">${selectedCount}/${groupIds.length} · ${formatNumber(pointCount)}</span>
+                        </button>
+                        <div class="category-grid">
+                            ${sortedCategories.map(category => {
+                                const id = String(category.id || '');
+                                const active = state.selectedCategoryIds.has(id);
+                                const count = counts.get(id) || 0;
+                                return `
+                                    <button class="category-chip ${active ? 'is-active' : ''}" type="button" data-category="${escapeHtml(id)}" title="${escapeHtml(category.title || id)}">
+                                        ${category.icon ? `<img src="${escapeHtml(category.icon)}" alt="">` : ''}
+                                        <span class="chip-text">${escapeHtml(category.title || id)}</span>
+                                        <span>${formatNumber(count)}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </section>
+                `;
+            }).join('');
+            updateVisibleCount();
+        }
+
+        function updateVisibleCount() {
+            elements.visibleCount.textContent = `${formatNumber(visibleLocations().length)} 个点位`;
         }
 
         function tileBasePath() {
@@ -844,15 +747,24 @@
         }
 
         function clampCenter(center) {
+            const rect = elements.mapCanvas.getBoundingClientRect();
             const [west, south, east, north] = mapView.bounds;
-            return {
-                lng: Math.min(east, Math.max(west, center.lng)),
-                lat: Math.min(north, Math.max(south, center.lat)),
-            };
+            const nw = project(west, north);
+            const se = project(east, south);
+            const point = project(center.lng, center.lat);
+            const halfWidth = rect.width / 2;
+            const halfHeight = rect.height / 2;
+            const minX = nw.x + halfWidth;
+            const maxX = se.x - halfWidth;
+            const minY = nw.y + halfHeight;
+            const maxY = se.y - halfHeight;
+            const clampedX = minX > maxX ? (nw.x + se.x) / 2 : Math.min(maxX, Math.max(minX, point.x));
+            const clampedY = minY > maxY ? (nw.y + se.y) / 2 : Math.min(maxY, Math.max(minY, point.y));
+            return unproject(clampedX, clampedY);
         }
 
         function viewportState() {
-            const rect = elements.mapPreview.getBoundingClientRect();
+            const rect = elements.mapCanvas.getBoundingClientRect();
             const centerPx = project(mapView.center.lng, mapView.center.lat);
             return {
                 width: rect.width,
@@ -860,16 +772,6 @@
                 leftPx: centerPx.x - rect.width / 2,
                 topPx: centerPx.y - rect.height / 2,
             };
-        }
-
-        function renderPreview() {
-            updatePreviewLabel();
-            renderTiles();
-            renderMarkers();
-        }
-
-        function updatePreviewLabel() {
-            elements.previewLabel.textContent = `地图预览：${formatNumber(state.filtered.length)} 个点位 / ${mapView.zoom}级`;
         }
 
         function renderTiles() {
@@ -899,49 +801,104 @@
             elements.mapLayer.replaceChildren(fragment);
         }
 
-        function renderMarkers() {
-            const { width, height, leftPx, topPx } = viewportState();
-            const fragment = document.createDocumentFragment();
-            const margin = 36;
+        function markerPosition(location) {
+            const { leftPx, topPx } = viewportState();
+            const point = project(location.longitude, location.latitude);
+            return {
+                left: point.x - leftPx,
+                top: point.y - topPx,
+            };
+        }
 
-            state.filtered.forEach(location => {
+        function renderMarkers() {
+            const { width, height } = viewportState();
+            const locations = visibleLocations();
+            const fragment = document.createDocumentFragment();
+            const margin = 40;
+
+            locations.forEach(location => {
                 if (!Number.isFinite(location.longitude) || !Number.isFinite(location.latitude)) return;
-                const point = project(location.longitude, location.latitude);
-                const left = point.x - leftPx;
-                const top = point.y - topPx;
+                const { left, top } = markerPosition(location);
                 if (left < -margin || left > width + margin || top < -margin || top > height + margin) return;
 
                 const marker = document.createElement('button');
-                marker.className = 'map-marker';
+                marker.className = `map-marker ${state.popupLocation?.id === location.id ? 'is-active' : ''}`;
                 marker.type = 'button';
                 marker.style.left = `${left}px`;
                 marker.style.top = `${top}px`;
                 marker.title = `${location.title || '未命名点位'} / ${location.category_name || location.category_title || '未分类'}`;
-                marker.innerHTML = location.category_icon
-                    ? `<img src="${escapeHtml(location.category_icon)}" alt="">`
-                    : '';
+                marker.innerHTML = location.category_icon ? `<img src="${escapeHtml(location.category_icon)}" alt="">` : '';
                 marker.addEventListener('click', event => {
                     event.stopPropagation();
-                    const card = document.getElementById(`location-${location.id}`);
-                    if (card) {
-                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        card.animate([
-                            { transform: 'translateY(0)' },
-                            { transform: 'translateY(-4px)' },
-                            { transform: 'translateY(0)' },
-                        ], { duration: 420, easing: 'ease-out' });
-                    }
+                    state.popupLocation = location;
+                    renderMarkers();
+                    renderPopup();
                 });
                 fragment.appendChild(marker);
             });
 
             elements.markerLayer.replaceChildren(fragment);
+            updateVisibleCount();
         }
 
-        function rerenderMap() {
-            updatePreviewLabel();
+        function renderPopup() {
+            const location = state.popupLocation;
+            elements.popupLayer.innerHTML = '';
+            if (!location || !state.selectedCategoryIds.has(categoryId(location))) return;
+
+            const { width, height } = viewportState();
+            const { left, top } = markerPosition(location);
+            if (left < 0 || left > width || top < 0 || top > height) return;
+
+            const title = location.title || '未命名点位';
+            const category = location.category_name || location.category_title || '未分类';
+            const group = location.group_name || location.category_group_title || '未分组';
+            const image = location.image || (location.images && location.images[0]) || '';
+            const desc = location.description || '暂无文字说明';
+            const author = location.author?.nickName || '';
+            const latitude = Number.isFinite(location.latitude) ? Number(location.latitude).toFixed(6) : '-';
+            const longitude = Number.isFinite(location.longitude) ? Number(location.longitude).toFixed(6) : '-';
+
+            const popup = document.createElement('article');
+            popup.className = 'location-popup';
+            popup.style.left = `${left}px`;
+            popup.style.top = `${top}px`;
+            popup.innerHTML = `
+                ${image ? `<img class="popup-image" src="${escapeHtml(image)}" alt="${escapeHtml(title)}">` : ''}
+                <div class="popup-body">
+                    <div class="popup-head">
+                        ${location.category_icon ? `<img class="popup-icon" src="${escapeHtml(location.category_icon)}" alt="">` : '<div class="popup-icon"></div>'}
+                        <div>
+                            <div class="popup-title" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
+                            <div class="popup-meta">${escapeHtml(group)} / ${escapeHtml(category)}</div>
+                        </div>
+                        <button class="popup-close" type="button" aria-label="关闭">×</button>
+                    </div>
+                    <div class="popup-desc">${escapeHtml(desc)}</div>
+                    <div class="popup-tags">
+                        <span class="tag">经度 ${escapeHtml(longitude)}</span>
+                        <span class="tag">纬度 ${escapeHtml(latitude)}</span>
+                        ${author ? `<span class="tag">贡献者 ${escapeHtml(author)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+            popup.querySelector('.popup-close').addEventListener('click', event => {
+                event.stopPropagation();
+                state.popupLocation = null;
+                elements.popupLayer.innerHTML = '';
+                renderMarkers();
+            });
+            popup.addEventListener('click', event => {
+                event.stopPropagation();
+            });
+            elements.popupLayer.appendChild(popup);
+        }
+
+        function renderMap() {
+            mapView.center = clampCenter(mapView.center);
             renderTiles();
             renderMarkers();
+            renderPopup();
         }
 
         function setZoom(nextZoom, anchorX = null, anchorY = null) {
@@ -961,7 +918,7 @@
                 y: focalPx.y - focalY + height / 2,
             };
             mapView.center = clampCenter(unproject(newCenterPx.x, newCenterPx.y, zoom));
-            rerenderMap();
+            renderMap();
         }
 
         function setupMapView() {
@@ -980,45 +937,43 @@
             });
         }
 
-        function renderLocations() {
-            elements.resultCount.textContent = `当前显示 ${formatNumber(state.filtered.length)} / ${formatNumber(state.locations.length)} 个点位`;
+        function setAllVisible(visible) {
+            state.popupLocation = null;
+            state.selectedCategoryIds = visible
+                ? new Set(state.categories.map(category => String(category.id || '')).filter(Boolean))
+                : new Set();
+            renderCategoryPanel();
+            renderMap();
+        }
 
-            if (!state.filtered.length) {
-                elements.locationGrid.innerHTML = '<div class="panel empty">没有找到符合条件的地图点位。</div>';
-                return;
+        function toggleCategory(id) {
+            if (state.selectedCategoryIds.has(id)) {
+                state.selectedCategoryIds.delete(id);
+            } else {
+                state.selectedCategoryIds.add(id);
             }
+            if (state.popupLocation && !state.selectedCategoryIds.has(categoryId(state.popupLocation))) {
+                state.popupLocation = null;
+            }
+            renderCategoryPanel();
+            renderMap();
+        }
 
-            elements.locationGrid.innerHTML = state.filtered.map(location => {
-                const title = location.title || '未命名点位';
-                const category = location.category_name || location.category_title || '未分类';
-                const group = location.group_name || location.category_group_title || '未分组';
-                const description = location.description || '暂无文字说明';
-                const image = location.image || (location.images && location.images[0]) || '';
-                const icon = location.category_icon || '';
-                const author = location.author?.nickName || '';
-                const latitude = Number.isFinite(location.latitude) ? Number(location.latitude).toFixed(6) : '-';
-                const longitude = Number.isFinite(location.longitude) ? Number(location.longitude).toFixed(6) : '-';
-                return `
-                    <article class="panel location-card" id="location-${escapeHtml(location.id)}">
-                        ${image ? `<img class="location-image" src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy">` : `<div class="location-image"></div>`}
-                        <div class="location-body">
-                            <div class="location-top">
-                                ${icon ? `<img class="category-icon" src="${escapeHtml(icon)}" alt="" loading="lazy">` : `<div class="category-icon"></div>`}
-                                <div>
-                                    <div class="location-title" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
-                                    <div class="location-meta">${escapeHtml(group)} / ${escapeHtml(category)}</div>
-                                </div>
-                            </div>
-                            <div class="location-desc">${escapeHtml(description)}</div>
-                            <div class="location-foot">
-                                <span class="tag">经度 ${escapeHtml(longitude)}</span>
-                                <span class="tag">纬度 ${escapeHtml(latitude)}</span>
-                                ${author ? `<span class="tag">贡献者 ${escapeHtml(author)}</span>` : ''}
-                            </div>
-                        </div>
-                    </article>
-                `;
-            }).join('');
+        function toggleGroup(groupName) {
+            const ids = state.categories
+                .filter(category => (category.group_title || '未分组') === groupName)
+                .map(category => String(category.id || ''))
+                .filter(Boolean);
+            const allSelected = ids.every(id => state.selectedCategoryIds.has(id));
+            ids.forEach(id => {
+                if (allSelected) state.selectedCategoryIds.delete(id);
+                else state.selectedCategoryIds.add(id);
+            });
+            if (state.popupLocation && !state.selectedCategoryIds.has(categoryId(state.popupLocation))) {
+                state.popupLocation = null;
+            }
+            renderCategoryPanel();
+            renderMap();
         }
 
         async function init() {
@@ -1032,40 +987,29 @@
                 state.categories = categoryData.categories || [];
                 state.groups = categoryData.groups || [];
                 state.locations = locations || [];
-                state.filtered = state.locations.slice();
                 setupMapView();
-                renderStats();
-                applyFilters();
+                renderCategoryPanel();
+                renderMap();
+                elements.loading.classList.add('is-hidden');
             } catch (error) {
-                elements.resultCount.textContent = '地图数据加载失败';
-                elements.locationGrid.innerHTML = `<div class="panel empty">${escapeHtml(error.message || error)}</div>`;
+                elements.loading.textContent = error.message || '地图数据加载失败';
             }
         }
 
         elements.groupList.addEventListener('click', event => {
-            const button = event.target.closest('.group-btn');
-            if (!button) return;
-            state.activeGroup = button.dataset.group || '';
-            applyFilters();
+            const categoryButton = event.target.closest('.category-chip');
+            if (categoryButton) {
+                toggleCategory(categoryButton.dataset.category || '');
+                return;
+            }
+            const groupButton = event.target.closest('.group-head');
+            if (groupButton) {
+                toggleGroup(groupButton.dataset.group || '');
+            }
         });
 
-        elements.searchInput.addEventListener('input', event => {
-            state.query = event.target.value || '';
-            applyFilters();
-        });
-
-        elements.categorySelect.addEventListener('change', event => {
-            state.activeCategory = event.target.value || '';
-            applyFilters();
-        });
-
-        elements.clearButton.addEventListener('click', () => {
-            state.activeGroup = '';
-            state.activeCategory = '';
-            state.query = '';
-            elements.searchInput.value = '';
-            applyFilters();
-        });
+        elements.showAllButton.addEventListener('click', () => setAllVisible(true));
+        elements.hideAllButton.addEventListener('click', () => setAllVisible(false));
 
         elements.zoomInButton.addEventListener('click', event => {
             event.stopPropagation();
@@ -1077,15 +1021,21 @@
             setZoom(mapView.zoom - 1);
         });
 
-        elements.mapPreview.addEventListener('wheel', event => {
+        elements.mapCanvas.addEventListener('click', () => {
+            state.popupLocation = null;
+            elements.popupLayer.innerHTML = '';
+            renderMarkers();
+        });
+
+        elements.mapCanvas.addEventListener('wheel', event => {
             event.preventDefault();
-            const rect = elements.mapPreview.getBoundingClientRect();
+            const rect = elements.mapCanvas.getBoundingClientRect();
             const direction = event.deltaY < 0 ? 1 : -1;
             setZoom(mapView.zoom + direction, event.clientX - rect.left, event.clientY - rect.top);
         }, { passive: false });
 
-        elements.mapPreview.addEventListener('pointerdown', event => {
-            if (event.target.closest('.map-marker, .map-tool-btn')) return;
+        elements.mapCanvas.addEventListener('pointerdown', event => {
+            if (event.target.closest('.map-marker, .location-popup')) return;
             const centerPx = project(mapView.center.lng, mapView.center.lat);
             mapView.dragging = {
                 id: event.pointerId,
@@ -1093,32 +1043,32 @@
                 y: event.clientY,
                 centerPx,
             };
-            elements.mapPreview.classList.add('is-dragging');
-            elements.mapPreview.setPointerCapture(event.pointerId);
+            elements.mapCanvas.classList.add('is-dragging');
+            elements.mapCanvas.setPointerCapture(event.pointerId);
         });
 
-        elements.mapPreview.addEventListener('pointermove', event => {
+        elements.mapCanvas.addEventListener('pointermove', event => {
             const drag = mapView.dragging;
             if (!drag || drag.id !== event.pointerId) return;
             const dx = event.clientX - drag.x;
             const dy = event.clientY - drag.y;
             mapView.center = clampCenter(unproject(drag.centerPx.x - dx, drag.centerPx.y - dy));
-            rerenderMap();
+            renderMap();
         });
 
         function endMapDrag(event) {
             const drag = mapView.dragging;
             if (!drag || drag.id !== event.pointerId) return;
             mapView.dragging = null;
-            elements.mapPreview.classList.remove('is-dragging');
-            if (elements.mapPreview.hasPointerCapture(event.pointerId)) {
-                elements.mapPreview.releasePointerCapture(event.pointerId);
+            elements.mapCanvas.classList.remove('is-dragging');
+            if (elements.mapCanvas.hasPointerCapture(event.pointerId)) {
+                elements.mapCanvas.releasePointerCapture(event.pointerId);
             }
         }
 
-        elements.mapPreview.addEventListener('pointerup', endMapDrag);
-        elements.mapPreview.addEventListener('pointercancel', endMapDrag);
-        window.addEventListener('resize', rerenderMap);
+        elements.mapCanvas.addEventListener('pointerup', endMapDrag);
+        elements.mapCanvas.addEventListener('pointercancel', endMapDrag);
+        window.addEventListener('resize', renderMap);
 
         init();
     </script>
