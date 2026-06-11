@@ -68,11 +68,18 @@
             pointer-events: none;
         }
 
+        .map-content,
         .map-layer,
         .marker-layer,
         .popup-layer {
             position: absolute;
             inset: 0;
+        }
+
+        .map-content {
+            z-index: 1;
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
         }
 
         .map-layer {
@@ -594,9 +601,11 @@
 <body>
     <main class="map-shell">
         <section class="map-canvas" id="mapCanvas" aria-label="洛克王国世界地图">
-            <div class="map-layer" id="mapLayer"></div>
-            <div class="marker-layer" id="markerLayer"></div>
-            <div class="popup-layer" id="popupLayer"></div>
+            <div class="map-content" id="mapContent">
+                <div class="map-layer" id="mapLayer"></div>
+                <div class="marker-layer" id="markerLayer"></div>
+                <div class="popup-layer" id="popupLayer"></div>
+            </div>
         </section>
 
         <div class="topbar">
@@ -657,11 +666,11 @@
             bounds: [-1.4, 0, 0, 1.4],
             dragging: null,
             wheelRemainder: 0,
-            renderFrame: null,
         };
 
         const elements = {
             mapCanvas: document.getElementById('mapCanvas'),
+            mapContent: document.getElementById('mapContent'),
             mapLayer: document.getElementById('mapLayer'),
             markerLayer: document.getElementById('markerLayer'),
             popupLayer: document.getElementById('popupLayer'),
@@ -964,18 +973,15 @@
         }
 
         function renderMap() {
+            setMapContentOffset(0, 0);
             mapView.center = clampCenter(mapView.center);
             renderTiles();
             renderMarkers();
             renderPopup();
         }
 
-        function scheduleRenderMap() {
-            if (mapView.renderFrame !== null) return;
-            mapView.renderFrame = requestAnimationFrame(() => {
-                mapView.renderFrame = null;
-                renderMap();
-            });
+        function setMapContentOffset(x, y) {
+            elements.mapContent.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
         }
 
         function setZoom(nextZoom, anchorX = null, anchorY = null) {
@@ -1158,7 +1164,8 @@
             const dx = event.clientX - drag.x;
             const dy = event.clientY - drag.y;
             mapView.center = clampCenter(unproject(drag.centerPx.x - dx, drag.centerPx.y - dy));
-            scheduleRenderMap();
+            const currentPx = project(mapView.center.lng, mapView.center.lat);
+            setMapContentOffset(drag.centerPx.x - currentPx.x, drag.centerPx.y - currentPx.y);
         });
 
         function endMapDrag(event) {
