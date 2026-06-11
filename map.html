@@ -187,6 +187,10 @@
             line-height: 1.55;
             font-weight: 750;
             text-shadow: 0 2px 8px rgba(15,23,42,0.3);
+            isolation: isolate;
+            transform: translateZ(0);
+            will-change: backdrop-filter, -webkit-backdrop-filter;
+            box-shadow: 0 14px 35px rgba(15,23,42,var(--glass-refresh, 0.16));
         }
 
         .source-card strong {
@@ -219,6 +223,10 @@
             border-color: rgba(255,255,255,0.28);
             color: #ffffff;
             text-shadow: 0 2px 8px rgba(15,23,42,0.3);
+            isolation: isolate;
+            transform: translateZ(0);
+            will-change: backdrop-filter, -webkit-backdrop-filter;
+            box-shadow: 0 14px 35px rgba(15,23,42,var(--glass-refresh, 0.16));
         }
 
         .panel-head {
@@ -290,7 +298,7 @@
 
         .group-head {
             display: grid;
-            grid-template-columns: auto auto minmax(0, 1fr) auto;
+            grid-template-columns: auto minmax(0, 1fr) auto;
             align-items: center;
             gap: 9px;
             width: 100%;
@@ -340,23 +348,15 @@
             font-weight: 900;
         }
 
-        .group-icon {
-            width: 18px;
-            height: 18px;
-            border-radius: 6px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-size: 0.78rem;
-            line-height: 18px;
-            text-align: center;
-            font-weight: 950;
-        }
-
         .category-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 7px;
             padding: 9px 2px 0;
+        }
+
+        .category-grid[hidden] {
+            display: none;
         }
 
         .category-chip {
@@ -400,7 +400,7 @@
         .map-tools {
             position: absolute;
             right: 18px;
-            top: 92px;
+            top: 142px;
             z-index: 7;
             display: grid;
             gap: 8px;
@@ -587,7 +587,7 @@
 
             .map-tools {
                 right: 10px;
-                top: 64px;
+                top: 74px;
             }
 
             .map-tip {
@@ -669,6 +669,7 @@
             mapLayer: document.getElementById('mapLayer'),
             markerLayer: document.getElementById('markerLayer'),
             popupLayer: document.getElementById('popupLayer'),
+            filterPanel: document.querySelector('.filter-panel'),
             groupList: document.getElementById('groupList'),
             visibleCount: document.getElementById('visibleCount'),
             showAllButton: document.getElementById('showAllButton'),
@@ -736,7 +737,7 @@
 
         function renderCategoryPanel() {
             const counts = buildCategoryCounts();
-            elements.groupList.innerHTML = categoriesByGroup().map(([groupName, categories], groupIndex) => {
+            elements.groupList.innerHTML = categoriesByGroup().map(([groupName, categories]) => {
                 const sortedCategories = categories
                     .slice()
                     .sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''), 'zh-CN'));
@@ -750,7 +751,6 @@
                     <section class="group-block">
                         <div class="group-head ${isActive ? 'is-active' : ''}" data-group="${escapeHtml(groupName)}" title="选择或取消 ${escapeHtml(groupName)} 下全部小类">
                             <button class="group-toggle ${isCollapsed ? 'is-collapsed' : ''}" type="button" data-toggle-group="${escapeHtml(groupName)}" aria-label="${isCollapsed ? '展开' : '收起'}${escapeHtml(groupName)}">⌄</button>
-                            <span class="group-icon">${groupIndex + 1}</span>
                             <span class="group-name">${escapeHtml(groupName)}</span>
                             <span class="group-count">${selectedCount}/${groupIds.length} · ${formatNumber(pointCount)}</span>
                         </div>
@@ -811,13 +811,22 @@
             const point = project(center.lng, center.lat);
             const halfWidth = rect.width / 2;
             const halfHeight = rect.height / 2;
-            const minX = nw.x + halfWidth;
+            const leftInset = visibleLeftInset();
+            const minX = nw.x + halfWidth - leftInset;
             const maxX = se.x - halfWidth;
             const minY = nw.y + halfHeight;
             const maxY = se.y - halfHeight;
             const clampedX = minX > maxX ? (nw.x + se.x) / 2 : Math.min(maxX, Math.max(minX, point.x));
             const clampedY = minY > maxY ? (nw.y + se.y) / 2 : Math.min(maxY, Math.max(minY, point.y));
             return unproject(clampedX, clampedY);
+        }
+
+        function visibleLeftInset() {
+            if (window.matchMedia('(max-width: 760px)').matches || !elements.filterPanel) {
+                return 0;
+            }
+            const panelRect = elements.filterPanel.getBoundingClientRect();
+            return Math.max(0, Math.min(panelRect.right + 18, window.innerWidth * 0.42));
         }
 
         function viewportState() {
@@ -1144,6 +1153,7 @@
             if (!drag || drag.id !== event.pointerId) return;
             const dx = event.clientX - drag.x;
             const dy = event.clientY - drag.y;
+            document.documentElement.style.setProperty('--glass-refresh', `${0.155 + (Math.abs(dx + dy) % 10) / 1000}`);
             mapView.center = clampCenter(unproject(drag.centerPx.x - dx, drag.centerPx.y - dy));
             renderMap();
         });
@@ -1153,6 +1163,7 @@
             if (!drag || drag.id !== event.pointerId) return;
             mapView.dragging = null;
             elements.mapCanvas.classList.remove('is-dragging');
+            document.documentElement.style.removeProperty('--glass-refresh');
             if (elements.mapCanvas.hasPointerCapture(event.pointerId)) {
                 elements.mapCanvas.releasePointerCapture(event.pointerId);
             }
