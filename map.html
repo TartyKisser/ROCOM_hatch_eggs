@@ -229,6 +229,42 @@
             color: #ffffff;
             text-shadow: 0 2px 8px rgba(15,23,42,0.3);
             box-shadow: 0 14px 35px rgba(15,23,42,0.16);
+            transition: transform 0.22s ease, opacity 0.22s ease, visibility 0.22s ease;
+        }
+
+        .filter-panel.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(calc(-100% - 24px));
+            pointer-events: none;
+        }
+
+        .filter-collapse-btn {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            z-index: 8;
+            display: none;
+            min-height: 40px;
+            padding: 9px 14px;
+            border: 1px solid rgba(255,255,255,0.58);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.16);
+            color: #ffffff;
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 950;
+            text-shadow: 0 2px 8px rgba(15,23,42,0.3);
+            box-shadow: 0 14px 35px rgba(15,23,42,0.16);
+            cursor: pointer;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .filter-collapse-btn.is-visible {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .panel-head {
@@ -259,6 +295,20 @@
             color: #ffffff;
             font-size: 0.78rem;
             font-weight: 950;
+        }
+
+        .panel-fold-btn {
+            flex: 0 0 auto;
+            min-height: 28px;
+            padding: 5px 9px;
+            border: 1px solid rgba(0,0,0,0.22);
+            border-radius: 999px;
+            background: rgba(0,0,0,0.16);
+            color: #ffffff;
+            font: inherit;
+            font-size: 0.78rem;
+            font-weight: 950;
+            cursor: pointer;
         }
 
         .panel-subtitle {
@@ -587,6 +637,15 @@
                 max-height: 42vh;
             }
 
+            .filter-panel.is-hidden {
+                transform: translateY(calc(100% + 20px));
+            }
+
+            .filter-collapse-btn {
+                left: 10px;
+                bottom: 10px;
+            }
+
             .map-tools {
                 right: 10px;
                 top: 74px;
@@ -625,6 +684,7 @@
                 <div class="panel-title-row">
                     <div class="panel-title">分类分组</div>
                     <div class="visible-count" id="visibleCount">0 个点位</div>
+                    <button class="panel-fold-btn" id="foldFilterButton" type="button">收起</button>
                 </div>
                 <div class="panel-subtitle">默认隐藏点位，选择对应类别后显示图标。</div>
             </div>
@@ -634,6 +694,7 @@
             </div>
             <div class="group-list" id="groupList"></div>
         </aside>
+        <button class="filter-collapse-btn" id="restoreFilterButton" type="button">展开分类</button>
 
         <div class="map-tools" aria-label="地图缩放">
             <button class="map-tool-btn" id="zoomInButton" type="button" aria-label="放大地图">+</button>
@@ -656,6 +717,7 @@
             selectedCategoryIds: new Set(),
             collapsedGroups: new Set(),
             popupLocation: null,
+            filterPanelHidden: false,
         };
 
         const mapView = {
@@ -677,6 +739,8 @@
             filterPanel: document.querySelector('.filter-panel'),
             groupList: document.getElementById('groupList'),
             visibleCount: document.getElementById('visibleCount'),
+            foldFilterButton: document.getElementById('foldFilterButton'),
+            restoreFilterButton: document.getElementById('restoreFilterButton'),
             showAllButton: document.getElementById('showAllButton'),
             hideAllButton: document.getElementById('hideAllButton'),
             zoomInButton: document.getElementById('zoomInButton'),
@@ -827,7 +891,7 @@
         }
 
         function visibleLeftInset() {
-            if (window.matchMedia('(max-width: 760px)').matches || !elements.filterPanel) {
+            if (state.filterPanelHidden || window.matchMedia('(max-width: 760px)').matches || !elements.filterPanel) {
                 return 0;
             }
             const panelRect = elements.filterPanel.getBoundingClientRect();
@@ -984,6 +1048,14 @@
             elements.mapContent.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
         }
 
+        function setFilterPanelHidden(hidden) {
+            state.filterPanelHidden = hidden;
+            elements.filterPanel.classList.toggle('is-hidden', hidden);
+            elements.restoreFilterButton.classList.toggle('is-visible', hidden);
+            elements.foldFilterButton.textContent = hidden ? '展开' : '收起';
+            requestAnimationFrame(renderMap);
+        }
+
         function setZoom(nextZoom, anchorX = null, anchorY = null) {
             const oldZoom = mapView.zoom;
             const zoom = Math.min(mapView.maxZoom, Math.max(mapView.minZoom, nextZoom));
@@ -1118,6 +1190,8 @@
 
         elements.showAllButton.addEventListener('click', () => setAllVisible(true));
         elements.hideAllButton.addEventListener('click', () => setAllVisible(false));
+        elements.foldFilterButton.addEventListener('click', () => setFilterPanelHidden(true));
+        elements.restoreFilterButton.addEventListener('click', () => setFilterPanelHidden(false));
 
         elements.zoomInButton.addEventListener('click', event => {
             event.stopPropagation();
