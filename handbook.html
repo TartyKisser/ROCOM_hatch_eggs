@@ -538,6 +538,43 @@
             border-radius: 2px;
         }
 
+        .section-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .section-title-row .section-title {
+            margin-bottom: 0;
+        }
+
+        .skill-source-filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        .skill-source-button {
+            min-height: 30px;
+            padding: 5px 10px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 999px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .skill-source-button.active {
+            color: white;
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
         .fruit-evolution-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -689,6 +726,138 @@
             line-height: 1.65;
         }
 
+        .research-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .research-progress {
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(99,102,241,0.1);
+            color: var(--primary-dark);
+            font-size: 0.82rem;
+            font-weight: 950;
+        }
+
+        .research-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .research-item {
+            padding: 10px 12px;
+            border: 1px solid rgba(226,232,240,0.86);
+            border-radius: 13px;
+            background: rgba(255,255,255,0.72);
+        }
+
+        .research-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .research-name {
+            color: var(--text);
+            font-weight: 900;
+            line-height: 1.45;
+        }
+
+        .skill-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .skill-card {
+            display: grid;
+            grid-template-columns: 58px minmax(0, 1fr);
+            gap: 12px;
+            min-height: 96px;
+            padding: 12px;
+            border: 1px solid rgba(226,232,240,0.88);
+            border-radius: 14px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.68)),
+                radial-gradient(circle at top right, rgba(99,102,241,0.13), transparent 45%);
+        }
+
+        .skill-icon-wrap {
+            width: 58px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: rgba(248,250,252,0.92);
+            border: 1px solid rgba(226,232,240,0.9);
+        }
+
+        .skill-icon {
+            width: 46px;
+            height: 46px;
+            object-fit: contain;
+        }
+
+        .skill-main {
+            min-width: 0;
+        }
+
+        .skill-name-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .skill-name {
+            color: var(--text);
+            font-weight: 950;
+            line-height: 1.35;
+        }
+
+        .skill-level {
+            flex: 0 0 auto;
+            color: var(--primary-dark);
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .skill-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 6px;
+        }
+
+        .skill-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 22px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: rgba(99,102,241,0.09);
+            color: var(--primary-dark);
+            font-size: 0.75rem;
+            font-weight: 900;
+        }
+
+        .skill-unlock {
+            margin-top: 6px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 800;
+        }
+
         .skill-table-wrap {
             border: 1px solid var(--border);
             border-radius: 14px;
@@ -837,6 +1006,14 @@
 
             .detail-header-row {
                 flex-direction: column;
+            }
+
+            .section-title-row {
+                flex-direction: column;
+            }
+
+            .skill-source-filters {
+                justify-content: flex-start;
             }
 
             .detail-value-row {
@@ -1016,6 +1193,7 @@
         let activeAttribute = '';
         let activeEggGroup = '';
         let activeRareFilter = '';
+        let activeSkillSource = '';
         let galleryScrollY = 0;
 
         const searchInput = document.getElementById('searchInput');
@@ -1148,8 +1326,111 @@
             const eggChips = groups.length
                 ? groups.map(group => `<span class="type-chip egg-chip">蛋组：${escapeHtml(group)}</span>`).join('')
                 : '<span class="type-chip egg-chip">蛋组：不可繁殖</span>';
+            const genderRatio = record.genderRatio || '暂无';
+            const genderChip = `<span class="type-chip egg-chip">性别：${escapeHtml(genderRatio)}</span>`;
 
-            return attributeChips + eggChips;
+            return attributeChips + eggChips + genderChip;
+        }
+
+        function skillIconPath(skill) {
+            if (skill && skill.icon) return skill.icon;
+            return `skills/${String(skill && skill.name ? skill.name : 'unknown-skill').replace(/[<>:"\\/|?*\x00-\x1f]/g, '_')}.png`;
+        }
+
+        function renderSkillSourceFilters(record) {
+            const skills = Array.isArray(record.skills) ? record.skills : [];
+            const sources = ['默认', '血脉', '技能石'].filter(source => skills.some(skill => skill.source === source));
+            const allButtons = ['', ...sources];
+            return `
+                <div class="skill-source-filters">
+                    ${allButtons.map(source => `
+                        <button class="skill-source-button ${activeSkillSource === source ? 'active' : ''}" type="button" data-skill-source="${escapeHtml(source)}">
+                            ${escapeHtml(source || '全部')}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderSkillCards(record, sourceFilter = activeSkillSource) {
+            const skills = Array.isArray(record.skills) ? record.skills.filter(skill => skill && skill.name) : [];
+            const visibleSkills = sourceFilter ? skills.filter(skill => skill.source === sourceFilter) : skills;
+            if (!visibleSkills.length) {
+                return '<div class="empty-state">暂无技能资料。</div>';
+            }
+
+            return `
+                <div class="skill-card-grid">
+                    ${visibleSkills.map(skill => {
+                        const meta = [
+                            skill.source || '',
+                            skill.cost ? `耗能 ${skill.cost}` : '',
+                            skill.category || '',
+                            skill.type ? `${skill.type}系` : '',
+                            skill.power && skill.power !== '0' ? `威力 ${skill.power}` : ''
+                        ].filter(Boolean);
+
+                        return `
+                            <article class="skill-card">
+                                <div class="skill-icon-wrap">
+                                    <img class="skill-icon" src="${escapeHtml(skillIconPath(skill))}" alt="${escapeHtml(skill.name)}" loading="lazy" onerror="this.closest('.skill-icon-wrap').style.display='none'">
+                                </div>
+                                <div class="skill-main">
+                                    <div class="skill-name-row">
+                                        <div class="skill-name">${escapeHtml(skill.name)}</div>
+                                        ${skill.level ? `<div class="skill-level">${escapeHtml(skill.level)}</div>` : ''}
+                                    </div>
+                                    ${meta.length ? `<div class="skill-meta">${meta.map(item => `<span class="skill-chip">${escapeHtml(item)}</span>`).join('')}</div>` : ''}
+                                    <div class="skill-desc">${escapeHtml(skill.description || '暂无描述')}</div>
+                                    ${skill.unlock ? `<div class="skill-unlock">解锁：${escapeHtml(skill.unlock)}</div>` : ''}
+                                </div>
+                            </article>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function bindSkillSourceFilters(record) {
+            detailPanel.querySelectorAll('.skill-source-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    activeSkillSource = button.dataset.skillSource || '';
+                    const sourceFilterWrap = detailPanel.querySelector('.skill-source-filters');
+                    const skillContent = detailPanel.querySelector('#skillContent');
+                    if (sourceFilterWrap) {
+                        sourceFilterWrap.outerHTML = renderSkillSourceFilters(record);
+                    }
+                    if (skillContent) {
+                        skillContent.innerHTML = renderSkillCards(record, activeSkillSource);
+                    }
+                    bindSkillSourceFilters(record);
+                });
+            });
+        }
+
+        function renderResearch(record) {
+            const research = record.research || {};
+            const tasks = Array.isArray(research.tasks) ? research.tasks : [];
+
+            if (!tasks.length && !research.progress) {
+                return '<div class="empty-state">暂无课题资料。</div>';
+            }
+
+            const taskHtml = tasks.length
+                ? tasks.map(task => `
+                    <div class="research-item">
+                        <div class="research-name">${escapeHtml(task.name || '-')}</div>
+                    </div>
+                `).join('')
+                : '<div class="empty-state">暂无课题目标。</div>';
+
+            return `
+                <div class="research-head">
+                    <div class="ability-desc">图鉴课题目标</div>
+                    ${research.progress ? `<div class="research-progress">${escapeHtml(research.progress)}</div>` : ''}
+                </div>
+                <div class="research-list">${taskHtml}</div>
+            `;
         }
 
         function renderEvolutionChain(record) {
@@ -1207,6 +1488,7 @@
                 galleryScrollY = window.scrollY;
             }
             selectedId = id;
+            activeSkillSource = '';
             renderDetail();
             galleryView.classList.remove('active');
             detailView.classList.add('active');
@@ -1316,19 +1598,6 @@
                 `).join('')
                 : '<div class="empty-state">暂无特性资料。</div>';
 
-            const skills = record.skills && record.skills.length
-                ? record.skills.map(skill => `
-                    <tr>
-                        <td data-label="等级">${escapeHtml(skill.level)}</td>
-                        <td data-label="技能"><strong>${escapeHtml(skill.name)}</strong></td>
-                        <td data-label="能量">${escapeHtml(skill.cost || '-')}</td>
-                        <td data-label="类别">${escapeHtml(skill.category || '-')}</td>
-                        <td data-label="威力">${escapeHtml(skill.power || '-')}</td>
-                        <td data-label="描述" class="skill-desc">${escapeHtml(skill.description || '-')}</td>
-                    </tr>
-                `).join('')
-                : '<tr><td colspan="6">暂无技能资料。</td></tr>';
-
             detailPanel.innerHTML = `
                 <div class="detail-hero" style="${recordBackgroundStyle(record, 'detail')}">
                     <div class="portrait-wrap">
@@ -1415,22 +1684,16 @@
                     </div>
 
                     <div class="section">
-                        <h3 class="section-title">技能</h3>
-                        <div class="skill-table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>等级</th>
-                                        <th>技能</th>
-                                        <th>能量</th>
-                                        <th>类别</th>
-                                        <th>威力</th>
-                                        <th>描述</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${skills}</tbody>
-                            </table>
+                        <h3 class="section-title">图鉴课题</h3>
+                        ${renderResearch(record)}
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title-row">
+                            <h3 class="section-title">技能</h3>
+                            ${renderSkillSourceFilters(record)}
                         </div>
+                        <div id="skillContent">${renderSkillCards(record)}</div>
                     </div>
 
                     <div class="section">
@@ -1455,6 +1718,7 @@
                     }
                 });
             }
+            bindSkillSourceFilters(record);
         }
 
         async function loadHandbook() {
