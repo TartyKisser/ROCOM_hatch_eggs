@@ -778,16 +778,45 @@
         }
 
         .skill-card {
+            --skill-accent-rgb: 99,102,241;
+            --skill-secondary-rgb: 236,72,153;
+            --skill-text: var(--primary-dark);
             display: grid;
             grid-template-columns: 58px minmax(0, 1fr);
             gap: 12px;
             min-height: 96px;
             padding: 12px;
-            border: 1px solid rgba(226,232,240,0.88);
+            border: 1px solid rgba(var(--skill-accent-rgb),0.24);
             border-radius: 14px;
             background:
-                linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.68)),
-                radial-gradient(circle at top right, rgba(99,102,241,0.13), transparent 45%);
+                linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.72)),
+                radial-gradient(circle at top right, rgba(var(--skill-accent-rgb),0.22), transparent 48%),
+                linear-gradient(135deg, rgba(var(--skill-accent-rgb),0.12), rgba(var(--skill-secondary-rgb),0.1));
+            box-shadow: inset 4px 0 0 rgba(var(--skill-accent-rgb),0.54);
+        }
+
+        .skill-source-default {
+            --skill-accent-rgb: 37,99,235;
+            --skill-secondary-rgb: 14,165,233;
+            --skill-text: #1d4ed8;
+        }
+
+        .skill-source-bloodline {
+            --skill-accent-rgb: 219,39,119;
+            --skill-secondary-rgb: 244,114,182;
+            --skill-text: #be185d;
+        }
+
+        .skill-source-stone {
+            --skill-accent-rgb: 217,119,6;
+            --skill-secondary-rgb: 20,184,166;
+            --skill-text: #b45309;
+        }
+
+        .skill-source-other {
+            --skill-accent-rgb: 71,85,105;
+            --skill-secondary-rgb: 148,163,184;
+            --skill-text: #475569;
         }
 
         .skill-icon-wrap {
@@ -797,8 +826,8 @@
             align-items: center;
             justify-content: center;
             border-radius: 14px;
-            background: rgba(248,250,252,0.92);
-            border: 1px solid rgba(226,232,240,0.9);
+            background: rgba(255,255,255,0.66);
+            border: 1px solid rgba(var(--skill-accent-rgb),0.18);
         }
 
         .skill-icon {
@@ -827,7 +856,7 @@
 
         .skill-level {
             flex: 0 0 auto;
-            color: var(--primary-dark);
+            color: var(--skill-text);
             font-size: 0.78rem;
             font-weight: 950;
         }
@@ -849,6 +878,11 @@
             color: var(--primary-dark);
             font-size: 0.75rem;
             font-weight: 900;
+        }
+
+        .skill-card .skill-chip {
+            background: rgba(var(--skill-accent-rgb),0.1);
+            color: var(--skill-text);
         }
 
         .skill-unlock {
@@ -1337,6 +1371,13 @@
             return `skills/${String(skill && skill.name ? skill.name : 'unknown-skill').replace(/[<>:"\\/|?*\x00-\x1f]/g, '_')}.png`;
         }
 
+        function skillSourceClass(source) {
+            if (source === '默认') return 'skill-source-default';
+            if (source === '血脉') return 'skill-source-bloodline';
+            if (source === '技能石') return 'skill-source-stone';
+            return 'skill-source-other';
+        }
+
         function renderSkillSourceFilters(record) {
             const skills = Array.isArray(record.skills) ? record.skills : [];
             const sources = ['默认', '血脉', '技能石'].filter(source => skills.some(skill => skill.source === source));
@@ -1362,6 +1403,7 @@
             return `
                 <div class="skill-card-grid">
                     ${visibleSkills.map(skill => {
+                        const sourceClass = skillSourceClass(skill.source || '');
                         const meta = [
                             skill.source || '',
                             skill.cost ? `耗能 ${skill.cost}` : '',
@@ -1371,7 +1413,7 @@
                         ].filter(Boolean);
 
                         return `
-                            <article class="skill-card">
+                            <article class="skill-card ${sourceClass}">
                                 <div class="skill-icon-wrap">
                                     <img class="skill-icon" src="${escapeHtml(skillIconPath(skill))}" alt="${escapeHtml(skill.name)}" loading="lazy" onerror="this.closest('.skill-icon-wrap').style.display='none'">
                                 </div>
