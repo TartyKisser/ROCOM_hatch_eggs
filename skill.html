@@ -554,6 +554,120 @@
             line-height: 1.6;
         }
 
+        .acquire-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .acquire-pet-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .acquire-pet-strip.is-collapsed {
+            max-height: 46px;
+        }
+
+        .acquire-pet-avatar {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(226,232,240,0.9);
+            border-radius: 11px;
+            background: rgba(255,255,255,0.82);
+        }
+
+        .acquire-pet-avatar img {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 8px rgba(15,23,42,0.14));
+        }
+
+        .acquire-toggle {
+            width: 30px;
+            height: 30px;
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(99,102,241,0.18);
+            border-radius: 999px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font-size: 1rem;
+            font-weight: 950;
+            cursor: pointer;
+            transition: transform 0.16s ease, background 0.16s ease;
+        }
+
+        .acquire-toggle:hover {
+            background: rgba(99,102,241,0.14);
+            transform: translateY(-1px);
+        }
+
+        .acquire-toggle.is-open {
+            transform: rotate(180deg);
+        }
+
+        .acquire-toggle.is-hidden {
+            display: none;
+        }
+
+        .research-task-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .research-task-row {
+            display: grid;
+            grid-template-columns: 46px minmax(0, 1fr);
+            gap: 10px;
+            align-items: center;
+            padding: 8px;
+            border: 1px solid rgba(226,232,240,0.78);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.64);
+        }
+
+        .research-task-image {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            background: rgba(255,255,255,0.78);
+        }
+
+        .research-task-image img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 8px rgba(15,23,42,0.12));
+        }
+
+        .research-task-pet {
+            color: var(--primary-dark);
+            font-weight: 950;
+            line-height: 1.35;
+        }
+
+        .research-task-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
         .pet-grid {
             grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
         }
@@ -816,6 +930,7 @@
 
         let records = [];
         let skills = [];
+        let skillByName = new Map();
         let filteredSkills = [];
         let activeMode = 'skill';
         let activeType = '';
@@ -1006,6 +1121,7 @@
             });
 
             skills = [...map.values()].sort(compareSkills);
+            skillByName = map;
             filteredSkills = skills;
         }
 
@@ -1063,13 +1179,17 @@
                         const text = normalize([record.id, record.number, record.title, record.searchText].join(' '));
                         return text.includes(keyword);
                     });
-                    const skillNames = new Set();
+                    const skillNames = [];
+                    const seenSkillNames = new Set();
                     matchedPets.forEach(record => {
                         (Array.isArray(record.skills) ? record.skills : []).forEach(skill => {
-                            if (skill && skill.name) skillNames.add(skill.name);
+                            if (skill && skill.name && !seenSkillNames.has(skill.name)) {
+                                seenSkillNames.add(skill.name);
+                                skillNames.push(skill.name);
+                            }
                         });
                     });
-                    filteredSkills = skills.filter(skill => skillNames.has(skill.name));
+                    filteredSkills = skillNames.map(name => skillByName.get(name)).filter(Boolean);
                 }
             }
 
@@ -1142,6 +1262,25 @@
                 return;
             }
 
+            if (activeMode === 'pet') {
+                skillList.innerHTML = `
+                    <section class="panel skill-section">
+                        <div class="section-head">
+                            <h2 class="section-title"><span>可用技能</span></h2>
+                            <div class="section-count">${filteredSkills.length} 个技能</div>
+                        </div>
+                        <div class="skill-card-grid">
+                            ${filteredSkills.map(renderSkillCard).join('')}
+                        </div>
+                    </section>
+                `;
+
+                skillList.querySelectorAll('.skill-card').forEach(card => {
+                    card.addEventListener('click', () => showDetail(card.dataset.skillName));
+                });
+                return;
+            }
+
             const groups = new Map();
             filteredSkills.forEach(skill => {
                 const group = typeName(skill.type);
@@ -1176,6 +1315,42 @@
             return chunks.length ? chunks.join(' / ') : '暂无';
         }
 
+        function uniqueRecords(records) {
+            const seen = new Set();
+            return records.filter(record => {
+                if (!record || seen.has(record.id)) return false;
+                seen.add(record.id);
+                return true;
+            });
+        }
+
+        function renderPetAvatar(record) {
+            return `
+                <span class="acquire-pet-avatar" title="NO.${escapeHtml(record.number)} ${escapeHtml(record.title)}">
+                    <img src="${escapeHtml(portraitSmallPath(record))}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                </span>
+            `;
+        }
+
+        function renderResearchTaskRows(tasks) {
+            if (!tasks.length) return '';
+            return `
+                <div class="research-task-list">
+                    ${tasks.map(item => `
+                        <div class="research-task-row">
+                            <div class="research-task-image">
+                                <img src="${escapeHtml(portraitSmallPath(item.record))}" alt="${escapeHtml(item.record.title)}" loading="lazy" onerror="this.style.display='none'">
+                            </div>
+                            <div>
+                                <div class="research-task-pet">${escapeHtml(item.record.title)}</div>
+                                <div class="research-task-text">${escapeHtml(item.taskName)}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         function renderAcquisition(skill) {
             const grouped = new Map();
             skill.variants.forEach(({ record, skill: variant }) => {
@@ -1187,34 +1362,34 @@
                         pets: []
                     });
                 }
-                grouped.get(key).pets.push(record.title);
+                grouped.get(key).pets.push(record);
             });
 
             const learnRows = [...grouped.values()].sort((a, b) => {
                 const sourceCompare = a.source.localeCompare(b.source, 'zh-CN');
                 return sourceCompare || a.unlock.localeCompare(b.unlock, 'zh-CN', { numeric: true });
-            }).slice(0, 16).map(item => {
-                const petNames = [...new Set(item.pets)];
-                const preview = petNames.slice(0, 8).join('、') + (petNames.length > 8 ? ` 等 ${petNames.length} 只` : '');
+            }).slice(0, 16).map((item, index) => {
+                const petRecords = uniqueRecords(item.pets);
+                const stripId = `acquire-pets-${safeFileName(skill.name)}-${index}`;
                 return `
                     <div class="acquire-item">
-                        <div class="acquire-title">${escapeHtml(item.source)}：${escapeHtml(item.unlock)}</div>
-                        <div class="acquire-text">${escapeHtml(preview)}</div>
+                        <div class="acquire-title-row">
+                            <div class="acquire-title">${escapeHtml(item.source)}：${escapeHtml(item.unlock)}</div>
+                            ${petRecords.length > 1 ? `<button class="acquire-toggle" type="button" aria-label="展开精灵列表" aria-expanded="false" data-acquire-target="${escapeHtml(stripId)}">⌄</button>` : ''}
+                        </div>
+                        <div class="acquire-pet-strip ${petRecords.length > 1 ? 'is-collapsed' : ''}" id="${escapeHtml(stripId)}">
+                            ${petRecords.map(renderPetAvatar).join('')}
+                        </div>
                     </div>
                 `;
             });
 
-            const taskRows = skill.researchTasks.slice(0, 36).map(item => `
-                <div class="acquire-item">
-                    <div class="acquire-title">${escapeHtml(item.record.title)}</div>
-                    <div class="acquire-text">${escapeHtml(item.taskName)}</div>
-                </div>
-            `);
+            const visibleTaskRows = skill.researchTasks.slice(0, 36);
 
             const hiddenLearnCount = grouped.size > 16 ? grouped.size - 16 : 0;
             const hiddenTaskCount = skill.researchTasks.length > 36 ? skill.researchTasks.length - 36 : 0;
 
-            if (!learnRows.length && !taskRows.length) {
+            if (!learnRows.length && !visibleTaskRows.length) {
                 return '<div class="empty-state">暂无明确获取方式。</div>';
             }
 
@@ -1222,11 +1397,35 @@
                 <div class="acquire-list">
                     ${learnRows.join('')}
                     ${hiddenLearnCount ? `<div class="acquire-item"><div class="acquire-title">更多学习来源</div><div class="acquire-text">另有 ${hiddenLearnCount} 组来源未展开。</div></div>` : ''}
-                    ${taskRows.length ? `<div class="acquire-item"><div class="acquire-title">图鉴课题线索</div><div class="acquire-text">下列精灵课题中出现了该技能名称。</div></div>` : ''}
-                    ${taskRows.join('')}
-                    ${hiddenTaskCount ? `<div class="acquire-item"><div class="acquire-title">更多课题线索</div><div class="acquire-text">另有 ${hiddenTaskCount} 条课题未展开。</div></div>` : ''}
+                    ${visibleTaskRows.length ? `
+                        <div class="acquire-item">
+                            <div class="acquire-title">图鉴课题线索</div>
+                            <div class="acquire-text">下列精灵课题中出现了该技能名称。</div>
+                            ${renderResearchTaskRows(visibleTaskRows)}
+                            ${hiddenTaskCount ? `<div class="acquire-text">另有 ${hiddenTaskCount} 条课题未展开。</div>` : ''}
+                        </div>
+                    ` : ''}
                 </div>
             `;
+        }
+
+        function bindAcquisitionToggles() {
+            detailPanel.querySelectorAll('.acquire-toggle').forEach(button => {
+                const target = document.getElementById(button.dataset.acquireTarget || '');
+                if (!target || target.scrollHeight <= target.clientHeight + 1) {
+                    button.classList.add('is-hidden');
+                    if (target) target.classList.remove('is-collapsed');
+                    return;
+                }
+                button.addEventListener('click', () => {
+                    const target = document.getElementById(button.dataset.acquireTarget || '');
+                    if (!target) return;
+                    const isCollapsed = target.classList.toggle('is-collapsed');
+                    button.classList.toggle('is-open', !isCollapsed);
+                    button.setAttribute('aria-expanded', String(!isCollapsed));
+                    button.setAttribute('aria-label', isCollapsed ? '展开精灵列表' : '收起精灵列表');
+                });
+            });
         }
 
         function renderUsablePets(skill) {
@@ -1339,6 +1538,8 @@
                     </div>
                 </div>
             `;
+
+            bindAcquisitionToggles();
         }
 
         function hashSkillName() {
