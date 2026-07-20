@@ -1135,6 +1135,10 @@
             return cleanList(record.attributes).length ? cleanList(record.attributes) : ['普通'];
         }
 
+        function hasUsableEggGroup(record) {
+            return cleanList(record && record.eggGroups).length > 0;
+        }
+
         function primaryAttribute(record) {
             return recordAttributes(record)[0] || '普通';
         }
@@ -1651,7 +1655,10 @@
                 const allFamilies = buildCandidateFamilies(records);
                 adventureTargets = allFamilies.filter(family => family.members.some(member => adventureNumbers.has(member.number)));
                 rareTargets = allFamilies.filter(family => family.members.some(member => rareNumbers.has(member.number)));
-                candidates = buildCandidateFamilies(records.filter(record => Number.isFinite(record.baseStarlightValue)))
+                candidates = buildCandidateFamilies(records.filter(record => (
+                    Number.isFinite(record.baseStarlightValue)
+                    && hasUsableEggGroup(record)
+                )))
                     .filter(family => !family.members.some(member => adventureNumbers.has(member.number)));
 
                 renderSortPriority();
