@@ -564,46 +564,70 @@
         .acquire-pet-strip {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             margin-top: 10px;
             overflow: hidden;
         }
 
         .acquire-pet-strip.is-collapsed {
-            max-height: 46px;
+            max-height: 96px;
         }
 
         .acquire-pet-avatar {
-            width: 42px;
-            height: 42px;
+            width: 78px;
+            min-height: 92px;
             flex: 0 0 auto;
             display: inline-flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 5px;
+            padding: 7px 6px 6px;
             border: 1px solid rgba(226,232,240,0.9);
-            border-radius: 11px;
+            border-radius: 12px;
             background: rgba(255,255,255,0.82);
         }
 
-        .acquire-pet-avatar img {
-            width: 38px;
-            height: 38px;
+        .acquire-pet-image {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .acquire-pet-image img {
+            width: 58px;
+            height: 58px;
             object-fit: contain;
             filter: drop-shadow(0 6px 8px rgba(15,23,42,0.14));
         }
 
+        .acquire-pet-name {
+            width: 100%;
+            overflow: hidden;
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            font-weight: 850;
+            line-height: 1.2;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .acquire-toggle {
-            width: 30px;
+            min-width: 54px;
             height: 30px;
             flex: 0 0 auto;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            padding: 0 12px;
             border: 1px solid rgba(99,102,241,0.18);
             border-radius: 999px;
             background: rgba(99,102,241,0.08);
             color: var(--primary-dark);
-            font-size: 1rem;
+            font-size: 0.82rem;
             font-weight: 950;
             cursor: pointer;
             transition: transform 0.16s ease, background 0.16s ease;
@@ -612,10 +636,6 @@
         .acquire-toggle:hover {
             background: rgba(99,102,241,0.14);
             transform: translateY(-1px);
-        }
-
-        .acquire-toggle.is-open {
-            transform: rotate(180deg);
         }
 
         .acquire-toggle.is-hidden {
@@ -1327,7 +1347,10 @@
         function renderPetAvatar(record) {
             return `
                 <span class="acquire-pet-avatar" title="NO.${escapeHtml(record.number)} ${escapeHtml(record.title)}">
-                    <img src="${escapeHtml(portraitSmallPath(record))}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                    <span class="acquire-pet-image">
+                        <img src="${escapeHtml(portraitSmallPath(record))}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                    </span>
+                    <span class="acquire-pet-name">${escapeHtml(record.title)}</span>
                 </span>
             `;
         }
@@ -1375,7 +1398,7 @@
                     <div class="acquire-item">
                         <div class="acquire-title-row">
                             <div class="acquire-title">${escapeHtml(item.source)}：${escapeHtml(item.unlock)}</div>
-                            ${petRecords.length > 1 ? `<button class="acquire-toggle" type="button" aria-label="展开精灵列表" aria-expanded="false" data-acquire-target="${escapeHtml(stripId)}">⌄</button>` : ''}
+                            ${petRecords.length > 1 ? `<button class="acquire-toggle" type="button" aria-label="展开精灵列表" aria-expanded="false" data-acquire-target="${escapeHtml(stripId)}">展开</button>` : ''}
                         </div>
                         <div class="acquire-pet-strip ${petRecords.length > 1 ? 'is-collapsed' : ''}" id="${escapeHtml(stripId)}">
                             ${petRecords.map(renderPetAvatar).join('')}
@@ -1422,6 +1445,7 @@
                     if (!target) return;
                     const isCollapsed = target.classList.toggle('is-collapsed');
                     button.classList.toggle('is-open', !isCollapsed);
+                    button.textContent = isCollapsed ? '展开' : '折叠';
                     button.setAttribute('aria-expanded', String(!isCollapsed));
                     button.setAttribute('aria-label', isCollapsed ? '展开精灵列表' : '收起精灵列表');
                 });
