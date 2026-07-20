@@ -554,6 +554,13 @@
             --feature-image: url('./web_images/handbook.png');
         }
 
+        .skilldex-card {
+            --feature-image: url('./web_images/skill.png');
+            background:
+                linear-gradient(135deg, rgba(79,70,229,0.92), rgba(236,72,153,0.82)),
+                url('./web_images/types/幻.png') center / 46% no-repeat;
+        }
+
         .adventure-card {
             --feature-image: url('./web_images/adventure.png');
         }
@@ -602,6 +609,16 @@
         }
 
         .feature-card:nth-child(3) .feature-mark {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            box-shadow: 0 10px 24px rgba(245,158,11,0.28);
+        }
+
+        .feature-card.skilldex-card .feature-mark {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            box-shadow: 0 10px 24px rgba(139,92,246,0.3);
+        }
+
+        .feature-card.adventure-card .feature-mark {
             background: linear-gradient(135deg, #f59e0b, #ef4444);
             box-shadow: 0 10px 24px rgba(245,158,11,0.28);
         }
@@ -1053,6 +1070,15 @@
                     <p class="feature-copy">精灵资料、属性、种族值与图片信息。</p>
                 </div>
                 <span class="feature-action">查看图鉴 <span>›</span></span>
+            </a>
+
+            <a class="feature-card visual-card skilldex-card" href="skill.html">
+                <div>
+                    <span class="feature-mark">技</span>
+                    <h2 class="feature-title">技能图鉴</h2>
+                    <p class="feature-copy">按系别浏览技能，查看技能资料、获得方式与可使用精灵。</p>
+                </div>
+                <span class="feature-action">查看技能 <span>›</span></span>
             </a>
 
             <a class="feature-card visual-card adventure-card" href="adventure.html">
