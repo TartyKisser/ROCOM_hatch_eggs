@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>奇遇混抓推荐 - 洛克王国世界工具站</title>
+    <title>异色刷取推荐 - 洛克王国世界工具站</title>
     <style>
         :root {
             --primary: #6366f1;
@@ -475,6 +475,10 @@
             align-items: center;
         }
 
+        .pair-row.is-single {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
         .plus {
             display: inline-flex;
             align-items: center;
@@ -894,8 +898,8 @@
     <div class="container">
         <header>
             <div class="hero-eyebrow">ADVENTURE</div>
-            <h1 class="main-title">奇遇混抓推荐</h1>
-            <p class="desc-font">按自定义优先级排序，寻找更快触发奇遇事件且更少歪异色的混抓组合。</p>
+            <h1 class="main-title">异色刷取推荐</h1>
+            <p class="desc-font">按自定义优先级排序，寻找更快触发异色事件且更少歪异色的刷取方案。</p>
         </header>
 
         <div class="topbar">
@@ -908,11 +912,11 @@
 
         <section class="panel controls">
             <div class="adventure-control-section">
-                <div class="control-title">选择奇遇家族</div>
+                <div class="control-title">选择异色家族</div>
                 <div id="targetStrip" class="target-strip"></div>
             </div>
             <div class="adventure-control-section">
-                <div class="control-title">限定混抓家族（可选）</div>
+                <div class="control-title">限定刷取家族（可选）</div>
                 <div class="candidate-search-grid">
                     <div class="candidate-field">
                         <input id="candidateInputA" class="search-input" type="search" placeholder="输入第一只精灵名称或编号" autocomplete="off" aria-controls="candidateSuggestA">
@@ -988,23 +992,9 @@
             '机械': '#40CBA9',
             '幻': '#9FA7F8'
         };
-        const EGG_GROUP_BOXES = {
-            yellow: ['动物组', '大地组', '巨灵组', '两栖组', '飞龙组'],
-            blue: ['植物组', '天空组', '海洋组', '机械组', '魔力组'],
-            red: ['拟人组', '妖精组', '昆虫组', '软体组']
-        };
-        const EGG_BOX_LABELS = {
-            yellow: '黄色盒子',
-            blue: '蓝色盒子',
-            red: '红色盒子'
-        };
         const STARLIGHT_BADGE = './web_images/values/base-starlight-value.png';
-        const EGG_GROUP_TO_BOX = Object.fromEntries(
-            Object.entries(EGG_GROUP_BOXES).flatMap(([box, groups]) => groups.map(group => [group, box]))
-        );
         const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
         const PAGE_SIZE = 80;
-        const EGG_GROUP_ONLY_TARGET_NUMBERS = new Set(['362', '365', '369']);
 
         let records = [];
         let canonicalRecordByNumber = new Map();
@@ -1016,12 +1006,11 @@
         let filteredStrategies = [];
         let visibleCount = PAGE_SIZE;
         let activeTarget = '';
-        let sortPriority = ['rare', 'pool', 'score'];
+        let sortPriority = ['rare', 'score'];
 
         const SORT_LABELS = {
             score: '星光值',
-            rare: '少歪异色',
-            pool: '触发池子数量'
+            rare: '少歪异色'
         };
 
         const sortPriorityGroup = document.getElementById('sortPriority');
@@ -1126,43 +1115,20 @@
             return a.filter(item => second.has(item));
         }
 
-        function subsets(values) {
-            const items = cleanList(values);
-            const result = [];
-            const total = 1 << items.length;
-            for (let mask = 1; mask < total; mask += 1) {
-                result.push(items.filter((_, index) => mask & (1 << index)));
-            }
-            return result;
-        }
-
         function addToIndex(index, key, target) {
             if (!key) return;
             if (!index.has(key)) index.set(key, new Set());
             index.get(key).add(target);
         }
 
-        function eggBoxes(groups) {
-            return [...new Set(cleanList(groups).map(group => EGG_GROUP_TO_BOX[group]).filter(Boolean))];
-        }
-
-        function targetRequiresEggGroupRule(target) {
-            const numbers = target && Array.isArray(target.memberNumbers) ? target.memberNumbers : [target && target.number];
-            return numbers.some(number => EGG_GROUP_ONLY_TARGET_NUMBERS.has(normalizeNumber(number)));
-        }
-
         function buildTargetIndex(targets) {
             const attributeIndex = new Map();
-            const eggBoxIndex = new Map();
 
             targets.forEach(target => {
-                if (!targetRequiresEggGroupRule(target)) {
-                    subsets(target.attributes).forEach(items => addToIndex(attributeIndex, setKey(items), target));
-                }
-                eggBoxes(target.eggGroups).forEach(box => addToIndex(eggBoxIndex, box, target));
+                recordAttributes(target).forEach(attribute => addToIndex(attributeIndex, attribute, target));
             });
 
-            return { attributeIndex, eggBoxIndex };
+            return { attributeIndex };
         }
 
         function recordAttributes(record) {
@@ -1171,10 +1137,6 @@
 
         function primaryAttribute(record) {
             return recordAttributes(record)[0] || '普通';
-        }
-
-        function recordEggGroups(record) {
-            return cleanList(record.eggGroups);
         }
 
         function portraitSmallPath(record) {
@@ -1262,7 +1224,6 @@
                 const memberNames = members.map(member => member.title);
                 const memberNumbers = members.map(member => member.number);
                 const attributes = uniqueList(members.flatMap(recordAttributes));
-                const eggGroups = uniqueList(members.flatMap(recordEggGroups));
                 const score = weightedFamilyStarlight(family.members, family.evolutionIds);
                 const title = members.length > 1 ? `${representative.title}家族` : representative.title;
                 const firstAttribute = primaryAttribute(representative);
@@ -1275,7 +1236,6 @@
                     portrait: representative.portrait,
                     attributes,
                     firstAttribute,
-                    eggGroups,
                     baseStarlightValue: score,
                     members,
                     memberNames,
@@ -1333,6 +1293,24 @@
 
         function candidateMatchesTerm(record, term) {
             return !term || candidateSearchText(record).includes(term);
+        }
+
+        function strategyMatchesCandidates(strategy, firstTerm, secondTerm) {
+            const participants = [strategy.first, strategy.second].filter(Boolean);
+            if (!firstTerm && !secondTerm) return true;
+            if (firstTerm && !secondTerm) {
+                return participants.some(record => candidateMatchesTerm(record, firstTerm));
+            }
+            if (!firstTerm && secondTerm) {
+                return participants.some(record => candidateMatchesTerm(record, secondTerm));
+            }
+            if (participants.length < 2) return false;
+
+            const [first, second] = participants;
+            return (
+                (candidateMatchesTerm(first, firstTerm) && candidateMatchesTerm(second, secondTerm))
+                || (candidateMatchesTerm(first, secondTerm) && candidateMatchesTerm(second, firstTerm))
+            );
         }
 
         function renderCandidateSuggestOption(record) {
@@ -1422,25 +1400,34 @@
                 ? strategy.otherTargets.map(renderOtherTarget).join('')
                 : '<span class="other-item">暂无</span>';
             const ruleChips = strategy.rules.map(rule => `<span class="rule-chip">${escapeHtml(rule)}</span>`).join('');
+            const candidateRow = strategy.second
+                ? `
+                    <div class="pair-row">
+                        ${renderSprite(strategy.first)}
+                        <span class="plus">+</span>
+                        ${renderSprite(strategy.second)}
+                    </div>
+                `
+                : `
+                    <div class="pair-row is-single">
+                        ${renderSprite(strategy.first)}
+                    </div>
+                `;
 
             return `
                 <article class="panel strategy-card">
                     <div class="strategy-head">
-	                        <div class="target-mini">
-	                            <img class="mini-img" src="${escapeHtml(portraitSmallPath(strategy.target))}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
+                        <div class="target-mini">
+                            <img class="mini-img" src="${escapeHtml(portraitSmallPath(strategy.target))}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
                             <div>
-                                <div class="mini-label">目标奇遇</div>
-	                                <div class="mini-name">${formatNo(strategy.target.number)} ${escapeHtml(strategy.target.title)}</div>
-	                            </div>
-	                        </div>
-	                        ${renderScoreBadge(strategy.score)}
-	                    </div>
-                    <div class="strategy-body">
-                        <div class="pair-row">
-                            ${renderSprite(strategy.first)}
-                            <span class="plus">+</span>
-                            ${renderSprite(strategy.second)}
+                                <div class="mini-label">目标异色</div>
+                                <div class="mini-name">${formatNo(strategy.target.number)} ${escapeHtml(strategy.target.title)}</div>
+                            </div>
                         </div>
+                        ${renderScoreBadge(strategy.score)}
+                    </div>
+                    <div class="strategy-body">
+                        ${candidateRow}
                         <div class="chip-row">${ruleChips}</div>
                         <div class="others">
                             <div class="others-title">还可能触发</div>
@@ -1451,76 +1438,88 @@
             `;
         }
 
+        function strategySearchTextParts(strategy, otherTargets) {
+            return [
+                strategy.target.number,
+                strategy.target.title,
+                strategy.target.searchText,
+                strategy.first.number,
+                strategy.first.title,
+                strategy.first.searchText,
+                strategy.second && strategy.second.number,
+                strategy.second && strategy.second.title,
+                strategy.second && strategy.second.searchText,
+                ...otherTargets.map(rareItem => `${rareItem.target.number}${rareItem.target.title}${rareItem.target.searchText}${rareItem.rules.join('')}`)
+            ];
+        }
+
+        function addRuleTarget(map, target, rule) {
+            const item = map.get(target.key) || { target, rules: [] };
+            if (!item.rules.includes(rule)) item.rules.push(rule);
+            map.set(target.key, item);
+        }
+
+        function collectTriggeredTargets(targetIndex, attributes, rulePrefix) {
+            const triggered = new Map();
+            uniqueList(attributes).forEach(attribute => {
+                const rule = `${rulePrefix}：${attribute}`;
+                (targetIndex.attributeIndex.get(attribute) || []).forEach(target => addRuleTarget(triggered, target, rule));
+            });
+            return triggered;
+        }
+
+        function pushStrategiesForRuleMaps(strategies, first, second, targetRuleMap, rareTargetRuleMap) {
+            if (!targetRuleMap.size) return;
+
+            const rareTriggeredItems = [...rareTargetRuleMap.values()].map(item => ({
+                target: item.target,
+                rules: item.rules
+            }));
+            const score = first.baseStarlightValue + (second ? second.baseStarlightValue : 0);
+
+            targetRuleMap.forEach(item => {
+                const otherTargets = rareTriggeredItems.filter(rareItem => rareItem.target.key !== item.target.key);
+                const strategy = {
+                    target: item.target,
+                    first,
+                    second,
+                    score,
+                    rules: item.rules,
+                    otherTargets
+                };
+                strategy.searchText = normalize(strategySearchTextParts(strategy, otherTargets).join(' '));
+                strategies.push(strategy);
+            });
+        }
+
         function buildStrategies() {
             const adventureIndex = buildTargetIndex(adventureTargets);
             const rareIndex = buildTargetIndex(rareTargets);
             const strategies = [];
+
             for (let i = 0; i < candidates.length; i += 1) {
+                const single = candidates[i];
+                pushStrategiesForRuleMaps(
+                    strategies,
+                    single,
+                    null,
+                    collectTriggeredTargets(adventureIndex, recordAttributes(single), '单刷系别'),
+                    collectTriggeredTargets(rareIndex, recordAttributes(single), '单刷系别')
+                );
+
                 for (let j = i + 1; j < candidates.length; j += 1) {
                     const first = candidates[i];
                     const second = candidates[j];
                     if (first.key === second.key) continue;
 
-                    const attributeKey = mixedAttributeKey(first, second);
-                    const commonEggBoxes = eggBoxes(intersect(recordEggGroups(first), recordEggGroups(second)));
-                    const targetRuleMap = new Map();
-                    const rareTargetRuleMap = new Map();
-
-                    (adventureIndex.attributeIndex.get(attributeKey) || []).forEach(target => targetRuleMap.set(target.key, {
-                        target,
-                        rules: ['系别交集']
-                    }));
-                    (rareIndex.attributeIndex.get(attributeKey) || []).forEach(target => rareTargetRuleMap.set(target.key, {
-                        target,
-                        rules: ['系别交集']
-                    }));
-
-                    commonEggBoxes.forEach(box => {
-                        const boxRule = `蛋组：${EGG_BOX_LABELS[box] || box}`;
-                        (adventureIndex.eggBoxIndex.get(box) || []).forEach(target => {
-                            const item = targetRuleMap.get(target.key) || { target, rules: [] };
-                            if (!item.rules.includes(boxRule)) item.rules.push(boxRule);
-                            targetRuleMap.set(target.key, item);
-                        });
-                        (rareIndex.eggBoxIndex.get(box) || []).forEach(target => {
-                            const item = rareTargetRuleMap.get(target.key) || { target, rules: [] };
-                            if (!item.rules.includes(boxRule)) item.rules.push(boxRule);
-                            rareTargetRuleMap.set(target.key, item);
-                        });
-                    });
-
-                    if (!targetRuleMap.size) continue;
-
-                    const rareTriggeredItems = [...rareTargetRuleMap.values()].map(item => ({
-                        target: item.target,
-                        rules: item.rules
-                    }));
-                    const score = first.baseStarlightValue + second.baseStarlightValue;
-
-                    targetRuleMap.forEach(item => {
-                        const otherTargets = rareTriggeredItems.filter(rareItem => rareItem.target.key !== item.target.key);
-                        strategies.push({
-                            target: item.target,
-                            first,
-                            second,
-                            score,
-                            rules: item.rules,
-                            triggerPoolCount: item.rules.length,
-                            otherTargets,
-                            searchText: normalize([
-                                item.target.number,
-                                item.target.title,
-                                item.target.searchText,
-                                first.number,
-                                first.title,
-                                first.searchText,
-                                second.number,
-                                second.title,
-                                second.searchText,
-                                ...otherTargets.map(rareItem => `${rareItem.target.number}${rareItem.target.title}${rareItem.target.searchText}${rareItem.rules.join('')}`)
-                            ].join(' '))
-                        });
-                    });
+                    const commonAttributes = intersect(recordAttributes(first), recordAttributes(second));
+                    pushStrategiesForRuleMaps(
+                        strategies,
+                        first,
+                        second,
+                        collectTriggeredTargets(adventureIndex, commonAttributes, '共同系别'),
+                        collectTriggeredTargets(rareIndex, commonAttributes, '共同系别')
+                    );
                 }
             }
 
@@ -1532,7 +1531,8 @@
                 a.target.number.localeCompare(b.target.number)
                 || a.target.key.localeCompare(b.target.key, 'zh-CN')
                 || a.first.number.localeCompare(b.first.number)
-                || a.second.number.localeCompare(b.second.number)
+                || Number(Boolean(a.second)) - Number(Boolean(b.second))
+                || String(a.second && a.second.number || '').localeCompare(String(b.second && b.second.number || ''))
             );
         }
 
@@ -1542,19 +1542,12 @@
 
         function compareBySortKey(a, b, sortKey) {
             if (sortKey === 'score') return b.score - a.score;
-            if (sortKey === 'pool') return b.triggerPoolCount - a.triggerPoolCount;
             if (sortKey === 'rare') {
                 return (a.otherTargets.length - b.otherTargets.length)
                     || (otherTriggerMethodCount(a) - otherTriggerMethodCount(b));
             }
 
             return 0;
-        }
-
-        function mixedAttributeKey(first, second) {
-            return first.firstAttribute && first.firstAttribute === second.firstAttribute
-                ? first.firstAttribute
-                : '';
         }
 
         function compareStrategies(a, b) {
@@ -1617,19 +1610,7 @@
             const secondTerm = normalize(candidateInputB.value);
             filteredStrategies = allStrategies.filter(strategy => {
                 const matchesTarget = !activeTarget || strategy.target.key === activeTarget;
-                const matchesFirstCandidate = candidateMatchesTerm(strategy.first, firstTerm);
-                const matchesSecondCandidate = candidateMatchesTerm(strategy.second, secondTerm);
-                const matchesReverseFirst = candidateMatchesTerm(strategy.first, secondTerm);
-                const matchesReverseSecond = candidateMatchesTerm(strategy.second, firstTerm);
-                const matchesCandidates = (
-                    (!firstTerm && !secondTerm)
-                    || (firstTerm && !secondTerm && (matchesFirstCandidate || matchesReverseSecond))
-                    || (!firstTerm && secondTerm && (matchesReverseFirst || matchesSecondCandidate))
-                    || (firstTerm && secondTerm && (
-                        (matchesFirstCandidate && matchesSecondCandidate)
-                        || (matchesReverseFirst && matchesReverseSecond)
-                    ))
-                );
+                const matchesCandidates = strategyMatchesCandidates(strategy, firstTerm, secondTerm);
                 return matchesTarget && matchesCandidates;
             });
             filteredStrategies = sortStrategies(filteredStrategies);
@@ -1641,7 +1622,7 @@
 
         function renderStrategies() {
             if (!filteredStrategies.length) {
-                strategyGrid.innerHTML = '<div class="panel empty-state">没有匹配的混抓策略。</div>';
+                strategyGrid.innerHTML = '<div class="panel empty-state">没有匹配的异色刷取方案。</div>';
                 loadMore.style.display = 'none';
                 return;
             }
