@@ -1125,7 +1125,7 @@
             const attributeIndex = new Map();
 
             targets.forEach(target => {
-                recordAttributes(target).forEach(attribute => addToIndex(attributeIndex, attribute, target));
+                targetTriggerAttributes(target).forEach(attribute => addToIndex(attributeIndex, attribute, target));
             });
 
             return { attributeIndex };
@@ -1133,6 +1133,14 @@
 
         function recordAttributes(record) {
             return cleanList(record.attributes).length ? cleanList(record.attributes) : ['普通'];
+        }
+
+        function targetTriggerAttributes(target) {
+            return recordAttributes(target && target.representative ? target.representative : target);
+        }
+
+        function brushAttributes(record) {
+            return [primaryAttribute(record)].filter(Boolean);
         }
 
         function hasUsableEggGroup(record) {
@@ -1238,6 +1246,7 @@
                     number: representative.number,
                     title,
                     portrait: representative.portrait,
+                    representative,
                     attributes,
                     firstAttribute,
                     baseStarlightValue: score,
@@ -1507,8 +1516,8 @@
                     strategies,
                     single,
                     null,
-                    collectTriggeredTargets(adventureIndex, recordAttributes(single), '单刷系别'),
-                    collectTriggeredTargets(rareIndex, recordAttributes(single), '单刷系别')
+                    collectTriggeredTargets(adventureIndex, brushAttributes(single), '单刷第一属性'),
+                    collectTriggeredTargets(rareIndex, brushAttributes(single), '单刷第一属性')
                 );
 
                 for (let j = i + 1; j < candidates.length; j += 1) {
@@ -1516,13 +1525,15 @@
                     const second = candidates[j];
                     if (first.key === second.key) continue;
 
-                    const commonAttributes = intersect(recordAttributes(first), recordAttributes(second));
+                    const commonAttributes = first.firstAttribute && first.firstAttribute === second.firstAttribute
+                        ? [first.firstAttribute]
+                        : [];
                     pushStrategiesForRuleMaps(
                         strategies,
                         first,
                         second,
-                        collectTriggeredTargets(adventureIndex, commonAttributes, '共同系别'),
-                        collectTriggeredTargets(rareIndex, commonAttributes, '共同系别')
+                        collectTriggeredTargets(adventureIndex, commonAttributes, '共同第一属性'),
+                        collectTriggeredTargets(rareIndex, commonAttributes, '共同第一属性')
                     );
                 }
             }
