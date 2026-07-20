@@ -186,6 +186,36 @@
             align-items: start;
         }
 
+        .mode-toggle {
+            display: inline-grid;
+            grid-template-columns: repeat(2, minmax(92px, 1fr));
+            gap: 4px;
+            min-height: 40px;
+            padding: 4px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 13px;
+            background: rgba(99,102,241,0.08);
+        }
+
+        .mode-option {
+            min-height: 32px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 900;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .mode-option.active {
+            background: #ffffff;
+            color: var(--primary-dark);
+            box-shadow: 0 8px 20px rgba(99,102,241,0.14);
+        }
+
         .candidate-field {
             position: relative;
             min-width: 0;
@@ -207,6 +237,12 @@
         .search-input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        .search-input:disabled {
+            cursor: not-allowed;
+            color: rgba(100,116,139,0.72);
+            background: rgba(226,232,240,0.72);
         }
 
         .sort-priority {
@@ -917,6 +953,10 @@
             </div>
             <div class="adventure-control-section">
                 <div class="control-title">限定刷取家族（可选）</div>
+                <div id="brushMode" class="mode-toggle" role="radiogroup" aria-label="刷取模式">
+                    <button class="mode-option active" type="button" data-mode="mixed" role="radio" aria-checked="true">混刷</button>
+                    <button class="mode-option" type="button" data-mode="single" role="radio" aria-checked="false">单刷</button>
+                </div>
                 <div class="candidate-search-grid">
                     <div class="candidate-field">
                         <input id="candidateInputA" class="search-input" type="search" placeholder="输入第一只精灵名称或编号" autocomplete="off" aria-controls="candidateSuggestA">
@@ -1006,7 +1046,13 @@
         let filteredStrategies = [];
         let visibleCount = PAGE_SIZE;
         let activeTarget = '';
+        let activeBrushMode = 'mixed';
         let sortPriority = ['rare', 'score'];
+
+        const BRUSH_MODE_LABELS = {
+            mixed: '混刷',
+            single: '单刷'
+        };
 
         const SORT_LABELS = {
             score: '星光值',
@@ -1014,6 +1060,7 @@
         };
 
         const sortPriorityGroup = document.getElementById('sortPriority');
+        const brushMode = document.getElementById('brushMode');
         const candidateInputA = document.getElementById('candidateInputA');
         const candidateInputB = document.getElementById('candidateInputB');
         const candidateSuggestA = document.getElementById('candidateSuggestA');
@@ -1601,6 +1648,23 @@
             applyFilters();
         }
 
+        function renderBrushModeControls() {
+            brushMode.querySelectorAll('.mode-option').forEach(button => {
+                const isActive = button.dataset.mode === activeBrushMode;
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-checked', String(isActive));
+            });
+
+            const isSingle = activeBrushMode === 'single';
+            candidateInputA.placeholder = isSingle ? '输入单刷精灵名称或编号' : '输入第一只精灵名称或编号';
+            candidateInputB.disabled = isSingle;
+            candidateInputB.placeholder = isSingle ? '单刷模式不需要第二只精灵' : '输入第二只精灵名称或编号';
+            if (isSingle) {
+                candidateInputB.value = '';
+                closeSuggestMenu(candidateSuggestB);
+            }
+        }
+
         function renderTargetControls() {
             targetStrip.innerHTML = [
                 `<button class="target-chip ${activeTarget === '' ? 'active' : ''}" type="button" data-target="">全部</button>`,
@@ -1615,7 +1679,8 @@
             targetStrip.querySelectorAll('.target-chip').forEach(button => {
                 button.addEventListener('click', () => {
                     activeTarget = button.dataset.target || '';
-                    renderTargetControls();
+                    visibleCount = PAGE_SIZE;
+                    applyFilters();
                 });
             });
         }
@@ -1625,19 +1690,20 @@
             const secondTerm = normalize(candidateInputB.value);
             filteredStrategies = allStrategies.filter(strategy => {
                 const matchesTarget = !activeTarget || strategy.target.key === activeTarget;
+                const matchesMode = activeBrushMode === 'single' ? !strategy.second : Boolean(strategy.second);
                 const matchesCandidates = strategyMatchesCandidates(strategy, firstTerm, secondTerm);
-                return matchesTarget && matchesCandidates;
+                return matchesTarget && matchesMode && matchesCandidates;
             });
             filteredStrategies = sortStrategies(filteredStrategies);
 
-            resultCount.textContent = `共 ${filteredStrategies.length} 条推荐`;
+            resultCount.textContent = `共 ${filteredStrategies.length} 条${BRUSH_MODE_LABELS[activeBrushMode]}推荐`;
             renderTargetControls();
             renderStrategies();
         }
 
         function renderStrategies() {
             if (!filteredStrategies.length) {
-                strategyGrid.innerHTML = '<div class="panel empty-state">没有匹配的异色刷取方案。</div>';
+                strategyGrid.innerHTML = `<div class="panel empty-state">没有匹配的${escapeHtml(BRUSH_MODE_LABELS[activeBrushMode])}方案。</div>`;
                 loadMore.style.display = 'none';
                 return;
             }
@@ -1673,11 +1739,10 @@
                     .filter(family => !family.members.some(member => adventureNumbers.has(member.number)));
 
                 renderSortPriority();
+                renderBrushModeControls();
                 renderTargetControls();
                 allStrategies = buildStrategies();
-                filteredStrategies = sortStrategies(allStrategies);
-                resultCount.textContent = `共 ${filteredStrategies.length} 条推荐`;
-                renderStrategies();
+                applyFilters();
             } catch (error) {
                 console.error(error);
                 resultCount.textContent = '加载失败';
@@ -1687,6 +1752,15 @@
 
         startSearch.addEventListener('click', () => {
             visibleCount = PAGE_SIZE;
+            applyFilters();
+        });
+
+        brushMode.addEventListener('click', event => {
+            const button = event.target.closest('.mode-option');
+            if (!button || button.dataset.mode === activeBrushMode) return;
+            activeBrushMode = button.dataset.mode;
+            visibleCount = PAGE_SIZE;
+            renderBrushModeControls();
             applyFilters();
         });
 
@@ -1719,9 +1793,11 @@
             candidateInputA.value = '';
             candidateInputB.value = '';
             activeTarget = '';
+            activeBrushMode = 'mixed';
             visibleCount = PAGE_SIZE;
             closeSuggestMenu(candidateSuggestA);
             closeSuggestMenu(candidateSuggestB);
+            renderBrushModeControls();
             applyFilters();
         });
 
