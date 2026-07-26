@@ -138,8 +138,15 @@
         }
 
         .controls {
+            position: relative;
+            z-index: 30;
             padding: 18px;
             margin-bottom: 18px;
+        }
+
+        #skillList {
+            position: relative;
+            z-index: 1;
         }
 
         .filter-block {
@@ -163,6 +170,56 @@
 
         .search-field {
             min-width: 0;
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 60;
+            display: none;
+            max-height: 240px;
+            overflow-y: auto;
+            border: 2px solid var(--border);
+            border-top: 0;
+            border-radius: 0 0 12px 12px;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 14px 30px rgba(15,23,42,0.16);
+        }
+
+        .autocomplete-item {
+            width: 100%;
+            padding: 10px 14px;
+            border: 0;
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.16s ease;
+        }
+
+        .autocomplete-item:hover {
+            background: #f1f5f9;
+        }
+
+        .autocomplete-title {
+            font-size: 0.94rem;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+
+        .autocomplete-meta {
+            margin-top: 2px;
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 800;
+            line-height: 1.35;
         }
 
         .search-input {
@@ -861,16 +918,16 @@
                 </div>
 
                 <div class="search-grid">
-                    <label class="search-field">
+                    <label class="search-field autocomplete-container">
                         <div class="filter-label">精灵名称</div>
                         <input id="petSearchInput" class="search-input" type="search" placeholder="搜索精灵名称..." autocomplete="off">
+                        <div id="petAutocomplete" class="autocomplete-list"></div>
                     </label>
                     <label class="search-field">
                         <div class="filter-label">技能名称</div>
                         <input id="skillSearchInput" class="search-input" type="search" placeholder="搜索技能名称..." autocomplete="off">
                     </label>
                 </div>
-                <div id="petMatches" class="pet-matches"></div>
             </section>
 
             <section id="skillList">
@@ -930,8 +987,8 @@
         let filteredSkills = [];
         let activeType = '';
         let activeCategory = '';
+        let selectedPetId = '';
         let selectedSkillName = '';
-        let matchedPets = [];
         let galleryScrollY = 0;
 
         const homeLink = document.getElementById('homeLink');
@@ -943,9 +1000,9 @@
         const detailPanel = document.getElementById('detailPanel');
         const skillSearchInput = document.getElementById('skillSearchInput');
         const petSearchInput = document.getElementById('petSearchInput');
+        const petAutocomplete = document.getElementById('petAutocomplete');
         const typeFilters = document.getElementById('typeFilters');
         const categoryFilters = document.getElementById('categoryFilters');
-        const petMatches = document.getElementById('petMatches');
         const backToTop = document.getElementById('backToTop');
 
         function escapeHtml(value) {
@@ -1135,8 +1192,7 @@
                 `<button class="filter-chip ${activeType === '' ? 'active' : ''}" type="button" data-type="">全部</button>`,
                 ...ATTRIBUTES.map(attr => (
                     `<button class="filter-chip ${activeType === attr ? 'active' : ''}" type="button" data-type="${escapeHtml(attr)}">${renderAttributeLogo(attr)}<span>${escapeHtml(attr)}</span></button>`
-                )),
-                `<button class="filter-chip ${activeType === FALLBACK_TYPE ? 'active' : ''}" type="button" data-type="${FALLBACK_TYPE}">${FALLBACK_TYPE}</button>`
+                ))
             ].join('');
 
             typeFilters.querySelectorAll('.filter-chip').forEach(button => {
@@ -1164,26 +1220,21 @@
         }
 
         function applyFilters() {
-            matchedPets = [];
-            const petKeyword = normalize(petSearchInput.value);
             const skillKeyword = normalize(skillSearchInput.value);
             let candidateSkills = skills;
 
-            if (petKeyword) {
-                matchedPets = records.filter(record => {
-                    const text = normalize([record.id, record.number, record.title, record.searchText].join(' '));
-                    return text.includes(petKeyword);
-                });
+            if (selectedPetId) {
+                const selectedRecord = records.find(record => record.id === selectedPetId);
                 const skillNames = [];
                 const seenSkillNames = new Set();
-                matchedPets.forEach(record => {
-                    (Array.isArray(record.skills) ? record.skills : []).forEach(skill => {
+                if (selectedRecord) {
+                    (Array.isArray(selectedRecord.skills) ? selectedRecord.skills : []).forEach(skill => {
                         if (skill && skill.name && !seenSkillNames.has(skill.name)) {
                             seenSkillNames.add(skill.name);
                             skillNames.push(skill.name);
                         }
                     });
-                });
+                }
                 candidateSkills = skillNames.map(name => skillByName.get(name)).filter(Boolean);
             }
 
@@ -1199,30 +1250,47 @@
 
             renderTypeFilters();
             renderCategoryFilters();
-            renderPetMatches();
             renderSkillList();
         }
 
-        function renderPetMatches() {
-            if (!petSearchInput.value.trim()) {
-                petMatches.innerHTML = '';
+        function petInputLabel(record) {
+            return record ? `NO.${record.number} ${record.title}` : '';
+        }
+
+        function petSearchText(record) {
+            return normalize([record.id, record.number, record.title, record.searchText].join(' '));
+        }
+
+        function renderPetAutocomplete() {
+            const keyword = normalize(petSearchInput.value);
+            petAutocomplete.innerHTML = '';
+
+            if (!keyword || selectedPetId) {
+                petAutocomplete.style.display = 'none';
                 return;
             }
 
-            if (!matchedPets.length) {
-                petMatches.innerHTML = '<span class="pet-match-chip">没有匹配的精灵</span>';
+            const matches = records.filter(record => petSearchText(record).includes(keyword)).slice(0, 18);
+            if (!matches.length) {
+                petAutocomplete.style.display = 'none';
                 return;
             }
 
-            petMatches.innerHTML = matchedPets.slice(0, 18).map(record => `
-                <button class="pet-match-chip" type="button" data-pet-name="${escapeHtml(record.title)}">
-                    NO.${escapeHtml(record.number)} ${escapeHtml(record.title)}
+            petAutocomplete.innerHTML = matches.map(record => `
+                <button class="autocomplete-item" type="button" data-pet-id="${escapeHtml(record.id)}">
+                    <div class="autocomplete-title">NO.${escapeHtml(record.number)} ${escapeHtml(record.title)}</div>
+                    <div class="autocomplete-meta">${escapeHtml(recordAttributes(record).join(' / ') || '暂无系别')}</div>
                 </button>
-            `).join('') + (matchedPets.length > 18 ? `<span class="pet-match-chip">另有 ${matchedPets.length - 18} 只</span>` : '');
+            `).join('');
+            petAutocomplete.style.display = 'block';
 
-            petMatches.querySelectorAll('button.pet-match-chip').forEach(button => {
+            petAutocomplete.querySelectorAll('.autocomplete-item').forEach(button => {
                 button.addEventListener('click', () => {
-                    petSearchInput.value = button.dataset.petName || '';
+                    const record = records.find(item => item.id === button.dataset.petId);
+                    if (!record) return;
+                    selectedPetId = record.id;
+                    petSearchInput.value = petInputLabel(record);
+                    petAutocomplete.style.display = 'none';
                     applyFilters();
                 });
             });
@@ -1573,7 +1641,20 @@
         }
 
         skillSearchInput.addEventListener('input', applyFilters);
-        petSearchInput.addEventListener('input', applyFilters);
+        petSearchInput.addEventListener('input', () => {
+            const selectedRecord = selectedPetId ? records.find(record => record.id === selectedPetId) : null;
+            if (!selectedRecord || petSearchInput.value !== petInputLabel(selectedRecord)) {
+                selectedPetId = '';
+            }
+            renderPetAutocomplete();
+            applyFilters();
+        });
+        petSearchInput.addEventListener('focus', renderPetAutocomplete);
+        document.addEventListener('click', event => {
+            if (!event.target.closest('.autocomplete-container')) {
+                petAutocomplete.style.display = 'none';
+            }
+        });
         backToGallery.addEventListener('click', () => showGallery(true, true));
         window.addEventListener('hashchange', () => {
             const name = hashSkillName();
