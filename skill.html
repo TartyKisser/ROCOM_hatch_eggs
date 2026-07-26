@@ -142,46 +142,27 @@
             margin-bottom: 18px;
         }
 
-        .mode-tabs {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
-            margin-bottom: 14px;
+        .filter-block {
+            margin-top: 12px;
         }
 
-        .mode-tab {
-            min-height: 42px;
-            padding: 9px 12px;
-            border: 1px solid rgba(99,102,241,0.16);
-            border-radius: 12px;
-            background: rgba(99,102,241,0.08);
-            color: var(--primary-dark);
-            font: inherit;
-            font-size: 0.92rem;
+        .filter-label {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
             font-weight: 900;
-            cursor: pointer;
+            margin-bottom: 8px;
         }
 
-        .mode-tab.active {
-            color: white;
-            border-color: transparent;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            box-shadow: 0 10px 24px rgba(99,102,241,0.22);
-        }
-
-        .control-panel {
-            display: none;
-        }
-
-        .control-panel.active {
-            display: block;
-        }
-
-        .search-row {
+        .search-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
-            align-items: center;
+            align-items: end;
+            margin-top: 12px;
+        }
+
+        .search-field {
+            min-width: 0;
         }
 
         .search-input {
@@ -806,7 +787,7 @@
                 justify-content: flex-start;
             }
 
-            .mode-tabs,
+            .search-grid,
             .detail-hero,
             .info-grid {
                 grid-template-columns: 1fr;
@@ -820,9 +801,6 @@
                 min-height: 170px;
             }
 
-            .search-row {
-                grid-template-columns: 1fr;
-            }
         }
 
         @media (max-width: 560px) {
@@ -872,30 +850,27 @@
 
         <main id="galleryView" class="view active">
             <section class="panel controls">
-                <div class="mode-tabs" role="tablist" aria-label="技能图鉴筛选方式">
-                    <button class="mode-tab active" type="button" data-mode="skill">技能名称</button>
-                    <button class="mode-tab" type="button" data-mode="type">系别筛选</button>
-                    <button class="mode-tab" type="button" data-mode="pet">精灵名称</button>
-                </div>
-
-                <div id="skillModePanel" class="control-panel active">
-                    <div class="search-row">
-                        <input id="skillSearchInput" class="search-input" type="search" placeholder="搜索技能名称..." autocomplete="off">
-                        <button id="clearSkillSearch" class="btn" type="button">清空</button>
-                    </div>
-                </div>
-
-                <div id="typeModePanel" class="control-panel">
+                <div class="filter-block">
+                    <div class="filter-label">系别</div>
                     <div id="typeFilters" class="filters"></div>
                 </div>
 
-                <div id="petModePanel" class="control-panel">
-                    <div class="search-row">
-                        <input id="petSearchInput" class="search-input" type="search" placeholder="搜索精灵名称..." autocomplete="off">
-                        <button id="clearPetSearch" class="btn" type="button">清空</button>
-                    </div>
-                    <div id="petMatches" class="pet-matches"></div>
+                <div class="filter-block">
+                    <div class="filter-label">技能类型</div>
+                    <div id="categoryFilters" class="filters"></div>
                 </div>
+
+                <div class="search-grid">
+                    <label class="search-field">
+                        <div class="filter-label">精灵名称</div>
+                        <input id="petSearchInput" class="search-input" type="search" placeholder="搜索精灵名称..." autocomplete="off">
+                    </label>
+                    <label class="search-field">
+                        <div class="filter-label">技能名称</div>
+                        <input id="skillSearchInput" class="search-input" type="search" placeholder="搜索技能名称..." autocomplete="off">
+                    </label>
+                </div>
+                <div id="petMatches" class="pet-matches"></div>
             </section>
 
             <section id="skillList">
@@ -921,6 +896,7 @@
 
     <script>
         const ATTRIBUTES = ['普通', '草', '火', '水', '光', '地', '冰', '龙', '电', '毒', '虫', '武', '翼', '萌', '幽', '恶', '机械', '幻'];
+        const SKILL_CATEGORIES = ['物攻', '魔攻', '防御', '状态'];
         const ATTRIBUTE_LOGOS = Object.fromEntries(
             ATTRIBUTES.map(attr => [attr, `./web_images/types/${attr}.png`])
         );
@@ -952,8 +928,8 @@
         let skills = [];
         let skillByName = new Map();
         let filteredSkills = [];
-        let activeMode = 'skill';
         let activeType = '';
+        let activeCategory = '';
         let selectedSkillName = '';
         let matchedPets = [];
         let galleryScrollY = 0;
@@ -966,10 +942,9 @@
         const skillList = document.getElementById('skillList');
         const detailPanel = document.getElementById('detailPanel');
         const skillSearchInput = document.getElementById('skillSearchInput');
-        const clearSkillSearch = document.getElementById('clearSkillSearch');
         const petSearchInput = document.getElementById('petSearchInput');
-        const clearPetSearch = document.getElementById('clearPetSearch');
         const typeFilters = document.getElementById('typeFilters');
+        const categoryFilters = document.getElementById('categoryFilters');
         const petMatches = document.getElementById('petMatches');
         const backToTop = document.getElementById('backToTop');
 
@@ -1172,54 +1147,64 @@
             });
         }
 
-        function renderModePanels() {
-            document.querySelectorAll('.mode-tab').forEach(button => {
-                button.classList.toggle('active', button.dataset.mode === activeMode);
+        function renderCategoryFilters() {
+            categoryFilters.innerHTML = [
+                `<button class="filter-chip ${activeCategory === '' ? 'active' : ''}" type="button" data-category="">全部</button>`,
+                ...SKILL_CATEGORIES.map(category => (
+                    `<button class="filter-chip ${activeCategory === category ? 'active' : ''}" type="button" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`
+                ))
+            ].join('');
+
+            categoryFilters.querySelectorAll('.filter-chip').forEach(button => {
+                button.addEventListener('click', () => {
+                    activeCategory = button.dataset.category || '';
+                    applyFilters();
+                });
             });
-            document.getElementById('skillModePanel').classList.toggle('active', activeMode === 'skill');
-            document.getElementById('typeModePanel').classList.toggle('active', activeMode === 'type');
-            document.getElementById('petModePanel').classList.toggle('active', activeMode === 'pet');
         }
 
         function applyFilters() {
-            renderModePanels();
             matchedPets = [];
+            const petKeyword = normalize(petSearchInput.value);
+            const skillKeyword = normalize(skillSearchInput.value);
+            let candidateSkills = skills;
 
-            if (activeMode === 'skill') {
-                const keyword = normalize(skillSearchInput.value);
-                filteredSkills = skills.filter(skill => !keyword || skill.searchText.includes(keyword));
-            } else if (activeMode === 'type') {
-                filteredSkills = skills.filter(skill => !activeType || typeName(skill.type) === activeType);
-            } else {
-                const keyword = normalize(petSearchInput.value);
-                if (!keyword) {
-                    filteredSkills = [];
-                } else {
-                    matchedPets = records.filter(record => {
-                        const text = normalize([record.id, record.number, record.title, record.searchText].join(' '));
-                        return text.includes(keyword);
+            if (petKeyword) {
+                matchedPets = records.filter(record => {
+                    const text = normalize([record.id, record.number, record.title, record.searchText].join(' '));
+                    return text.includes(petKeyword);
+                });
+                const skillNames = [];
+                const seenSkillNames = new Set();
+                matchedPets.forEach(record => {
+                    (Array.isArray(record.skills) ? record.skills : []).forEach(skill => {
+                        if (skill && skill.name && !seenSkillNames.has(skill.name)) {
+                            seenSkillNames.add(skill.name);
+                            skillNames.push(skill.name);
+                        }
                     });
-                    const skillNames = [];
-                    const seenSkillNames = new Set();
-                    matchedPets.forEach(record => {
-                        (Array.isArray(record.skills) ? record.skills : []).forEach(skill => {
-                            if (skill && skill.name && !seenSkillNames.has(skill.name)) {
-                                seenSkillNames.add(skill.name);
-                                skillNames.push(skill.name);
-                            }
-                        });
-                    });
-                    filteredSkills = skillNames.map(name => skillByName.get(name)).filter(Boolean);
-                }
+                });
+                candidateSkills = skillNames.map(name => skillByName.get(name)).filter(Boolean);
             }
 
+            if (skillKeyword) {
+                candidateSkills = candidateSkills.filter(skill => normalize(skill.name).includes(skillKeyword));
+            }
+
+            filteredSkills = candidateSkills.filter(skill => {
+                const matchesType = !activeType || typeName(skill.type) === activeType;
+                const matchesCategory = !activeCategory || skill.category === activeCategory;
+                return matchesType && matchesCategory;
+            });
+
             renderTypeFilters();
+            renderCategoryFilters();
             renderPetMatches();
             renderSkillList();
         }
 
         function renderPetMatches() {
-            if (activeMode !== 'pet' || !petSearchInput.value.trim()) {
+            if (!petSearchInput.value.trim()) {
                 petMatches.innerHTML = '';
                 return;
             }
@@ -1269,12 +1254,6 @@
         }
 
         function renderSkillList() {
-            if (activeMode === 'pet' && !petSearchInput.value.trim()) {
-                resultCount.textContent = `共 ${skills.length} 个技能`;
-                skillList.innerHTML = '<div class="panel empty-state">输入精灵名称后显示它能使用的技能。</div>';
-                return;
-            }
-
             resultCount.textContent = `共 ${filteredSkills.length} / ${skills.length} 个技能`;
 
             if (!filteredSkills.length) {
@@ -1282,7 +1261,7 @@
                 return;
             }
 
-            if (activeMode === 'pet') {
+            if (petSearchInput.value.trim()) {
                 skillList.innerHTML = `
                     <section class="panel skill-section">
                         <div class="section-head">
@@ -1593,25 +1572,8 @@
             }
         }
 
-        document.querySelectorAll('.mode-tab').forEach(button => {
-            button.addEventListener('click', () => {
-                activeMode = button.dataset.mode || 'skill';
-                applyFilters();
-            });
-        });
-
         skillSearchInput.addEventListener('input', applyFilters);
         petSearchInput.addEventListener('input', applyFilters);
-        clearSkillSearch.addEventListener('click', () => {
-            skillSearchInput.value = '';
-            applyFilters();
-            skillSearchInput.focus();
-        });
-        clearPetSearch.addEventListener('click', () => {
-            petSearchInput.value = '';
-            applyFilters();
-            petSearchInput.focus();
-        });
         backToGallery.addEventListener('click', () => showGallery(true, true));
         window.addEventListener('hashchange', () => {
             const name = hashSkillName();
