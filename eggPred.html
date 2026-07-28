@@ -670,11 +670,6 @@
         const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
         const EPSILON = 1e-9;
         const SOFTMAX_TEMPERATURE = 0.1;
-        const DEFAULT_SCORE_WEIGHTS = {
-            center: 5,
-            diagonal: 71,
-            compactness: 24
-        };
 
         let records = [];
         let families = [];
@@ -687,8 +682,6 @@
         const dataStatus = document.getElementById('dataStatus');
         const resultSummary = document.getElementById('resultSummary');
         const resultList = document.getElementById('resultList');
-        const weightSummary = document.getElementById('weightSummary');
-        const weightControls = [...document.querySelectorAll('[data-weight-key]')];
 
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -711,64 +704,6 @@
 
         function rangeText(minValue, maxValue, unit) {
             return `${escapeHtml(minValue)} - ${escapeHtml(maxValue)} ${unit}`;
-        }
-
-        function weightControlValue(key) {
-            const input = document.querySelector(`.weight-input[data-weight-key="${key}"]`);
-            const value = numeric(input ? input.value : DEFAULT_SCORE_WEIGHTS[key]);
-            return Math.max(0, value === null ? DEFAULT_SCORE_WEIGHTS[key] : value);
-        }
-
-        function getRawScoreWeights() {
-            return {
-                center: weightControlValue('center'),
-                diagonal: weightControlValue('diagonal'),
-                compactness: weightControlValue('compactness')
-            };
-        }
-
-        function getNormalizedScoreWeights() {
-            const raw = getRawScoreWeights();
-            const total = raw.center + raw.diagonal + raw.compactness;
-            if (total <= 0) {
-                return {
-                    center: DEFAULT_SCORE_WEIGHTS.center / 100,
-                    diagonal: DEFAULT_SCORE_WEIGHTS.diagonal / 100,
-                    compactness: DEFAULT_SCORE_WEIGHTS.compactness / 100
-                };
-            }
-            return {
-                center: raw.center / total,
-                diagonal: raw.diagonal / total,
-                compactness: raw.compactness / total
-            };
-        }
-
-        function syncWeightSummary() {
-            const raw = getRawScoreWeights();
-            const total = raw.center + raw.diagonal + raw.compactness;
-            const suffix = total <= 0 ? '，已使用默认权重' : '';
-            weightSummary.textContent = `中心 ${raw.center} / 对角线 ${raw.diagonal} / 区间 ${raw.compactness}${suffix}`;
-        }
-
-        function hasValidEggInput() {
-            const height = numeric(heightInput.value);
-            const weight = numeric(weightInput.value);
-            return height !== null && weight !== null && height > 0 && weight > 0;
-        }
-
-        function syncWeightControl(changedControl) {
-            const key = changedControl.dataset.weightKey;
-            const value = Math.max(0, Math.min(100, numeric(changedControl.value) ?? DEFAULT_SCORE_WEIGHTS[key]));
-            weightControls
-                .filter(control => control.dataset.weightKey === key)
-                .forEach(control => {
-                    control.value = String(value);
-                });
-            syncWeightSummary();
-            if (hasValidEggInput()) {
-                predict();
-            }
         }
 
         function firstAttribute(record) {
@@ -884,7 +819,7 @@
             return Math.max(a, b, EPSILON);
         }
 
-        function scoreFamily(family, height, weight, weights) {
+        function scoreFamily(family, height, weight) {
             if (
                 height < family.heightMin || height > family.heightMax ||
                 weight < family.weightMin || weight > family.weightMax
@@ -913,9 +848,9 @@
             const diagonalScore = Math.exp(-1.6 * normalizedDiagonalDistance * normalizedDiagonalDistance);
 
             const compactnessScore = clamp(Math.pow(medianArea / Math.max(family.area, EPSILON), 0.35), 0.55, 2.15);
-            const rawScore = Math.pow(centerScore, weights.center) *
-                Math.pow(diagonalScore, weights.diagonal) *
-                Math.pow(compactnessScore, weights.compactness);
+            const rawScore = Math.pow(centerScore, 0.1) *
+                Math.pow(diagonalScore, 0.74) *
+                Math.pow(compactnessScore, 0.16);
 
             return {
                 ...family,
@@ -936,9 +871,8 @@
                 return;
             }
 
-            const weights = getNormalizedScoreWeights();
             const matches = families
-                .map(family => scoreFamily(family, height, weight, weights))
+                .map(family => scoreFamily(family, height, weight))
                 .filter(Boolean);
 
             if (!matches.length) {
@@ -1039,9 +973,6 @@
 
         predictButton.addEventListener('click', predict);
         clearButton.addEventListener('click', clearForm);
-        weightControls.forEach(control => {
-            control.addEventListener('input', () => syncWeightControl(control));
-        });
         [heightInput, weightInput].forEach(input => {
             input.addEventListener('keydown', event => {
                 if (event.key === 'Enter') {
@@ -1050,7 +981,6 @@
             });
         });
 
-        syncWeightSummary();
         loadHandbook();
     </script>
     <script>
