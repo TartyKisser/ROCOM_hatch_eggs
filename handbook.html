@@ -581,6 +581,43 @@
             gap: 18px;
         }
 
+        .distribution-egg-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .distribution-egg-grid .section {
+            min-width: 0;
+        }
+
+        .egg-size-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .egg-size-item {
+            padding: 12px;
+            border: 1px solid rgba(226,232,240,0.86);
+            border-radius: 13px;
+            background: rgba(255,255,255,0.72);
+        }
+
+        .egg-size-label {
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 900;
+        }
+
+        .egg-size-value {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 950;
+        }
+
         .fruit-card {
             display: grid;
             grid-template-columns: 118px minmax(0, 1fr);
@@ -1033,6 +1070,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .distribution-egg-grid {
+                grid-template-columns: 1fr;
+            }
+
             .detail-hero {
                 min-height: auto;
                 padding: 20px;
@@ -1317,6 +1358,34 @@
 
         function displayValue(value) {
             return value === undefined || value === null || value === '' ? '暂无' : value;
+        }
+
+        function formatEggSizeRange(minValue, maxValue, unit) {
+            const hasMin = minValue !== undefined && minValue !== null && minValue !== '';
+            const hasMax = maxValue !== undefined && maxValue !== null && maxValue !== '';
+            if (!hasMin && !hasMax) return '暂无';
+            if (hasMin && hasMax) return `${escapeHtml(minValue)} - ${escapeHtml(maxValue)} ${unit}`;
+            return `${escapeHtml(hasMin ? minValue : maxValue)} ${unit}`;
+        }
+
+        function renderEggSize(record) {
+            const eggSize = record.eggSize;
+            if (!eggSize) {
+                return '<p class="ability-desc">暂无精灵蛋尺寸资料。</p>';
+            }
+
+            return `
+                <div class="egg-size-grid">
+                    <div class="egg-size-item">
+                        <div class="egg-size-label">蛋身高</div>
+                        <div class="egg-size-value">${formatEggSizeRange(eggSize.heightMin, eggSize.heightMax, 'm')}</div>
+                    </div>
+                    <div class="egg-size-item">
+                        <div class="egg-size-label">蛋体重</div>
+                        <div class="egg-size-value">${formatEggSizeRange(eggSize.weightMin, eggSize.weightMax, 'kg')}</div>
+                    </div>
+                </div>
+            `;
         }
 
         function renderImageValueChip(key, label, value) {
@@ -1698,9 +1767,16 @@
                         </div>
                     </div>
 
-                    <div class="section">
-                        <h3 class="section-title">分布</h3>
-                        <p class="ability-desc">${escapeHtml(record.distribution || '暂无分布资料。')}</p>
+                    <div class="distribution-egg-grid">
+                        <div class="section">
+                            <h3 class="section-title">分布</h3>
+                            <p class="ability-desc">${escapeHtml(record.distribution || '暂无分布资料。')}</p>
+                        </div>
+
+                        <div class="section">
+                            <h3 class="section-title">精灵蛋尺寸</h3>
+                            ${renderEggSize(record)}
+                        </div>
                     </div>
 
                     <div class="section">
