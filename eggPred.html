@@ -737,8 +737,8 @@
             const diagonalScore = Math.exp(-1.6 * normalizedDiagonalDistance * normalizedDiagonalDistance);
 
             const compactnessScore = clamp(Math.pow(medianArea / Math.max(family.area, EPSILON), 0.35), 0.55, 2.15);
-            const rawScore = Math.pow(centerScore, 0.1) *
-                Math.pow(diagonalScore, 0.66) *
+            const rawScore = Math.pow(centerScore, 0) *
+                Math.pow(diagonalScore, 0.76) *
                 Math.pow(compactnessScore, 0.24);
 
             return {
