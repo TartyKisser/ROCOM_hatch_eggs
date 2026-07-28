@@ -185,6 +185,77 @@
             background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
+        .weight-panel {
+            margin-top: 14px;
+            padding: 14px;
+            border: 1px solid rgba(226,232,240,0.9);
+            border-radius: 14px;
+            background: rgba(248,250,252,0.78);
+        }
+
+        .weight-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .weight-title {
+            color: var(--primary-dark);
+            font-size: 0.98rem;
+            font-weight: 950;
+        }
+
+        .weight-summary {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-align: right;
+            line-height: 1.45;
+        }
+
+        .weight-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .weight-control {
+            display: grid;
+            grid-template-columns: minmax(72px, 96px) minmax(0, 1fr) 72px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .weight-label {
+            color: var(--text);
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .weight-slider {
+            width: 100%;
+            accent-color: var(--primary);
+        }
+
+        .weight-input {
+            width: 72px;
+            min-height: 34px;
+            padding: 6px 8px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.94);
+            color: var(--text);
+            font-size: 0.9rem;
+            font-weight: 850;
+            outline: none;
+        }
+
+        .weight-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
         .note-panel {
             margin-top: 14px;
             padding: 14px;
@@ -446,12 +517,28 @@
             .score-details {
                 grid-template-columns: 1fr;
             }
+
+            .weight-head {
+                flex-direction: column;
+            }
+
+            .weight-summary {
+                text-align: left;
+            }
         }
 
         @media (max-width: 520px) {
             .action-row,
             .result-card {
                 grid-template-columns: 1fr;
+            }
+
+            .weight-control {
+                grid-template-columns: 1fr 72px;
+            }
+
+            .weight-label {
+                grid-column: 1 / -1;
             }
 
             .sprite-image-wrap {
@@ -495,6 +582,30 @@
                 <div class="action-row">
                     <button id="predictButton" class="btn primary-btn" type="button">查询</button>
                     <button id="clearButton" class="btn" type="button">清空</button>
+                </div>
+
+                <div class="weight-panel">
+                    <div class="weight-head">
+                        <div class="weight-title">评分权重</div>
+                        <div id="weightSummary" class="weight-summary">中心 5 / 对角线 71 / 区间 24</div>
+                    </div>
+                    <div class="weight-grid">
+                        <label class="weight-control">
+                            <span class="weight-label">中心贴近</span>
+                            <input class="weight-slider" type="range" min="0" max="100" step="1" value="5" data-weight-key="center">
+                            <input class="weight-input" type="number" min="0" max="100" step="1" value="5" inputmode="numeric" data-weight-key="center">
+                        </label>
+                        <label class="weight-control">
+                            <span class="weight-label">对角线贴近</span>
+                            <input class="weight-slider" type="range" min="0" max="100" step="1" value="71" data-weight-key="diagonal">
+                            <input class="weight-input" type="number" min="0" max="100" step="1" value="71" inputmode="numeric" data-weight-key="diagonal">
+                        </label>
+                        <label class="weight-control">
+                            <span class="weight-label">区间精确</span>
+                            <input class="weight-slider" type="range" min="0" max="100" step="1" value="24" data-weight-key="compactness">
+                            <input class="weight-input" type="number" min="0" max="100" step="1" value="24" inputmode="numeric" data-weight-key="compactness">
+                        </label>
+                    </div>
                 </div>
 
                 <div class="note-panel">
@@ -559,6 +670,11 @@
         const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
         const EPSILON = 1e-9;
         const SOFTMAX_TEMPERATURE = 0.1;
+        const DEFAULT_SCORE_WEIGHTS = {
+            center: 5,
+            diagonal: 71,
+            compactness: 24
+        };
 
         let records = [];
         let families = [];
@@ -571,6 +687,8 @@
         const dataStatus = document.getElementById('dataStatus');
         const resultSummary = document.getElementById('resultSummary');
         const resultList = document.getElementById('resultList');
+        const weightSummary = document.getElementById('weightSummary');
+        const weightControls = [...document.querySelectorAll('[data-weight-key]')];
 
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -593,6 +711,64 @@
 
         function rangeText(minValue, maxValue, unit) {
             return `${escapeHtml(minValue)} - ${escapeHtml(maxValue)} ${unit}`;
+        }
+
+        function weightControlValue(key) {
+            const input = document.querySelector(`.weight-input[data-weight-key="${key}"]`);
+            const value = numeric(input ? input.value : DEFAULT_SCORE_WEIGHTS[key]);
+            return Math.max(0, value === null ? DEFAULT_SCORE_WEIGHTS[key] : value);
+        }
+
+        function getRawScoreWeights() {
+            return {
+                center: weightControlValue('center'),
+                diagonal: weightControlValue('diagonal'),
+                compactness: weightControlValue('compactness')
+            };
+        }
+
+        function getNormalizedScoreWeights() {
+            const raw = getRawScoreWeights();
+            const total = raw.center + raw.diagonal + raw.compactness;
+            if (total <= 0) {
+                return {
+                    center: DEFAULT_SCORE_WEIGHTS.center / 100,
+                    diagonal: DEFAULT_SCORE_WEIGHTS.diagonal / 100,
+                    compactness: DEFAULT_SCORE_WEIGHTS.compactness / 100
+                };
+            }
+            return {
+                center: raw.center / total,
+                diagonal: raw.diagonal / total,
+                compactness: raw.compactness / total
+            };
+        }
+
+        function syncWeightSummary() {
+            const raw = getRawScoreWeights();
+            const total = raw.center + raw.diagonal + raw.compactness;
+            const suffix = total <= 0 ? '，已使用默认权重' : '';
+            weightSummary.textContent = `中心 ${raw.center} / 对角线 ${raw.diagonal} / 区间 ${raw.compactness}${suffix}`;
+        }
+
+        function hasValidEggInput() {
+            const height = numeric(heightInput.value);
+            const weight = numeric(weightInput.value);
+            return height !== null && weight !== null && height > 0 && weight > 0;
+        }
+
+        function syncWeightControl(changedControl) {
+            const key = changedControl.dataset.weightKey;
+            const value = Math.max(0, Math.min(100, numeric(changedControl.value) ?? DEFAULT_SCORE_WEIGHTS[key]));
+            weightControls
+                .filter(control => control.dataset.weightKey === key)
+                .forEach(control => {
+                    control.value = String(value);
+                });
+            syncWeightSummary();
+            if (hasValidEggInput()) {
+                predict();
+            }
         }
 
         function firstAttribute(record) {
@@ -708,7 +884,7 @@
             return Math.max(a, b, EPSILON);
         }
 
-        function scoreFamily(family, height, weight) {
+        function scoreFamily(family, height, weight, weights) {
             if (
                 height < family.heightMin || height > family.heightMax ||
                 weight < family.weightMin || weight > family.weightMax
@@ -737,9 +913,9 @@
             const diagonalScore = Math.exp(-1.6 * normalizedDiagonalDistance * normalizedDiagonalDistance);
 
             const compactnessScore = clamp(Math.pow(medianArea / Math.max(family.area, EPSILON), 0.35), 0.55, 2.15);
-            const rawScore = Math.pow(centerScore, 0.05) *
-                Math.pow(diagonalScore, 0.71) *
-                Math.pow(compactnessScore, 0.24);
+            const rawScore = Math.pow(centerScore, weights.center) *
+                Math.pow(diagonalScore, weights.diagonal) *
+                Math.pow(compactnessScore, weights.compactness);
 
             return {
                 ...family,
@@ -760,8 +936,9 @@
                 return;
             }
 
+            const weights = getNormalizedScoreWeights();
             const matches = families
-                .map(family => scoreFamily(family, height, weight))
+                .map(family => scoreFamily(family, height, weight, weights))
                 .filter(Boolean);
 
             if (!matches.length) {
@@ -862,6 +1039,9 @@
 
         predictButton.addEventListener('click', predict);
         clearButton.addEventListener('click', clearForm);
+        weightControls.forEach(control => {
+            control.addEventListener('input', () => syncWeightControl(control));
+        });
         [heightInput, weightInput].forEach(input => {
             input.addEventListener('keydown', event => {
                 if (event.key === 'Enter') {
@@ -870,6 +1050,7 @@
             });
         });
 
+        syncWeightSummary();
         loadHandbook();
     </script>
     <script>
