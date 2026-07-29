@@ -633,6 +633,7 @@
         const HOME_PROXY_URL = './home_proxy.php';
 
         let homeData = null;
+        let homeOnline = null;
         let handbookRecords = [];
         let recordByName = new Map();
         let queryLoading = false;
@@ -711,7 +712,13 @@
                 body: JSON.stringify(payload),
             });
 
-            const data = await response.json().catch(() => ({}));
+            const text = await response.text();
+            let data = {};
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (error) {
+                throw new Error('代理没有返回 JSON，请确认服务器已启用 PHP，并且 home_proxy.php 没有被当作静态文件返回。');
+            }
             if (!response.ok) {
                 throw new Error(data.detail || `代理返回 HTTP ${response.status}`);
             }
@@ -765,10 +772,12 @@
                     postHomeApi('online-status', { uid: Number(uid) }).catch(() => null),
                 ]);
                 homeData = data;
+                homeOnline = online;
                 renderHome(online);
                 localStorage.setItem('rocom_home_last_uid', uid);
             } catch (error) {
                 homeData = null;
+                homeOnline = null;
                 renderHome(null);
                 setError(error.message || '家园查询失败。');
                 dataStatus.textContent = '查询失败';
@@ -883,10 +892,10 @@
         function mutationBadge(pet) {
             const mutation = String(pet.mutation || '');
             if (mutation === '异色炫彩') {
-                return '<img class="mutation-badge" src="./web_images/rareshine.png" alt="异色炫彩" title="异色炫彩" onerror="this.style.display=\\'none\\'">';
+                return `<img class="mutation-badge" src="./web_images/rareshine.png" alt="异色炫彩" title="异色炫彩" onerror="this.style.display='none'">`;
             }
             if (mutation === '异色') {
-                return '<img class="mutation-badge" src="./web_images/rare.png" alt="异色" title="异色" onerror="this.style.display=\\'none\\'">';
+                return `<img class="mutation-badge" src="./web_images/rare.png" alt="异色" title="异色" onerror="this.style.display='none'">`;
             }
             return '';
         }
@@ -987,6 +996,7 @@
         clearButton.addEventListener('click', () => {
             uidInput.value = '';
             homeData = null;
+            homeOnline = null;
             dataStatus.textContent = '等待查询';
             setError('');
             renderHome(null);
@@ -995,11 +1005,14 @@
 
         async function init() {
             setLoading();
-            await loadHandbookIndex();
             const params = new URLSearchParams(location.search);
-            const uid = normalizeUid(params.get('uid')) || normalizeUid(localStorage.getItem('rocom_home_last_uid'));
+            const urlUid = normalizeUid(params.get('uid'));
+            const uid = urlUid || normalizeUid(localStorage.getItem('rocom_home_last_uid'));
             if (uid) uidInput.value = uid;
-            if (normalizeUid(params.get('uid'))) queryHome(false, normalizeUid(params.get('uid')));
+            if (urlUid) queryHome(false, urlUid);
+            loadHandbookIndex().then(() => {
+                if (homeData) renderHome(homeOnline);
+            });
         }
 
         init();

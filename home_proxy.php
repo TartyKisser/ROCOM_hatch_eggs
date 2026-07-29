@@ -78,30 +78,8 @@ $upstreamPayload = json_encode([
     'refresh' => $refresh,
 ], JSON_UNESCAPED_UNICODE);
 
-$context = stream_context_create([
-    'http' => [
-        'method' => 'POST',
-        'timeout' => 8,
-        'ignore_errors' => true,
-        'header' => implode("\r\n", [
-            'User-Agent: Mozilla/5.0 (ROCOM Tools Home PHP Proxy)',
-            'Accept: application/json',
-            'Accept-Language: zh-CN,zh;q=0.9',
-            'Content-Type: application/json',
-            'Origin: ' . UPSTREAM_ORIGIN,
-            'Referer: ' . UPSTREAM_ORIGIN . '/home',
-        ]),
-        'content' => $upstreamPayload,
-    ],
-    'ssl' => [
-        'verify_peer' => true,
-        'verify_peer_name' => true,
-    ],
-]);
-
 $url = UPSTREAM_ORIGIN . $endpoint['path'];
-$responseBody = @file_get_contents($url, false, $context);
-$statusCode = upstream_status_code($http_response_header ?? []);
+[$responseBody, $statusCode] = request_upstream($url, $upstreamPayload);
 
 if ($responseBody === false || trim($responseBody) === '') {
     http_response_code(502);
@@ -123,6 +101,54 @@ if (!$refresh && $statusCode >= 200 && $statusCode < 300) {
 }
 
 echo $responseBody;
+
+function request_upstream(string $url, string $payload): array
+{
+    $headers = [
+        'User-Agent: Mozilla/5.0 (ROCOM Tools Home PHP Proxy)',
+        'Accept: application/json',
+        'Accept-Language: zh-CN,zh;q=0.9',
+        'Content-Type: application/json',
+        'Origin: ' . UPSTREAM_ORIGIN,
+        'Referer: ' . UPSTREAM_ORIGIN . '/home',
+    ];
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 8,
+            CURLOPT_CONNECTTIMEOUT => 4,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
+        $body = curl_exec($ch);
+        $statusCode = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+        curl_close($ch);
+
+        return [$body === false ? false : $body, $statusCode ?: 200];
+    }
+
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'timeout' => 8,
+            'ignore_errors' => true,
+            'header' => implode("\r\n", $headers),
+            'content' => $payload,
+        ],
+        'ssl' => [
+            'verify_peer' => true,
+            'verify_peer_name' => true,
+        ],
+    ]);
+
+    $body = @file_get_contents($url, false, $context);
+    return [$body, upstream_status_code($http_response_header ?? [])];
+}
 
 function normalize_uid($value): ?int
 {
