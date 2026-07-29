@@ -247,7 +247,7 @@
             display: none;
             grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.85fr);
             gap: 18px;
-            align-items: start;
+            align-items: stretch;
         }
 
         .content-grid.active {
@@ -258,13 +258,35 @@
             padding: 18px;
         }
 
+        .resident-section {
+            display: flex;
+            min-height: 0;
+            flex-direction: column;
+        }
+
+        .resident-section #residentsContent {
+            flex: 1;
+            min-height: 0;
+        }
+
         .section + .section {
             margin-top: 18px;
         }
 
         .side-column {
             display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
             gap: 18px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .side-column .section {
+            min-height: 0;
+        }
+
+        .side-column .section + .section {
+            margin-top: 0;
         }
 
         .section-title {
@@ -525,6 +547,16 @@
 
             .content-grid {
                 grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .resident-section {
+                display: block;
+            }
+
+            .side-column {
+                grid-template-rows: auto;
+                height: auto;
             }
         }
 
@@ -602,7 +634,7 @@
         <section id="statsGrid" class="stats-grid"></section>
 
         <main id="contentGrid" class="content-grid">
-            <section class="panel section">
+            <section class="panel section resident-section">
                 <h2 id="residentsTitle" class="section-title">居住精灵</h2>
                 <div id="residentsContent"></div>
             </section>
