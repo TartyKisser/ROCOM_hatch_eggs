@@ -297,8 +297,8 @@
 
         .pet-card {
             display: grid;
-            grid-template-columns: 82px minmax(0, 1fr);
-            gap: 12px;
+            grid-template-columns: 68px minmax(0, 1fr);
+            gap: 10px;
             padding: 12px;
             border: 1px solid rgba(226,232,240,0.9);
             border-radius: 16px;
@@ -308,8 +308,9 @@
         }
 
         .pet-image-wrap {
-            width: 82px;
-            height: 82px;
+            position: relative;
+            width: 68px;
+            height: 68px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -319,17 +320,61 @@
         }
 
         .pet-image {
-            width: 76px;
-            height: 76px;
+            width: 62px;
+            height: 62px;
             object-fit: contain;
             filter: drop-shadow(0 8px 12px rgba(15,23,42,0.14));
         }
 
+        .mutation-badge {
+            position: absolute;
+            top: -7px;
+            left: -7px;
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 8px rgba(15,23,42,0.22));
+            pointer-events: none;
+        }
+
+        .pet-name-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
         .pet-name {
+            min-width: 0;
             color: var(--text);
             font-size: 1rem;
             line-height: 1.35;
             font-weight: 950;
+        }
+
+        .pet-mini-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            flex: 0 0 auto;
+            color: var(--primary-dark);
+            font-size: 0.78rem;
+            font-weight: 950;
+        }
+
+        .gender-symbol {
+            font-size: 1rem;
+            line-height: 1;
+            font-weight: 950;
+        }
+
+        .gender-male {
+            color: #2563eb;
+        }
+
+        .gender-female {
+            color: #db2777;
         }
 
         .pet-sub {
@@ -365,7 +410,27 @@
             object-fit: contain;
         }
 
-        .egg-chip {
+        .type-logo-chip {
+            width: 22px;
+            height: 22px;
+            min-height: 22px;
+            padding: 2px;
+            justify-content: center;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid rgba(226,232,240,0.86);
+        }
+
+        .type-logo-chip img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .egg-group-chip {
+            color: #1d4ed8;
+            background: rgba(37,99,235,0.1);
+        }
+
+        .alert-chip {
             color: #be185d;
             background: rgba(236,72,153,0.1);
         }
@@ -418,6 +483,11 @@
             color: var(--text-secondary);
             font-size: 0.75rem;
             font-weight: 850;
+        }
+
+        .plant-status.ripe-text {
+            color: #dc2626;
+            font-weight: 950;
         }
 
         .empty-state {
@@ -563,6 +633,8 @@
         const HOME_PROXY_URL = './home_proxy.php';
 
         let homeData = null;
+        let handbookRecords = [];
+        let recordByName = new Map();
         let queryLoading = false;
 
         const uidInput = document.getElementById('uidInput');
@@ -605,6 +677,14 @@
             return `${UPSTREAM_ORIGIN}${path.startsWith('/') ? '' : '/'}${path}`;
         }
 
+        function localAssetUrl(path) {
+            return String(path || '').replace(/^\.\//, '');
+        }
+
+        function normalizeName(value) {
+            return String(value || '').replace(/\s+/g, '').toLowerCase();
+        }
+
         function displayValue(value) {
             return value === undefined || value === null || value === '' ? '-' : value;
         }
@@ -636,6 +716,25 @@
                 throw new Error(data.detail || `代理返回 HTTP ${response.status}`);
             }
             return data;
+        }
+
+        async function loadHandbookIndex() {
+            try {
+                const response = await fetch('handbook_data.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                handbookRecords = Array.isArray(data.records) ? data.records : [];
+                recordByName = new Map();
+                handbookRecords.forEach(record => {
+                    if (!record || !record.title) return;
+                    recordByName.set(record.title, record);
+                    recordByName.set(normalizeName(record.title), record);
+                });
+            } catch (error) {
+                console.warn('handbook_data.json 加载失败，家园精灵图片将使用接口图片。', error);
+                handbookRecords = [];
+                recordByName = new Map();
+            }
         }
 
         function setError(message) {
@@ -731,45 +830,122 @@
             guardsTitle.textContent = `家园守卫 ${(homeData.guards || []).length}`;
             plantsTitle.textContent = `农场 ${(homeData.plants || []).length}`;
             residentsContent.innerHTML = renderPets(homeData.residents || []);
-            guardsContent.innerHTML = renderPets(homeData.guards || []);
+            guardsContent.innerHTML = renderPets(homeData.guards || [], { compact: true, hideSub: true });
             plantsContent.innerHTML = renderPlants(homeData.plants || []);
         }
 
-        function renderPets(pets) {
+        function renderPets(pets, options = {}) {
             if (!pets.length) return '<div class="empty-state">暂无资料。</div>';
-            return `<div class="pet-grid">${pets.map(renderPetCard).join('')}</div>`;
+            return `<div class="pet-grid">${pets.map(pet => renderPetCard(pet, options)).join('')}</div>`;
         }
 
-        function renderPetCard(pet) {
+        function petRecord(pet) {
+            const names = [pet.name, pet.defaultName, pet.speciesName].filter(Boolean);
+            for (const name of names) {
+                const exact = recordByName.get(name);
+                if (exact) return exact;
+                const normalized = recordByName.get(normalizeName(name));
+                if (normalized) return normalized;
+            }
+            return null;
+        }
+
+        function isRarePet(pet) {
+            return String(pet.mutation || '').includes('异色');
+        }
+
+        function petImagePath(pet) {
+            const record = petRecord(pet);
+            if (record) {
+                if (isRarePet(pet)) {
+                    return localAssetUrl(record.rarePath || inferRarePath(record.portrait) || record.portrait);
+                }
+                return localAssetUrl(record.portrait || record.icon);
+            }
+            return fullAssetUrl(pet.image);
+        }
+
+        function inferRarePath(path) {
+            return path ? String(path).replace(/-portrait\.png$/, '异色-portrait.png') : '';
+        }
+
+        function genderSymbol(gender) {
+            const value = String(gender || '');
+            if (value.includes('雄') || value.toLowerCase().includes('male')) {
+                return '<span class="gender-symbol gender-male" title="雄性">♂</span>';
+            }
+            if (value.includes('雌') || value.toLowerCase().includes('female')) {
+                return '<span class="gender-symbol gender-female" title="雌性">♀</span>';
+            }
+            return '';
+        }
+
+        function mutationBadge(pet) {
+            const mutation = String(pet.mutation || '');
+            if (mutation === '异色炫彩') {
+                return '<img class="mutation-badge" src="./web_images/rareshine.png" alt="异色炫彩" title="异色炫彩" onerror="this.style.display=\\'none\\'">';
+            }
+            if (mutation === '异色') {
+                return '<img class="mutation-badge" src="./web_images/rare.png" alt="异色" title="异色" onerror="this.style.display=\\'none\\'">';
+            }
+            return '';
+        }
+
+        function typeLogoPath(name) {
+            return `./web_images/types/${encodeURIComponent(name)}.png`;
+        }
+
+        function feedStatusText(status) {
+            return status === '可收集' ? '可收集灵感' : status;
+        }
+
+        function renderPetCard(pet, options = {}) {
             const title = pet.nickname && pet.nickname !== pet.defaultName
                 ? `${pet.defaultName || pet.name}（${pet.nickname}）`
                 : pet.name || pet.defaultName || '-';
             const attrs = Array.isArray(pet.attrs) ? pet.attrs : [];
             const eggGroups = Array.isArray(pet.eggGroups) ? pet.eggGroups : [];
-            const sub = [pet.level ? `Lv.${pet.level}` : '', pet.gender, pet.feedStatus].filter(Boolean).join(' · ');
+            const normalStatus = pet.feedStatus && pet.feedStatus !== '可收集' ? feedStatusText(pet.feedStatus) : '';
+            const sub = options.hideSub ? '' : [normalStatus].filter(Boolean).join(' · ');
 
             return `
                 <article class="pet-card">
                     <div class="pet-image-wrap">
-                        <img class="pet-image" src="${escapeHtml(fullAssetUrl(pet.image))}" alt="${escapeHtml(title)}" loading="lazy" onerror="this.style.display='none'">
+                        ${mutationBadge(pet)}
+                        <img class="pet-image" src="${escapeHtml(petImagePath(pet))}" data-fallback="${escapeHtml(fullAssetUrl(pet.image))}" alt="${escapeHtml(title)}" loading="lazy" onerror="useImageFallback(this)">
                     </div>
                     <div>
-                        <div class="pet-name">${escapeHtml(title)}</div>
-                        <div class="pet-sub">${escapeHtml(sub || '-')}</div>
+                        <div class="pet-name-row">
+                            <div class="pet-name">${escapeHtml(title)}</div>
+                            <div class="pet-mini-meta">
+                                ${pet.level ? `<span>Lv.${escapeHtml(pet.level)}</span>` : ''}
+                                ${genderSymbol(pet.gender)}
+                            </div>
+                        </div>
+                        ${sub ? `<div class="pet-sub">${escapeHtml(sub)}</div>` : ''}
                         <div class="chips">
                             ${attrs.map(attr => `
-                                <span class="chip">
-                                    ${attr.icon ? `<img src="${escapeHtml(fullAssetUrl(attr.icon))}" alt="" onerror="this.style.display='none'">` : ''}
-                                    ${escapeHtml(attr.name)}
+                                <span class="chip type-logo-chip" title="${escapeHtml(attr.name)}">
+                                    <img src="${escapeHtml(typeLogoPath(attr.name))}" alt="${escapeHtml(attr.name)}" onerror="this.style.display='none'">
                                 </span>
                             `).join('')}
-                            ${eggGroups.map(group => `<span class="chip">${escapeHtml(group)}</span>`).join('')}
-                            ${pet.mutation ? `<span class="chip egg-chip">${escapeHtml(pet.mutation)}</span>` : ''}
-                            ${pet.hasEgg ? '<span class="chip egg-chip">可收取蛋</span>' : ''}
+                            ${eggGroups.map(group => `<span class="chip egg-group-chip">${escapeHtml(group)}</span>`).join('')}
+                            ${pet.feedStatus === '可收集' ? '<span class="chip alert-chip">可收集灵感</span>' : ''}
+                            ${pet.hasEgg ? '<span class="chip alert-chip">可收取蛋</span>' : ''}
                         </div>
                     </div>
                 </article>
             `;
+        }
+
+        function useImageFallback(image) {
+            const fallback = image.dataset.fallback;
+            if (fallback && image.src !== fallback) {
+                image.src = fallback;
+                image.dataset.fallback = '';
+                return;
+            }
+            image.style.display = 'none';
         }
 
         function renderPlants(plants) {
@@ -783,14 +959,20 @@
                         const remaining = plant.ripeAt ? Math.ceil(Number(plant.ripeAt) - Date.now() / 1000) : plant.remainingSeconds;
                         return `
                             <article class="plant-card ${ripe ? 'ripe' : ''}">
-                                ${plant.image ? `<img class="plant-image" src="${escapeHtml(fullAssetUrl(plant.image))}" alt="${escapeHtml(plant.name)}" loading="lazy" onerror="this.style.display='none'">` : '<div class="plant-image"></div>'}
+                                ${plant.seedId ? `<img class="plant-image" src="${escapeHtml(farmImagePath(plant))}" data-fallback="${escapeHtml(fullAssetUrl(plant.image))}" alt="${escapeHtml(plant.name)}" loading="lazy" onerror="useImageFallback(this)">` : '<div class="plant-image"></div>'}
                                 <div class="plant-name">${escapeHtml(plant.name || '空地')}</div>
-                                <div class="plant-status">${escapeHtml(plant.seedId ? (ripe ? '可收获' : secondsToText(remaining)) : `地块 ${plant.plot}`)}</div>
+                                <div class="plant-status ${ripe ? 'ripe-text' : ''}">${escapeHtml(plant.seedId ? (ripe ? '可收获' : secondsToText(remaining)) : `地块 ${plant.plot}`)}</div>
                             </article>
                         `;
                     }).join('')}
                 </div>
             `;
+        }
+
+        function farmImagePath(plant) {
+            return plant && plant.name
+                ? `./web_images/farm/${encodeURIComponent(plant.name)}.png`
+                : '';
         }
 
         searchForm.addEventListener('submit', event => {
@@ -811,8 +993,9 @@
             uidInput.focus();
         });
 
-        function init() {
+        async function init() {
             setLoading();
+            await loadHandbookIndex();
             const params = new URLSearchParams(location.search);
             const uid = normalizeUid(params.get('uid')) || normalizeUid(localStorage.getItem('rocom_home_last_uid'));
             if (uid) uidInput.value = uid;
