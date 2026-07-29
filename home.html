@@ -636,6 +636,7 @@
         let homeOnline = null;
         let handbookRecords = [];
         let recordByName = new Map();
+        let recordByBaseName = new Map();
         let queryLoading = false;
 
         const uidInput = document.getElementById('uidInput');
@@ -686,6 +687,10 @@
             return String(value || '').replace(/\s+/g, '').toLowerCase();
         }
 
+        function basePetName(value) {
+            return String(value || '').replace(/（[^）]*）/g, '').replace(/\([^)]*\)/g, '').trim();
+        }
+
         function displayValue(value) {
             return value === undefined || value === null || value === '' ? '-' : value;
         }
@@ -732,15 +737,22 @@
                 const data = await response.json();
                 handbookRecords = Array.isArray(data.records) ? data.records : [];
                 recordByName = new Map();
+                recordByBaseName = new Map();
                 handbookRecords.forEach(record => {
                     if (!record || !record.title) return;
                     recordByName.set(record.title, record);
                     recordByName.set(normalizeName(record.title), record);
+                    const baseName = basePetName(record.title);
+                    if (baseName && !recordByBaseName.has(baseName)) {
+                        recordByBaseName.set(baseName, record);
+                        recordByBaseName.set(normalizeName(baseName), record);
+                    }
                 });
             } catch (error) {
                 console.warn('handbook_data.json 加载失败，家园精灵图片将使用接口图片。', error);
                 handbookRecords = [];
                 recordByName = new Map();
+                recordByBaseName = new Map();
             }
         }
 
@@ -838,7 +850,7 @@
             residentsTitle.textContent = `居住精灵 ${(homeData.residents || []).length}`;
             guardsTitle.textContent = `家园守卫 ${(homeData.guards || []).length}`;
             plantsTitle.textContent = `农场 ${(homeData.plants || []).length}`;
-            residentsContent.innerHTML = renderPets(homeData.residents || []);
+            residentsContent.innerHTML = renderPets(homeData.residents || [], { smallImage: true });
             guardsContent.innerHTML = renderPets(homeData.guards || [], { compact: true, hideSub: true });
             plantsContent.innerHTML = renderPlants(homeData.plants || []);
         }
@@ -856,6 +868,21 @@
                 const normalized = recordByName.get(normalizeName(name));
                 if (normalized) return normalized;
             }
+            for (const name of names) {
+                const baseExact = recordByBaseName.get(name);
+                if (baseExact) return baseExact;
+                const baseNormalized = recordByBaseName.get(normalizeName(name));
+                if (baseNormalized) return baseNormalized;
+            }
+            for (const name of names) {
+                const normalizedName = normalizeName(name);
+                const fuzzy = handbookRecords.find(record => {
+                    const title = normalizeName(record && record.title);
+                    const baseTitle = normalizeName(basePetName(record && record.title));
+                    return title.startsWith(normalizedName) || baseTitle.includes(normalizedName);
+                });
+                if (fuzzy) return fuzzy;
+            }
             return null;
         }
 
@@ -863,19 +890,24 @@
             return String(pet.mutation || '').includes('异色');
         }
 
-        function petImagePath(pet) {
+        function petImagePath(pet, options = {}) {
             const record = petRecord(pet);
             if (record) {
                 if (isRarePet(pet)) {
-                    return localAssetUrl(record.rarePath || inferRarePath(record.portrait) || record.portrait);
+                    return localAssetUrl(toSmallPortraitPath(record.rarePath || inferRarePath(record.portrait) || record.portrait, options.smallImage));
                 }
-                return localAssetUrl(record.portrait || record.icon);
+                return localAssetUrl(toSmallPortraitPath(record.portrait, options.smallImage) || record.icon);
             }
             return fullAssetUrl(pet.image);
         }
 
         function inferRarePath(path) {
             return path ? String(path).replace(/-portrait\.png$/, '异色-portrait.png') : '';
+        }
+
+        function toSmallPortraitPath(path, useSmall) {
+            if (!useSmall || !path) return path || '';
+            return String(path).replace('sprite_imgs/portrait/', 'sprite_imgs/portrait-small/');
         }
 
         function genderSymbol(gender) {
@@ -921,7 +953,7 @@
                 <article class="pet-card">
                     <div class="pet-image-wrap">
                         ${mutationBadge(pet)}
-                        <img class="pet-image" src="${escapeHtml(petImagePath(pet))}" data-fallback="${escapeHtml(fullAssetUrl(pet.image))}" alt="${escapeHtml(title)}" loading="lazy" onerror="useImageFallback(this)">
+                        <img class="pet-image" src="${escapeHtml(petImagePath(pet, options))}" data-fallback="${escapeHtml(fullAssetUrl(pet.image))}" alt="${escapeHtml(title)}" loading="lazy" onerror="useImageFallback(this)">
                     </div>
                     <div>
                         <div class="pet-name-row">
