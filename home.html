@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家园查询 - 洛克王国世界工具站</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: rgba(226,232,240,0.9);
+            --panel: rgba(255,255,255,0.92);
+            --panel-soft: rgba(248,250,252,0.86);
+            --shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            background: url('./web_images/bg.jpg') no-repeat center center fixed,
+                        linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+        }
+
+        .container {
+            width: 96%;
+            max-width: 1420px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 42px 20px 28px;
+            color: white;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.32);
+            border-radius: 999px;
+            background: rgba(15,23,42,0.22);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .main-title {
+            font-size: 2.6rem;
+            line-height: 1.12;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-shadow: 0 4px 18px rgba(15,23,42,0.45);
+        }
+
+        .desc-font {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.94);
+            text-shadow: 0 2px 8px rgba(15,23,42,0.28);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 10px 16px;
+            border: 1px solid rgba(255,255,255,0.48);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-dark);
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(15,23,42,0.12);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99,102,241,0.48);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.62;
+            transform: none;
+        }
+
+        .primary-btn {
+            color: white;
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .count-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 36px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.84);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.55);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .controls {
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            min-height: 46px;
+            padding: 13px 15px;
+            border: 2px solid var(--border);
+            border-radius: 13px;
+            font-size: 1rem;
+            color: var(--text);
+            background: rgba(255,255,255,0.94);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+        }
+
+        .notice {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 14px;
+            background: rgba(248,250,252,0.76);
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.65;
+            font-weight: 780;
+        }
+
+        .error {
+            display: none;
+            margin-bottom: 18px;
+            padding: 13px 15px;
+            border: 1px solid rgba(239,68,68,0.26);
+            border-radius: 14px;
+            background: rgba(254,242,242,0.92);
+            color: #b91c1c;
+            line-height: 1.65;
+            font-weight: 850;
+        }
+
+        .summary {
+            display: none;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 18px;
+            align-items: center;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .summary.active {
+            display: grid;
+        }
+
+        .home-title {
+            margin-bottom: 6px;
+            color: var(--text);
+            font-size: 1.45rem;
+            line-height: 1.25;
+            font-weight: 950;
+        }
+
+        .home-meta {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 850;
+        }
+
+        .summary-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stats-grid {
+            display: none;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .stats-grid.active {
+            display: grid;
+        }
+
+        .stat-card {
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--panel-soft);
+            box-shadow: 0 12px 28px rgba(15,23,42,0.09);
+        }
+
+        .stat-label {
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 850;
+        }
+
+        .stat-value {
+            color: var(--text);
+            font-size: 1.26rem;
+            font-weight: 950;
+        }
+
+        .tabs {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .tabs.active {
+            display: flex;
+        }
+
+        .tab-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 32px;
+            padding: 6px 12px;
+            border: 1px solid rgba(99,102,241,0.16);
+            border-radius: 999px;
+            background: rgba(99,102,241,0.08);
+            color: var(--primary-dark);
+            font: inherit;
+            font-size: 0.86rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            color: white;
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .content-grid {
+            display: none;
+            grid-template-columns: minmax(0, 1.6fr) minmax(310px, 0.9fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .content-grid.active {
+            display: grid;
+        }
+
+        .section {
+            padding: 18px;
+        }
+
+        .section + .section {
+            margin-top: 18px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            color: var(--primary-dark);
+            font-size: 1.14rem;
+            font-weight: 950;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 22px;
+            border-radius: 2px;
+            background: var(--primary);
+        }
+
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+
+        .pet-card {
+            display: grid;
+            grid-template-columns: 82px minmax(0, 1fr);
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid rgba(226,232,240,0.9);
+            border-radius: 16px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.72)),
+                radial-gradient(circle at top right, rgba(99,102,241,0.14), transparent 48%);
+        }
+
+        .pet-image-wrap {
+            width: 82px;
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: radial-gradient(circle, rgba(255,255,255,0.95), rgba(238,242,255,0.72));
+            border: 1px solid rgba(226,232,240,0.86);
+        }
+
+        .pet-image {
+            width: 76px;
+            height: 76px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 12px rgba(15,23,42,0.14));
+        }
+
+        .pet-name {
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.35;
+            font-weight: 950;
+        }
+
+        .pet-sub {
+            margin: 4px 0 8px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.45;
+            font-weight: 800;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            min-height: 22px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: rgba(99,102,241,0.09);
+            color: var(--primary-dark);
+            font-size: 0.74rem;
+            font-weight: 900;
+        }
+
+        .chip img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+        }
+
+        .egg-chip {
+            color: #be185d;
+            background: rgba(236,72,153,0.1);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 7px;
+            margin-top: 9px;
+        }
+
+        .detail-item {
+            padding: 7px;
+            border: 1px solid rgba(226,232,240,0.82);
+            border-radius: 10px;
+            background: rgba(248,250,252,0.82);
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            font-weight: 900;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            color: var(--text);
+            font-size: 0.84rem;
+            font-weight: 950;
+        }
+
+        .farm-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .plant-card {
+            min-height: 122px;
+            padding: 10px;
+            border: 1px solid rgba(226,232,240,0.9);
+            border-radius: 14px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.72)),
+                radial-gradient(circle at top right, rgba(34,197,94,0.18), transparent 48%);
+            text-align: center;
+        }
+
+        .plant-card.ripe {
+            border-color: rgba(34,197,94,0.42);
+            box-shadow: inset 0 0 0 2px rgba(34,197,94,0.12);
+        }
+
+        .plant-image {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 12px rgba(15,23,42,0.12));
+        }
+
+        .plant-name {
+            overflow: hidden;
+            margin-top: 5px;
+            color: var(--text);
+            font-size: 0.82rem;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .plant-status {
+            margin-top: 3px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 850;
+        }
+
+        .empty-state {
+            padding: 34px 16px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-weight: 800;
+            line-height: 1.75;
+        }
+
+        .footer-beian {
+            text-align: center;
+            margin-top: 40px;
+            padding-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .footer-beian a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .footer-beian a:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 1120px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .main-title {
+                font-size: 1.9rem;
+            }
+
+            .topbar,
+            .summary {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .search-row {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-actions {
+                justify-content: flex-start;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .farm-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .pet-card,
+            .detail-grid,
+            .stats-grid,
+            .farm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hero-eyebrow">HOME DIRECT</div>
+            <h1 class="main-title">家园查询</h1>
+            <p class="desc-font">纯前端直连第三方接口的实验版本。</p>
+        </header>
+
+        <div class="topbar">
+            <a class="btn" href="index.html">‹ 返回主页</a>
+            <div class="count-pill" id="dataStatus">等待查询</div>
+        </div>
+
+        <section class="panel controls">
+            <form id="searchForm" class="search-row">
+                <input id="uidInput" class="search-input" type="search" inputmode="numeric" autocomplete="off" placeholder="输入玩家 UID">
+                <button id="queryButton" class="btn primary-btn" type="submit">查询</button>
+                <button id="clearButton" class="btn" type="button">清空</button>
+            </form>
+            <div class="notice">
+                当前页面会直接请求 roco-eggs.tsuki-world.com 的接口。若浏览器提示 Failed to fetch，大概率是对方没有开放 CORS，纯前端无法读取返回数据。
+            </div>
+        </section>
+
+        <div id="errorBox" class="error"></div>
+
+        <section id="summaryPanel" class="panel summary">
+            <div>
+                <h2 id="homeTitle" class="home-title">-</h2>
+                <div id="homeMeta" class="home-meta">UID -</div>
+            </div>
+            <div class="summary-actions">
+                <button id="detailButton" class="btn" type="button">查询个体资料</button>
+                <button id="refreshButton" class="btn" type="button">刷新</button>
+            </div>
+        </section>
+
+        <section id="statsGrid" class="stats-grid"></section>
+
+        <nav id="tabs" class="tabs" aria-label="家园视图">
+            <button class="tab-btn active" type="button" data-view="residents">居住精灵</button>
+            <button class="tab-btn" type="button" data-view="guards">家园守卫</button>
+            <button class="tab-btn" type="button" data-view="plants">农场</button>
+        </nav>
+
+        <main id="contentGrid" class="content-grid">
+            <section class="panel section">
+                <h2 id="mainTitle" class="section-title">居住精灵</h2>
+                <div id="mainContent"></div>
+            </section>
+            <aside>
+                <section class="panel section">
+                    <h2 class="section-title">接口状态</h2>
+                    <p id="detailNotice" class="notice">个体资料需要目标玩家在线并开放家园。</p>
+                </section>
+                <section class="panel section">
+                    <h2 class="section-title">牌子范围</h2>
+                    <div id="traitGuide" class="notice">查询后展示。</div>
+                </section>
+            </aside>
+        </main>
+
+        <section id="emptyState" class="panel empty-state">输入 UID 查询家园。</section>
+    </div>
+
+    <div class="footer-beian">
+        <a href="https://beian.mps.gov.cn/#/query/webSearch?code=32058102002843" rel="noreferrer" target="_blank">
+            <img src="https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png" alt="" style="width: 20px; height: 20px;">
+            苏公网安备32058102002843号
+        </a>
+    </div>
+
+    <script>
+        const UPSTREAM_ORIGIN = 'https://roco-eggs.tsuki-world.com';
+
+        let homeData = null;
+        let petDetails = [];
+        let activeView = 'residents';
+        let currentUid = '';
+        let queryLoading = false;
+        let detailLoading = false;
+
+        const uidInput = document.getElementById('uidInput');
+        const searchForm = document.getElementById('searchForm');
+        const queryButton = document.getElementById('queryButton');
+        const clearButton = document.getElementById('clearButton');
+        const refreshButton = document.getElementById('refreshButton');
+        const detailButton = document.getElementById('detailButton');
+        const dataStatus = document.getElementById('dataStatus');
+        const errorBox = document.getElementById('errorBox');
+        const summaryPanel = document.getElementById('summaryPanel');
+        const homeTitle = document.getElementById('homeTitle');
+        const homeMeta = document.getElementById('homeMeta');
+        const statsGrid = document.getElementById('statsGrid');
+        const tabs = document.getElementById('tabs');
+        const contentGrid = document.getElementById('contentGrid');
+        const mainTitle = document.getElementById('mainTitle');
+        const mainContent = document.getElementById('mainContent');
+        const emptyState = document.getElementById('emptyState');
+        const detailNotice = document.getElementById('detailNotice');
+        const traitGuide = document.getElementById('traitGuide');
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function normalizeUid(value) {
+            const uid = String(value || '').replace(/\D/g, '');
+            return /^\d{5,10}$/.test(uid) ? uid : '';
+        }
+
+        function fullAssetUrl(path) {
+            if (!path) return '';
+            if (/^https?:\/\//i.test(path)) return path;
+            return `${UPSTREAM_ORIGIN}${path.startsWith('/') ? '' : '/'}${path}`;
+        }
+
+        function displayValue(value) {
+            return value === undefined || value === null || value === '' ? '-' : value;
+        }
+
+        function formatNumber(value) {
+            return value === undefined || value === null || value === '' ? '-' : Number(value).toLocaleString('zh-CN');
+        }
+
+        function formatMetric(value, digits, unit) {
+            const number = Number(value);
+            if (!Number.isFinite(number)) return '-';
+            return `${number.toFixed(digits).replace(/\.?0+$/, '')}${unit}`;
+        }
+
+        function percentLabel(value) {
+            return value === undefined || value === null ? '' : ` · ${value}%`;
+        }
+
+        function secondsToText(seconds) {
+            const value = Math.max(0, Math.ceil(Number(seconds) || 0));
+            if (!value) return '可收获';
+            const hours = Math.floor(value / 3600);
+            const minutes = Math.max(hours ? 0 : 1, Math.ceil((value % 3600) / 60));
+            return hours ? `${hours}时${minutes}分` : `${minutes}分`;
+        }
+
+        async function postDirect(path, payload) {
+            let response;
+            try {
+                response = await fetch(`${UPSTREAM_ORIGIN}${path}`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    credentials: 'omit',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+            } catch (error) {
+                throw new Error('直连请求失败：浏览器可能因 CORS 或 Cloudflare 策略阻止了跨域读取。纯前端无法绕过这个限制。');
+            }
+
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(data.detail || `接口返回 HTTP ${response.status}`);
+            }
+            return data;
+        }
+
+        function setError(message) {
+            errorBox.style.display = message ? 'block' : 'none';
+            errorBox.textContent = message || '';
+        }
+
+        function setLoading() {
+            queryButton.disabled = queryLoading;
+            refreshButton.disabled = queryLoading || !homeData;
+            detailButton.disabled = detailLoading || queryLoading || !homeData;
+            queryButton.textContent = queryLoading ? '查询中' : '查询';
+            detailButton.textContent = detailLoading ? '查询中' : '查询个体资料';
+        }
+
+        async function queryHome(refresh = false, uid = normalizeUid(uidInput.value)) {
+            if (!uid) {
+                setError('请输入正确的玩家 UID。');
+                return;
+            }
+
+            currentUid = uid;
+            uidInput.value = uid;
+            queryLoading = true;
+            petDetails = [];
+            setError('');
+            setLoading();
+            dataStatus.textContent = refresh ? '正在刷新' : '正在查询';
+
+            try {
+                const [data, online] = await Promise.all([
+                    postDirect('/api/home/query', { uid: Number(uid), refresh }),
+                    postDirect('/api/home/online-status', { uid: Number(uid) }).catch(() => null),
+                ]);
+                homeData = data;
+                renderHome(online);
+                detailNotice.textContent = online && online.status === 'online'
+                    ? '目标玩家在线，可尝试查询个体资料。'
+                    : '目标玩家当前可能离线，个体资料可能无法获取。';
+                localStorage.setItem('rocom_home_last_uid', uid);
+            } catch (error) {
+                homeData = null;
+                renderHome(null);
+                setError(error.message || '家园查询失败。');
+                dataStatus.textContent = '查询失败';
+            } finally {
+                queryLoading = false;
+                setLoading();
+            }
+        }
+
+        async function queryDetails(refresh = true) {
+            if (!currentUid || !homeData) return;
+            detailLoading = true;
+            setLoading();
+            detailNotice.textContent = '正在获取个体资料。';
+
+            try {
+                const data = await postDirect('/api/home/pet-details', { uid: Number(currentUid), refresh });
+                petDetails = Array.isArray(data.pets) ? data.pets : [];
+                detailNotice.textContent = data.available
+                    ? `已获取 ${petDetails.length} 只精灵的个体资料。`
+                    : '未获取到个体资料；该数据需要目标玩家在线并开放家园。';
+                renderMainContent();
+            } catch (error) {
+                detailNotice.textContent = error.message || '个体资料暂时不可用。';
+            } finally {
+                detailLoading = false;
+                setLoading();
+            }
+        }
+
+        function renderHome(online) {
+            const hasData = Boolean(homeData);
+            summaryPanel.classList.toggle('active', hasData);
+            statsGrid.classList.toggle('active', hasData);
+            tabs.classList.toggle('active', hasData);
+            contentGrid.classList.toggle('active', hasData);
+            emptyState.style.display = hasData ? 'none' : 'block';
+
+            if (!hasData) {
+                statsGrid.innerHTML = '';
+                mainContent.innerHTML = '';
+                return;
+            }
+
+            const home = homeData.home || {};
+            homeTitle.textContent = home.name || '-';
+            homeMeta.textContent = `UID ${homeData.uid}${online && online.status ? ` · ${online.status === 'online' ? '在线' : '离线'}` : ''}`;
+            dataStatus.textContent = homeData.cached ? '已载入缓存' : '已同步';
+            renderStats();
+            renderTraitGuide();
+            renderMainContent();
+        }
+
+        function renderStats() {
+            const home = homeData.home || {};
+            const pets = [...(homeData.residents || []), ...(homeData.guards || [])];
+            const eggs = pets.filter(pet => pet.hasEgg).length;
+            const inspiration = pets.filter(pet => pet.feedStatus === '可收集').length;
+            const ripe = (homeData.plants || []).filter(plant => plant.ripeAt && Number(plant.ripeAt) * 1000 <= Date.now()).length;
+            const items = [
+                ['家园等级', home.level],
+                ['舒适度', formatNumber(home.comfort)],
+                ['居住精灵', (homeData.residents || []).length],
+                ['可收取蛋', eggs],
+                ['可收集灵感', inspiration],
+                ['可收获植物', ripe],
+            ];
+
+            statsGrid.innerHTML = items.map(([label, value]) => `
+                <article class="stat-card">
+                    <div class="stat-label">${escapeHtml(label)}</div>
+                    <div class="stat-value">${escapeHtml(displayValue(value))}</div>
+                </article>
+            `).join('');
+        }
+
+        function renderTraitGuide() {
+            const thresholds = homeData.traitThresholds || {};
+            const softVoice = thresholds.softVoiceDb || [];
+            const roughVoice = thresholds.roughVoiceDb || [];
+            traitGuide.innerHTML = `
+                <div>小不点 / 大块头：身高或体重边界 ${escapeHtml(displayValue(thresholds.bodyEdgePercent))}%</div>
+                <div>婉转声：${escapeHtml(displayValue(softVoice[0]))} 至 ${escapeHtml(displayValue(softVoice[1]))} dB</div>
+                <div>粗嗓门：${escapeHtml(displayValue(roughVoice[0]))} 至 ${escapeHtml(displayValue(roughVoice[1]))} dB</div>
+            `;
+        }
+
+        function renderMainContent() {
+            if (!homeData) return;
+            tabs.querySelectorAll('.tab-btn').forEach(button => {
+                button.classList.toggle('active', activeView === button.dataset.view);
+            });
+
+            if (activeView === 'guards') {
+                mainTitle.textContent = `家园守卫 ${(homeData.guards || []).length}`;
+                mainContent.innerHTML = renderPets(homeData.guards || []);
+                return;
+            }
+
+            if (activeView === 'plants') {
+                mainTitle.textContent = `农场 ${(homeData.plants || []).length}`;
+                mainContent.innerHTML = renderPlants(homeData.plants || []);
+                return;
+            }
+
+            mainTitle.textContent = `居住精灵 ${(homeData.residents || []).length}`;
+            mainContent.innerHTML = renderPets(homeData.residents || []);
+        }
+
+        function renderPets(pets) {
+            if (!pets.length) return '<div class="empty-state">暂无资料。</div>';
+            return `<div class="pet-grid">${pets.map(renderPetCard).join('')}</div>`;
+        }
+
+        function findDetail(pet) {
+            if (!petDetails.length) return null;
+            const names = new Set([pet.name, pet.defaultName, pet.speciesName].filter(Boolean));
+            return petDetails.find(detail => detail.petId === pet.petId && [detail.name, detail.defaultName].some(name => names.has(name)))
+                || petDetails.find(detail => detail.petId === pet.petId)
+                || petDetails.find(detail => [detail.name, detail.defaultName].some(name => names.has(name)))
+                || null;
+        }
+
+        function renderPetCard(pet) {
+            const detail = findDetail(pet);
+            const title = pet.nickname && pet.nickname !== pet.defaultName
+                ? `${pet.defaultName || pet.name}（${pet.nickname}）`
+                : pet.name || pet.defaultName || '-';
+            const attrs = Array.isArray(pet.attrs) ? pet.attrs : [];
+            const eggGroups = Array.isArray(pet.eggGroups) ? pet.eggGroups : [];
+            const sub = [pet.level ? `Lv.${pet.level}` : '', pet.gender, detail && detail.nature ? `性格 ${detail.nature}` : '', pet.feedStatus].filter(Boolean).join(' · ');
+
+            return `
+                <article class="pet-card">
+                    <div class="pet-image-wrap">
+                        <img class="pet-image" src="${escapeHtml(fullAssetUrl(pet.image))}" alt="${escapeHtml(title)}" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div>
+                        <div class="pet-name">${escapeHtml(title)}</div>
+                        <div class="pet-sub">${escapeHtml(sub || '-')}</div>
+                        <div class="chips">
+                            ${attrs.map(attr => `
+                                <span class="chip">
+                                    ${attr.icon ? `<img src="${escapeHtml(fullAssetUrl(attr.icon))}" alt="" onerror="this.style.display='none'">` : ''}
+                                    ${escapeHtml(attr.name)}
+                                </span>
+                            `).join('')}
+                            ${eggGroups.map(group => `<span class="chip">${escapeHtml(group)}</span>`).join('')}
+                            ${pet.mutation ? `<span class="chip egg-chip">${escapeHtml(pet.mutation)}</span>` : ''}
+                            ${pet.hasEgg ? '<span class="chip egg-chip">可收取蛋</span>' : ''}
+                        </div>
+                        ${detail ? renderDetail(detail) : ''}
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderDetail(detail) {
+            const height = detail.heightCm === undefined || detail.heightCm === null
+                ? '-'
+                : formatMetric(Number(detail.heightCm) / 100, 2, 'm');
+            return `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">身高</div>
+                        <div class="detail-value">${height}${percentLabel(detail.heightPercent)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">体重</div>
+                        <div class="detail-value">${formatMetric(detail.weightKg, 3, 'kg')}${percentLabel(detail.weightPercent)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">声音</div>
+                        <div class="detail-value">${escapeHtml(displayValue(detail.voice))} dB${percentLabel(detail.voicePercent)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPlants(plants) {
+            if (!plants.length) return '<div class="empty-state">暂无农场资料。</div>';
+            const byPlot = new Map(plants.map(plant => [Number(plant.plot), plant]));
+            const slots = Array.from({ length: 15 }, (_, index) => byPlot.get(index + 1) || { plot: index + 1, name: '空地' });
+            return `
+                <div class="farm-grid">
+                    ${slots.map(plant => {
+                        const ripe = plant.ripeAt && Number(plant.ripeAt) * 1000 <= Date.now();
+                        const remaining = plant.ripeAt ? Math.ceil(Number(plant.ripeAt) - Date.now() / 1000) : plant.remainingSeconds;
+                        return `
+                            <article class="plant-card ${ripe ? 'ripe' : ''}">
+                                ${plant.image ? `<img class="plant-image" src="${escapeHtml(fullAssetUrl(plant.image))}" alt="${escapeHtml(plant.name)}" loading="lazy" onerror="this.style.display='none'">` : '<div class="plant-image"></div>'}
+                                <div class="plant-name">${escapeHtml(plant.name || '空地')}</div>
+                                <div class="plant-status">${escapeHtml(plant.seedId ? (ripe ? '可收获' : secondsToText(remaining)) : `地块 ${plant.plot}`)}</div>
+                            </article>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        searchForm.addEventListener('submit', event => {
+            event.preventDefault();
+            queryHome(false);
+        });
+
+        uidInput.addEventListener('input', () => {
+            uidInput.value = uidInput.value.replace(/\D/g, '');
+        });
+
+        clearButton.addEventListener('click', () => {
+            uidInput.value = '';
+            currentUid = '';
+            homeData = null;
+            petDetails = [];
+            dataStatus.textContent = '等待查询';
+            setError('');
+            renderHome(null);
+            uidInput.focus();
+        });
+
+        refreshButton.addEventListener('click', () => queryHome(true, currentUid));
+        detailButton.addEventListener('click', () => queryDetails(true));
+
+        tabs.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                activeView = button.dataset.view || 'residents';
+                renderMainContent();
+            });
+        });
+
+        function init() {
+            setLoading();
+            const params = new URLSearchParams(location.search);
+            const uid = normalizeUid(params.get('uid')) || normalizeUid(localStorage.getItem('rocom_home_last_uid'));
+            if (uid) uidInput.value = uid;
+            if (normalizeUid(params.get('uid'))) queryHome(false, normalizeUid(params.get('uid')));
+        }
+
+        init();
+    </script>
+    <script>
+    (function(){
+        var bp = document.createElement('script');
+        bp.src = '//push.zhanzhang.baidu.com/push.js';
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+</body>
+</html>
