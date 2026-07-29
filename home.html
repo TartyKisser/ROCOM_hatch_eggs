@@ -172,18 +172,6 @@
             box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
         }
 
-        .notice {
-            margin-top: 12px;
-            padding: 12px 14px;
-            border: 1px solid rgba(99,102,241,0.16);
-            border-radius: 14px;
-            background: rgba(248,250,252,0.76);
-            color: var(--text-secondary);
-            font-size: 0.88rem;
-            line-height: 1.65;
-            font-weight: 780;
-        }
-
         .error {
             display: none;
             margin-bottom: 18px;
@@ -198,7 +186,7 @@
 
         .summary {
             display: none;
-            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-columns: minmax(0, 1fr);
             gap: 18px;
             align-items: center;
             padding: 18px;
@@ -221,13 +209,6 @@
             color: var(--text-secondary);
             font-size: 0.88rem;
             font-weight: 850;
-        }
-
-        .summary-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            flex-wrap: wrap;
         }
 
         .stats-grid {
@@ -262,42 +243,9 @@
             font-weight: 950;
         }
 
-        .tabs {
-            display: none;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 18px;
-        }
-
-        .tabs.active {
-            display: flex;
-        }
-
-        .tab-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 32px;
-            padding: 6px 12px;
-            border: 1px solid rgba(99,102,241,0.16);
-            border-radius: 999px;
-            background: rgba(99,102,241,0.08);
-            color: var(--primary-dark);
-            font: inherit;
-            font-size: 0.86rem;
-            font-weight: 900;
-            cursor: pointer;
-        }
-
-        .tab-btn.active {
-            color: white;
-            border-color: transparent;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-
         .content-grid {
             display: none;
-            grid-template-columns: minmax(0, 1.6fr) minmax(310px, 0.9fr);
+            grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.85fr);
             gap: 18px;
             align-items: start;
         }
@@ -312,6 +260,11 @@
 
         .section + .section {
             margin-top: 18px;
+        }
+
+        .side-column {
+            display: grid;
+            gap: 18px;
         }
 
         .section-title {
@@ -336,6 +289,10 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 12px;
+        }
+
+        .side-column .pet-grid {
+            grid-template-columns: 1fr;
         }
 
         .pet-card {
@@ -413,37 +370,14 @@
             background: rgba(236,72,153,0.1);
         }
 
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 7px;
-            margin-top: 9px;
-        }
-
-        .detail-item {
-            padding: 7px;
-            border: 1px solid rgba(226,232,240,0.82);
-            border-radius: 10px;
-            background: rgba(248,250,252,0.82);
-        }
-
-        .detail-label {
-            color: var(--text-secondary);
-            font-size: 0.72rem;
-            font-weight: 900;
-            margin-bottom: 2px;
-        }
-
-        .detail-value {
-            color: var(--text);
-            font-size: 0.84rem;
-            font-weight: 950;
-        }
-
         .farm-grid {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 10px;
+        }
+
+        .side-column .farm-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
         .plant-card {
@@ -533,18 +467,18 @@
                 font-size: 1.9rem;
             }
 
-            .topbar,
-            .summary {
+            .topbar {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .summary.active {
                 display: grid;
                 grid-template-columns: 1fr;
             }
 
             .search-row {
                 grid-template-columns: 1fr;
-            }
-
-            .summary-actions {
-                justify-content: flex-start;
             }
 
             .stats-grid {
@@ -558,7 +492,6 @@
 
         @media (max-width: 520px) {
             .pet-card,
-            .detail-grid,
             .stats-grid,
             .farm-grid {
                 grid-template-columns: 1fr;
@@ -585,9 +518,6 @@
                 <button id="queryButton" class="btn primary-btn" type="submit">查询</button>
                 <button id="clearButton" class="btn" type="button">清空</button>
             </form>
-            <div class="notice">
-                当前页面会请求本站的 PHP 轻量代理；代理设置了短缓存、超时和简单限流，适合低配置服务器。
-            </div>
         </section>
 
         <div id="errorBox" class="error"></div>
@@ -597,33 +527,23 @@
                 <h2 id="homeTitle" class="home-title">-</h2>
                 <div id="homeMeta" class="home-meta">UID -</div>
             </div>
-            <div class="summary-actions">
-                <button id="detailButton" class="btn" type="button">查询个体资料</button>
-                <button id="refreshButton" class="btn" type="button">刷新</button>
-            </div>
         </section>
 
         <section id="statsGrid" class="stats-grid"></section>
 
-        <nav id="tabs" class="tabs" aria-label="家园视图">
-            <button class="tab-btn active" type="button" data-view="residents">居住精灵</button>
-            <button class="tab-btn" type="button" data-view="guards">家园守卫</button>
-            <button class="tab-btn" type="button" data-view="plants">农场</button>
-        </nav>
-
         <main id="contentGrid" class="content-grid">
             <section class="panel section">
-                <h2 id="mainTitle" class="section-title">居住精灵</h2>
-                <div id="mainContent"></div>
+                <h2 id="residentsTitle" class="section-title">居住精灵</h2>
+                <div id="residentsContent"></div>
             </section>
-            <aside>
+            <aside class="side-column">
                 <section class="panel section">
-                    <h2 class="section-title">接口状态</h2>
-                    <p id="detailNotice" class="notice">个体资料需要目标玩家在线并开放家园。</p>
+                    <h2 id="guardsTitle" class="section-title">家园守卫</h2>
+                    <div id="guardsContent"></div>
                 </section>
                 <section class="panel section">
-                    <h2 class="section-title">牌子范围</h2>
-                    <div id="traitGuide" class="notice">查询后展示。</div>
+                    <h2 id="plantsTitle" class="section-title">农场</h2>
+                    <div id="plantsContent"></div>
                 </section>
             </aside>
         </main>
@@ -643,31 +563,26 @@
         const HOME_PROXY_URL = './home_proxy.php';
 
         let homeData = null;
-        let petDetails = [];
-        let activeView = 'residents';
-        let currentUid = '';
         let queryLoading = false;
-        let detailLoading = false;
 
         const uidInput = document.getElementById('uidInput');
         const searchForm = document.getElementById('searchForm');
         const queryButton = document.getElementById('queryButton');
         const clearButton = document.getElementById('clearButton');
-        const refreshButton = document.getElementById('refreshButton');
-        const detailButton = document.getElementById('detailButton');
         const dataStatus = document.getElementById('dataStatus');
         const errorBox = document.getElementById('errorBox');
         const summaryPanel = document.getElementById('summaryPanel');
         const homeTitle = document.getElementById('homeTitle');
         const homeMeta = document.getElementById('homeMeta');
         const statsGrid = document.getElementById('statsGrid');
-        const tabs = document.getElementById('tabs');
         const contentGrid = document.getElementById('contentGrid');
-        const mainTitle = document.getElementById('mainTitle');
-        const mainContent = document.getElementById('mainContent');
+        const residentsTitle = document.getElementById('residentsTitle');
+        const residentsContent = document.getElementById('residentsContent');
+        const guardsTitle = document.getElementById('guardsTitle');
+        const guardsContent = document.getElementById('guardsContent');
+        const plantsTitle = document.getElementById('plantsTitle');
+        const plantsContent = document.getElementById('plantsContent');
         const emptyState = document.getElementById('emptyState');
-        const detailNotice = document.getElementById('detailNotice');
-        const traitGuide = document.getElementById('traitGuide');
 
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -696,16 +611,6 @@
 
         function formatNumber(value) {
             return value === undefined || value === null || value === '' ? '-' : Number(value).toLocaleString('zh-CN');
-        }
-
-        function formatMetric(value, digits, unit) {
-            const number = Number(value);
-            if (!Number.isFinite(number)) return '-';
-            return `${number.toFixed(digits).replace(/\.?0+$/, '')}${unit}`;
-        }
-
-        function percentLabel(value) {
-            return value === undefined || value === null ? '' : ` · ${value}%`;
         }
 
         function secondsToText(seconds) {
@@ -740,10 +645,7 @@
 
         function setLoading() {
             queryButton.disabled = queryLoading;
-            refreshButton.disabled = queryLoading || !homeData;
-            detailButton.disabled = detailLoading || queryLoading || !homeData;
             queryButton.textContent = queryLoading ? '查询中' : '查询';
-            detailButton.textContent = detailLoading ? '查询中' : '查询个体资料';
         }
 
         async function queryHome(refresh = false, uid = normalizeUid(uidInput.value)) {
@@ -752,10 +654,8 @@
                 return;
             }
 
-            currentUid = uid;
             uidInput.value = uid;
             queryLoading = true;
-            petDetails = [];
             setError('');
             setLoading();
             dataStatus.textContent = refresh ? '正在刷新' : '正在查询';
@@ -767,9 +667,6 @@
                 ]);
                 homeData = data;
                 renderHome(online);
-                detailNotice.textContent = online && online.status === 'online'
-                    ? '目标玩家在线，可尝试查询个体资料。'
-                    : '目标玩家当前可能离线，个体资料可能无法获取。';
                 localStorage.setItem('rocom_home_last_uid', uid);
             } catch (error) {
                 homeData = null;
@@ -782,48 +679,27 @@
             }
         }
 
-        async function queryDetails(refresh = true) {
-            if (!currentUid || !homeData) return;
-            detailLoading = true;
-            setLoading();
-            detailNotice.textContent = '正在获取个体资料。';
-
-            try {
-                const data = await postHomeApi('pet-details', { uid: Number(currentUid), refresh });
-                petDetails = Array.isArray(data.pets) ? data.pets : [];
-                detailNotice.textContent = data.available
-                    ? `已获取 ${petDetails.length} 只精灵的个体资料。`
-                    : '未获取到个体资料；该数据需要目标玩家在线并开放家园。';
-                renderMainContent();
-            } catch (error) {
-                detailNotice.textContent = error.message || '个体资料暂时不可用。';
-            } finally {
-                detailLoading = false;
-                setLoading();
-            }
-        }
-
         function renderHome(online) {
             const hasData = Boolean(homeData);
             summaryPanel.classList.toggle('active', hasData);
             statsGrid.classList.toggle('active', hasData);
-            tabs.classList.toggle('active', hasData);
             contentGrid.classList.toggle('active', hasData);
             emptyState.style.display = hasData ? 'none' : 'block';
 
             if (!hasData) {
                 statsGrid.innerHTML = '';
-                mainContent.innerHTML = '';
+                residentsContent.innerHTML = '';
+                guardsContent.innerHTML = '';
+                plantsContent.innerHTML = '';
                 return;
             }
 
             const home = homeData.home || {};
-            homeTitle.textContent = home.name || '-';
-            homeMeta.textContent = `UID ${homeData.uid}${online && online.status ? ` · ${online.status === 'online' ? '在线' : '离线'}` : ''}`;
+            homeTitle.textContent = `账号昵称：${home.name || '-'}`;
+            homeMeta.textContent = `UID：${homeData.uid} · 在线状态：${online && online.status ? (online.status === 'online' ? '在线' : '离线') : '未知'}`;
             dataStatus.textContent = homeData.cached ? '已载入缓存' : '已同步';
             renderStats();
-            renderTraitGuide();
-            renderMainContent();
+            renderSections();
         }
 
         function renderStats() {
@@ -849,37 +725,14 @@
             `).join('');
         }
 
-        function renderTraitGuide() {
-            const thresholds = homeData.traitThresholds || {};
-            const softVoice = thresholds.softVoiceDb || [];
-            const roughVoice = thresholds.roughVoiceDb || [];
-            traitGuide.innerHTML = `
-                <div>小不点 / 大块头：身高或体重边界 ${escapeHtml(displayValue(thresholds.bodyEdgePercent))}%</div>
-                <div>婉转声：${escapeHtml(displayValue(softVoice[0]))} 至 ${escapeHtml(displayValue(softVoice[1]))} dB</div>
-                <div>粗嗓门：${escapeHtml(displayValue(roughVoice[0]))} 至 ${escapeHtml(displayValue(roughVoice[1]))} dB</div>
-            `;
-        }
-
-        function renderMainContent() {
+        function renderSections() {
             if (!homeData) return;
-            tabs.querySelectorAll('.tab-btn').forEach(button => {
-                button.classList.toggle('active', activeView === button.dataset.view);
-            });
-
-            if (activeView === 'guards') {
-                mainTitle.textContent = `家园守卫 ${(homeData.guards || []).length}`;
-                mainContent.innerHTML = renderPets(homeData.guards || []);
-                return;
-            }
-
-            if (activeView === 'plants') {
-                mainTitle.textContent = `农场 ${(homeData.plants || []).length}`;
-                mainContent.innerHTML = renderPlants(homeData.plants || []);
-                return;
-            }
-
-            mainTitle.textContent = `居住精灵 ${(homeData.residents || []).length}`;
-            mainContent.innerHTML = renderPets(homeData.residents || []);
+            residentsTitle.textContent = `居住精灵 ${(homeData.residents || []).length}`;
+            guardsTitle.textContent = `家园守卫 ${(homeData.guards || []).length}`;
+            plantsTitle.textContent = `农场 ${(homeData.plants || []).length}`;
+            residentsContent.innerHTML = renderPets(homeData.residents || []);
+            guardsContent.innerHTML = renderPets(homeData.guards || []);
+            plantsContent.innerHTML = renderPlants(homeData.plants || []);
         }
 
         function renderPets(pets) {
@@ -887,23 +740,13 @@
             return `<div class="pet-grid">${pets.map(renderPetCard).join('')}</div>`;
         }
 
-        function findDetail(pet) {
-            if (!petDetails.length) return null;
-            const names = new Set([pet.name, pet.defaultName, pet.speciesName].filter(Boolean));
-            return petDetails.find(detail => detail.petId === pet.petId && [detail.name, detail.defaultName].some(name => names.has(name)))
-                || petDetails.find(detail => detail.petId === pet.petId)
-                || petDetails.find(detail => [detail.name, detail.defaultName].some(name => names.has(name)))
-                || null;
-        }
-
         function renderPetCard(pet) {
-            const detail = findDetail(pet);
             const title = pet.nickname && pet.nickname !== pet.defaultName
                 ? `${pet.defaultName || pet.name}（${pet.nickname}）`
                 : pet.name || pet.defaultName || '-';
             const attrs = Array.isArray(pet.attrs) ? pet.attrs : [];
             const eggGroups = Array.isArray(pet.eggGroups) ? pet.eggGroups : [];
-            const sub = [pet.level ? `Lv.${pet.level}` : '', pet.gender, detail && detail.nature ? `性格 ${detail.nature}` : '', pet.feedStatus].filter(Boolean).join(' · ');
+            const sub = [pet.level ? `Lv.${pet.level}` : '', pet.gender, pet.feedStatus].filter(Boolean).join(' · ');
 
             return `
                 <article class="pet-card">
@@ -924,31 +767,8 @@
                             ${pet.mutation ? `<span class="chip egg-chip">${escapeHtml(pet.mutation)}</span>` : ''}
                             ${pet.hasEgg ? '<span class="chip egg-chip">可收取蛋</span>' : ''}
                         </div>
-                        ${detail ? renderDetail(detail) : ''}
                     </div>
                 </article>
-            `;
-        }
-
-        function renderDetail(detail) {
-            const height = detail.heightCm === undefined || detail.heightCm === null
-                ? '-'
-                : formatMetric(Number(detail.heightCm) / 100, 2, 'm');
-            return `
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <div class="detail-label">身高</div>
-                        <div class="detail-value">${height}${percentLabel(detail.heightPercent)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">体重</div>
-                        <div class="detail-value">${formatMetric(detail.weightKg, 3, 'kg')}${percentLabel(detail.weightPercent)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">声音</div>
-                        <div class="detail-value">${escapeHtml(displayValue(detail.voice))} dB${percentLabel(detail.voicePercent)}</div>
-                    </div>
-                </div>
             `;
         }
 
@@ -984,23 +804,11 @@
 
         clearButton.addEventListener('click', () => {
             uidInput.value = '';
-            currentUid = '';
             homeData = null;
-            petDetails = [];
             dataStatus.textContent = '等待查询';
             setError('');
             renderHome(null);
             uidInput.focus();
-        });
-
-        refreshButton.addEventListener('click', () => queryHome(true, currentUid));
-        detailButton.addEventListener('click', () => queryDetails(true));
-
-        tabs.querySelectorAll('.tab-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                activeView = button.dataset.view || 'residents';
-                renderMainContent();
-            });
         });
 
         function init() {
