@@ -265,8 +265,10 @@
         }
 
         .resident-section #residentsContent {
+            display: flex;
             flex: 1;
             min-height: 0;
+            flex-direction: column;
         }
 
         .section + .section {
@@ -313,6 +315,14 @@
             gap: 12px;
         }
 
+        .resident-section .pet-grid {
+            flex: 1;
+            height: 100%;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-rows: repeat(5, minmax(104px, 1fr));
+            gap: 14px;
+        }
+
         .side-column .pet-grid {
             grid-template-columns: 1fr;
         }
@@ -329,6 +339,13 @@
                 radial-gradient(circle at top right, rgba(99,102,241,0.14), transparent 48%);
         }
 
+        .resident-section .pet-card {
+            grid-template-columns: 84px minmax(0, 1fr);
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+        }
+
         .pet-image-wrap {
             position: relative;
             width: 68px;
@@ -341,11 +358,22 @@
             border: 1px solid rgba(226,232,240,0.86);
         }
 
+        .resident-section .pet-image-wrap {
+            width: 84px;
+            height: 84px;
+            border-radius: 18px;
+        }
+
         .pet-image {
             width: 62px;
             height: 62px;
             object-fit: contain;
             filter: drop-shadow(0 8px 12px rgba(15,23,42,0.14));
+        }
+
+        .resident-section .pet-image {
+            width: 78px;
+            height: 78px;
         }
 
         .mutation-badge {
@@ -554,6 +582,36 @@
                 display: block;
             }
 
+            .resident-section #residentsContent {
+                display: block;
+                flex: initial;
+            }
+
+            .resident-section .pet-grid {
+                height: auto;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                grid-template-rows: auto;
+                gap: 12px;
+            }
+
+            .resident-section .pet-card {
+                grid-template-columns: 68px minmax(0, 1fr);
+                align-items: initial;
+                gap: 10px;
+                padding: 12px;
+            }
+
+            .resident-section .pet-image-wrap {
+                width: 68px;
+                height: 68px;
+                border-radius: 16px;
+            }
+
+            .resident-section .pet-image {
+                width: 62px;
+                height: 62px;
+            }
+
             .side-column {
                 grid-template-rows: auto;
                 height: auto;
@@ -593,6 +651,7 @@
         }
 
         @media (max-width: 520px) {
+            .resident-section .pet-card,
             .pet-card,
             .stats-grid,
             .farm-grid {
