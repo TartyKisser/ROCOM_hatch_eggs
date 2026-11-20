@@ -6,25 +6,32 @@ import { build } from 'vite'
 
 const source = dirname(fileURLToPath(import.meta.url))
 const site = resolve(source, '..')
-const indexPath = join(site, 'index.html')
+const page = process.argv[2] ?? 'index.html'
+if (page !== 'index.html' && page !== 'handbook.html') throw new Error(`未知的页面入口 ${page}`)
+const pagePath = join(site, page)
 const noticesPath = 'home-ui/assets/third-party-licenses.md'
-const before = await readFile(indexPath)
+const before = await readFile(pagePath)
 
 const result = await build({
   root: source,
   base: './',
   configFile: false,
   publicDir: false,
-  build: { assetsDir: 'home-ui/assets', license: { fileName: noticesPath }, write: false },
+  build: {
+    assetsDir: 'home-ui/assets',
+    license: { fileName: noticesPath },
+    rolldownOptions: { input: join(source, page) },
+    write: false,
+  },
 })
 
 const files = (Array.isArray(result) ? result : [result]).flatMap(bundle => bundle.output)
-const entry = files.find(file => file.fileName === 'index.html')
-if (!entry || entry.type !== 'asset') throw new Error('首页构建没有生成 index.html')
+const entry = files.find(file => file.fileName === page)
+if (!entry || entry.type !== 'asset') throw new Error(`构建没有生成 ${page}`)
 
 const html = String(entry.source)
 if (!html.includes('type="module"') || !html.includes('="./home-ui/assets/')) {
-  throw new Error('首页 HTML 缺少构建后的资源链接')
+  throw new Error(`${page} 缺少构建后的资源链接`)
 }
 
 for (const file of files) {
@@ -46,16 +53,16 @@ for (const file of files) {
   }
 }
 
-const pending = join(site, `.homepage-${process.pid}.html`)
+const pending = join(site, `.${page}-${process.pid}.tmp`)
 await writeFile(pending, html, { flag: 'wx' })
 try {
-  if (!(await readFile(indexPath)).equals(before)) {
-    throw new Error('构建期间 index.html 有其他修改，已保留当前页面')
+  if (!(await readFile(pagePath)).equals(before)) {
+    throw new Error(`构建期间 ${page} 有其他修改，已保留当前页面`)
   }
-  await rename(pending, indexPath)
+  await rename(pending, pagePath)
 } finally {
   await unlink(pending).catch(error => {
     if (error.code !== 'ENOENT') throw error
   })
 }
-console.log('Built static homepage at index.html.')
+console.log(`Built static page at ${page}.`)

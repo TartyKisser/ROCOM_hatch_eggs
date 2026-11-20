@@ -1,6 +1,6 @@
-# 首页构建
+# 首页与精灵图鉴构建
 
-仓库根目录的 `index.html` 是首页入口。`homepage/` 存放 React 源码、字体和图片素材，`home-ui/assets/` 存放构建生成的静态文件和依赖许可。Nginx 直接提供这些文件，远行商人沿用 `merchant_proxy.php`。
+仓库根目录的 `index.html` 和 `handbook.html` 分别是首页和精灵图鉴入口。`homepage/` 存放 React 源码、字体和图片素材，`home-ui/assets/` 存放构建生成的静态文件和依赖许可。Nginx 直接提供这些文件，远行商人沿用 `merchant_proxy.php`。
 
 ## 在 A100 上构建
 
@@ -12,7 +12,9 @@ npm ci
 npm run build
 ```
 
-构建脚本先写入资源，再原子替换根目录的 `index.html`。通过 GitHub 发布时，把 `index.html` 和 `home-ui/` 放在同一次提交中。保存 `homepage/` 源码与锁文件即可在 A100 上重建。
+构建脚本先写入资源，再原子替换根目录的 `index.html`。构建精灵图鉴时，在同一目录执行 `npm run build:handbook`，产物入口为 `handbook.html`，数据来自站点根目录的 `handbook_data.json`。
+
+通过 GitHub 发布时，把本次构建对应的 HTML 入口和 `home-ui/` 放在同一次提交中。保存 `homepage/` 源码与锁文件即可在 A100 上重建。
 
 ### 预览
 
@@ -45,3 +47,5 @@ ssh -N -L 8080:127.0.0.1:8080 lwt@8a100.yangtan.top
 python3 prepare-fonts.py
 npm run build
 ```
+
+图鉴的字体子集包含界面文案和精灵名称。需要刷新子集时，执行 `python3 prepare-fonts.py handbook` 再构建图鉴。

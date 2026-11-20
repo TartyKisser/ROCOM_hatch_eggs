@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#272624">
+    <meta name="description" content="洛克王国世界精灵图鉴，查询精灵属性、技能、分布、进化链、精灵蛋和蛋组。">
+    <title>精灵图鉴 - 洛克王国世界工具站</title>
+    <link rel="preload" as="image" href="./assets/season-wallpaper.webp" media="(width > 560px)" fetchpriority="high">
+    <link rel="preload" as="image" href="./assets/season-wallpaper-mobile.webp" media="(max-width: 560px)" fetchpriority="high">
+    <link rel="preload" as="font" href="./fonts/roco-kingdom-sans-handbook.woff2" type="font/woff2" crossorigin>
+  </head>
+  <body>
+    <div id="app">
+      <main class="startup">
+        <h1>精灵图鉴</h1>
+        <p>正在打开图鉴。<a href="./">返回首页</a></p>
+        <noscript><p>请启用 JavaScript 以搜索和查看精灵资料。</p></noscript>
+      </main>
+    </div>
+    <script type="module" src="./src/handbook/main.jsx"></script>
+    <script async src="//push.zhanzhang.baidu.com/push.js"></script>
+  </body>
+</html>

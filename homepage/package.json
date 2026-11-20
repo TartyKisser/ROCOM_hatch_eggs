@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node build.mjs"
+    "build": "node build.mjs",
+    "build:handbook": "node build.mjs handbook.html"
   },
   "engines": {
     "node": ">=22.12.0"
