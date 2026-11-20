@@ -575,7 +575,7 @@
             background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
-        .fruit-evolution-grid {
+        .item-evolution-grid {
             display: grid;
             grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 18px;
@@ -618,29 +618,90 @@
             font-weight: 950;
         }
 
-        .fruit-card {
+        .item-image-options {
             display: grid;
-            grid-template-columns: 118px minmax(0, 1fr);
-            gap: 16px;
-            align-items: center;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 4px;
+            padding: 4px;
+            border: 1px solid rgba(99,102,241,0.18);
+            border-radius: 12px;
+            background: rgba(99,102,241,0.08);
         }
 
-        .fruit-image-wrap {
-            width: 118px;
-            height: 118px;
-            border-radius: 20px;
+        .item-image-option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .item-image-option input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            clip-path: inset(50%);
+        }
+
+        .item-image-option span {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.78);
-            border: 1px solid rgba(226,232,240,0.92);
+            min-height: 38px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 900;
+            text-align: center;
         }
 
-        .fruit-image {
-            width: 100px;
-            height: 100px;
+        .item-image-option input:checked + span {
+            background: white;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 6px rgba(15,23,42,0.12);
+        }
+
+        .item-image-option input:focus-visible + span {
+            outline: 2px solid var(--primary-dark);
+            outline-offset: 2px;
+        }
+
+        .item-image-panel {
+            margin-top: 12px;
+        }
+
+        .item-image-preview {
+            display: grid;
+            place-items: center;
+            width: min(100%, 180px);
+            min-height: 144px;
+            margin: 0 auto;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(226,232,240,0.92);
+            background: radial-gradient(circle, white, rgba(238,242,255,0.72));
+        }
+
+        .item-image-preview[hidden] {
+            display: none;
+        }
+
+        .item-image {
+            width: 118px;
+            max-width: 100%;
+            height: 118px;
             object-fit: contain;
             filter: drop-shadow(0 8px 12px rgba(15,23,42,0.12));
+        }
+
+        .item-image-empty {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .item-image-variants {
+            width: min(100%, 180px);
+            margin: 10px auto 0;
         }
 
         .evolution-list {
@@ -1066,7 +1127,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .fruit-evolution-grid {
+            .item-evolution-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -1102,11 +1163,6 @@
             .stat-row {
                 grid-template-columns: 58px 1fr 38px;
                 gap: 8px;
-            }
-
-            .fruit-card {
-                grid-template-columns: 1fr;
-                justify-items: start;
             }
 
             table,
@@ -1692,6 +1748,72 @@
             });
         }
 
+        function renderImageOption(group, value, label, checked = false) {
+            return `
+                <label class="item-image-option">
+                    <input type="radio" name="${group}" value="${value}"${checked ? ' checked' : ''}>
+                    <span>${label}</span>
+                </label>
+            `;
+        }
+
+        function renderItemPicture(path, title, label) {
+            return `
+                ${path ? `<img class="item-image" src="${escapeHtml(path)}" alt="${escapeHtml(`${title} ${label}`)}" loading="lazy">` : ''}
+                <p class="item-image-empty" role="status"${path ? ' hidden' : ''}>暂无${label}图片</p>
+            `;
+        }
+
+        function renderItemImages(record) {
+            const shinyEgg = record['icon-egg-rare'];
+            return `
+                <section class="section item-image-card" aria-label="精灵蛋与精灵果实">
+                    <div class="item-image-options" role="radiogroup" aria-label="图片类别">
+                        ${renderImageOption('item-image-kind', 'egg', '精灵蛋', true)}
+                        ${renderImageOption('item-image-kind', 'fruit', '精灵果实')}
+                    </div>
+                    <div class="item-image-panel" data-item-image-kind="egg">
+                        <div class="item-image-preview" data-egg-appearance="normal">
+                            ${renderItemPicture(record['icon-egg'], record.title, '精灵蛋')}
+                        </div>
+                        ${shinyEgg ? `
+                            <div class="item-image-preview" data-egg-appearance="shiny" hidden>
+                                ${renderItemPicture(shinyEgg, record.title, '异色蛋')}
+                            </div>
+                            <div class="item-image-options item-image-variants" role="radiogroup" aria-label="精灵蛋外观">
+                                ${renderImageOption('egg-appearance', 'normal', '普通', true)}
+                                ${renderImageOption('egg-appearance', 'shiny', '异色')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="item-image-panel" data-item-image-kind="fruit" hidden>
+                        <div class="item-image-preview">
+                            ${renderItemPicture(record['icon-fruit'], record.title, '精灵果实')}
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function bindItemImages() {
+            const card = detailPanel.querySelector('.item-image-card');
+            card.addEventListener('change', ({ target }) => {
+                const attribute = target.name === 'item-image-kind' ? 'data-item-image-kind' : 'data-egg-appearance';
+                card.querySelectorAll(`[${attribute}]`).forEach(panel => {
+                    panel.hidden = panel.getAttribute(attribute) !== target.value;
+                });
+            });
+
+            card.querySelectorAll('.item-image').forEach(image => {
+                const showUnavailable = () => {
+                    image.hidden = true;
+                    image.nextElementSibling.hidden = false;
+                };
+                image.addEventListener('error', showUnavailable);
+                if (image.complete && !image.naturalWidth) showUnavailable();
+            });
+        }
+
         function renderDetail() {
             const record = records.find(item => item.id === selectedId);
             if (!record) {
@@ -1750,16 +1872,8 @@
                         </div>
                     </div>
 
-                    <div class="fruit-evolution-grid">
-                        <div class="section">
-                            <h3 class="section-title">精灵果实</h3>
-                            <div class="fruit-card">
-                                <div class="fruit-image-wrap">
-                                    <img class="fruit-image" src="${escapeHtml(record.icon || portraitSmallPath(record))}" alt="${escapeHtml(record.title)} 精灵果实" onerror="this.style.display='none'">
-                                </div>
-                                <p class="ability-desc">${escapeHtml(record.title)} 对应的精灵果实图片。</p>
-                            </div>
-                        </div>
+                    <div class="item-evolution-grid">
+                        ${renderItemImages(record)}
 
                         <div class="section">
                             <h3 class="section-title">进化链</h3>
@@ -1836,6 +1950,7 @@
                     }
                 });
             }
+            bindItemImages();
             bindSkillSourceFilters(record);
         }
 
