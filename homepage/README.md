@@ -1,4 +1,4 @@
-# 首页与精灵图鉴构建
+# 网站前端构建
 
 仓库根目录的 `index.html` 和 `handbook.html` 分别是首页和精灵图鉴入口。`homepage/` 存放 React 源码、字体和图片素材，`home-ui/assets/` 存放构建生成的静态文件和依赖许可。Nginx 直接提供这些文件，远行商人沿用 `merchant_proxy.php`。
 
@@ -13,6 +13,8 @@ npm run build
 ```
 
 构建脚本先写入资源，再原子替换根目录的 `index.html`。构建精灵图鉴时，在同一目录执行 `npm run build:handbook`，产物入口为 `handbook.html`，数据来自站点根目录的 `handbook_data.json`。
+
+技能图鉴、孵蛋预测、精灵配对、小窝排布、家园查询、异色推荐及世界地图的源文件也在本目录。执行 `npm run build:tools` 会为这七个页面生成带 RocoKingdom UI 控件的 HTML 和共用样式，发布到各自原来的路径。
 
 通过 GitHub 发布时，把本次构建对应的 HTML 入口和 `home-ui/` 放在同一次提交中。保存 `homepage/` 源码与锁文件即可在 A100 上重建。
 
@@ -49,3 +51,5 @@ npm run build
 ```
 
 图鉴的字体子集包含界面文案和精灵名称。需要刷新子集时，执行 `python3 prepare-fonts.py handbook` 再构建图鉴。
+
+七个工具页面共用一个字体子集。界面文案或技能数据更新后，可执行 `python3 prepare-fonts.py tools` 刷新子集。

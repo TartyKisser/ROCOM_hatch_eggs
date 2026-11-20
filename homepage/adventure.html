@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异色刷取推荐 - 洛克王国世界工具站</title>
+    <style>
+        :root {
+            --primary: #ad7427;
+            --primary-dark: #694a23;
+            --secondary: #ec4899;
+            --text: #282522;
+            --text-secondary: #61584c;
+            --border: rgba(225,210,186,0.9);
+            --panel: rgba(255,255,255,0.92);
+            --panel-soft: rgba(244,235,220,0.88);
+            --shadow: 0 18px 45px rgba(46,36,24, 0.18);
+            --success: #16a34a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+        }
+
+        .container {
+            width: 96%;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 42px 20px 28px;
+            color: white;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.32);
+            border-radius: 999px;
+            background: rgba(46,36,24,0.22);
+            color: rgba(255,255,255,0.9);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .main-title {
+            font-size: 2.6rem;
+            line-height: 1.12;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-shadow: 0 4px 18px rgba(46,36,24,0.45);
+        }
+
+        .desc-font {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.94);
+            text-shadow: 0 2px 8px rgba(46,36,24,0.28);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 10px 16px;
+            border: 1px solid rgba(255,255,255,0.48);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-dark);
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(46,36,24,0.12);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            border-color: rgba(163,109,39,0.48);
+        }
+
+        .count-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 36px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.84);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .help-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255,255,255,0.48);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-dark);
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 950;
+            box-shadow: 0 8px 22px rgba(46,36,24,0.12);
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .help-button:hover {
+            transform: translateY(-2px);
+            border-color: rgba(163,109,39,0.48);
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(255,255,255,0.55);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .controls {
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .adventure-control-section + .adventure-control-section {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px dashed rgba(148,163,184,0.5);
+        }
+
+        .control-title {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            font-weight: 950;
+        }
+
+        .candidate-search-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            align-items: start;
+        }
+
+        .mode-toggle {
+            display: inline-grid;
+            grid-template-columns: repeat(2, minmax(92px, 1fr));
+            gap: 4px;
+            min-height: 40px;
+            padding: 4px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(163,109,39,0.16);
+            border-radius: 13px;
+            background: rgba(163,109,39,0.08);
+        }
+
+        .mode-option {
+            min-height: 32px;
+            padding: 0 14px;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 900;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .mode-option.active {
+            background: #ffffff;
+            color: var(--primary-dark);
+            box-shadow: 0 8px 20px rgba(163,109,39,0.14);
+        }
+
+        .candidate-field {
+            position: relative;
+            min-width: 0;
+        }
+
+        .search-input {
+            width: 100%;
+            min-height: 46px;
+            padding: 13px 15px;
+            border: 2px solid var(--border);
+            border-radius: 13px;
+            font-size: 1rem;
+            color: var(--text);
+            background: rgba(255,255,255,0.94);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(163,109,39,0.12);
+        }
+
+        .search-input:disabled {
+            cursor: not-allowed;
+            color: rgba(100,116,139,0.72);
+            background: rgba(225,210,186,0.72);
+        }
+
+        .sort-priority {
+            display: grid;
+            width: min(560px, 100%);
+            gap: 8px;
+        }
+
+        .sort-priority-item {
+            display: grid;
+            grid-template-columns: 32px minmax(0, 1fr) auto auto;
+            align-items: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 6px 8px;
+            border: 1px solid rgba(163,109,39,0.14);
+            border-radius: 13px;
+            background: rgba(255,255,255,0.94);
+            color: var(--text);
+        }
+
+        .sort-rank {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 950;
+        }
+
+        .sort-label {
+            min-width: 0;
+            overflow: hidden;
+            font-size: 0.9rem;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sort-move {
+            width: 30px;
+            height: 30px;
+            border: 1px solid rgba(163,109,39,0.16);
+            border-radius: 9px;
+            background: rgba(163,109,39,0.08);
+            color: var(--primary-dark);
+            font: inherit;
+            font-weight: 950;
+            cursor: pointer;
+        }
+
+        .sort-move:disabled {
+            opacity: 0.36;
+            cursor: default;
+        }
+
+        .suggest-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            z-index: 12;
+            display: none;
+            max-height: 280px;
+            overflow: auto;
+            padding: 6px;
+            border: 1px solid rgba(163,109,39,0.18);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 18px 36px rgba(46,36,24,0.18);
+        }
+
+        .suggest-menu.is-open {
+            display: block;
+        }
+
+        .suggest-option {
+            display: grid;
+            grid-template-columns: 36px minmax(0, 1fr);
+            gap: 9px;
+            align-items: center;
+            width: 100%;
+            padding: 7px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .suggest-option:hover {
+            background: rgba(163,109,39,0.08);
+        }
+
+        .suggest-option img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: rgba(244,235,220,0.9);
+        }
+
+        .suggest-name {
+            display: block;
+            overflow: hidden;
+            font-size: 0.9rem;
+            font-weight: 900;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .suggest-number {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            font-weight: 800;
+        }
+
+        .controls-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .btn-primary {
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff;
+        }
+
+        .target-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 2px;
+        }
+
+        .target-chip {
+            flex: 0 1 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 38px;
+            padding: 7px 11px 7px 7px;
+            border: 1px solid rgba(163,109,39,0.16);
+            border-radius: 999px;
+            background: rgba(163,109,39,0.08);
+            color: var(--primary-dark);
+            font-size: 0.86rem;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .target-chip.active {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+        }
+
+        .target-chip img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.82);
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 14px;
+        }
+
+        .strategy-card {
+            overflow: hidden;
+        }
+
+        .strategy-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 13px 14px;
+            border-bottom: 1px solid rgba(225,210,186,0.82);
+            background:
+                linear-gradient(135deg, rgba(163,109,39,0.12), rgba(236,72,153,0.1)),
+                rgba(255,255,255,0.48);
+        }
+
+        .target-mini {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            gap: 10px;
+        }
+
+        .mini-img {
+            width: 46px;
+            height: 46px;
+            object-fit: contain;
+            flex: 0 0 auto;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.78);
+        }
+
+        .mini-label {
+            color: var(--text-secondary);
+            font-size: 0.76rem;
+            font-weight: 900;
+            margin-bottom: 2px;
+        }
+
+        .mini-name {
+            overflow: hidden;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .score-badge {
+            position: relative;
+            width: 136px;
+            height: 54px;
+            min-width: 136px;
+            overflow: hidden;
+        }
+
+        .score-badge-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .score-badge-number {
+            position: absolute;
+            left: 64%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 42px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 950;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(124, 28, 126, 0.5);
+        }
+
+        .strategy-body {
+            padding: 14px;
+        }
+
+        .pair-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pair-row.is-single {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .plus {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(163,109,39,0.1);
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            font-weight: 950;
+        }
+
+        .sprite-card {
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid rgba(225,210,186,0.92);
+            border-radius: 14px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.72)),
+                linear-gradient(135deg, var(--type-a, #ad7427), var(--type-b, #ec4899));
+        }
+
+        .sprite-image-wrap {
+            height: 118px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.78), rgba(255,255,255,0.24) 58%, transparent);
+        }
+
+        .sprite-image {
+            max-width: 100%;
+            max-height: 112px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 16px rgba(46,36,24,0.16));
+        }
+
+        .sprite-number {
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 900;
+        }
+
+        .sprite-name {
+            overflow: hidden;
+            margin-top: 2px;
+            color: var(--text);
+            font-weight: 950;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .type-chip,
+        .rule-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            min-height: 24px;
+            padding: 4px 7px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 900;
+        }
+
+        .type-chip {
+            color: var(--primary-dark);
+            background: rgba(163,109,39,0.08);
+            border: 1px solid rgba(163,109,39,0.14);
+        }
+
+        .type-logo {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            flex: 0 0 auto;
+        }
+
+        .rule-chip {
+            color: #be123c;
+            background: rgba(244,63,94,0.1);
+        }
+
+        .others {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px dashed rgba(148,163,184,0.58);
+        }
+
+        .others-title {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .other-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .other-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-width: 0;
+            max-width: 100%;
+            padding: 5px 9px 5px 5px;
+            border-radius: 999px;
+            background: rgba(46,36,24,0.05);
+            color: var(--text);
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .other-info {
+            min-width: 0;
+            display: grid;
+            gap: 3px;
+        }
+
+        .other-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .other-rules {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+
+        .other-rule {
+            display: inline-flex;
+            align-items: center;
+            min-height: 18px;
+            padding: 2px 5px;
+            border-radius: 999px;
+            background: rgba(163,109,39,0.09);
+            color: var(--primary-dark);
+            font-size: 0.66rem;
+            font-weight: 900;
+        }
+
+        .other-item img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.82);
+            flex: 0 0 auto;
+        }
+
+        .empty-state {
+            padding: 26px;
+            color: var(--text-secondary);
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .load-more-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 18px 0 6px;
+        }
+
+        .footer-beian {
+            text-align: center;
+            margin-top: 40px;
+            padding-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .footer-beian a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .footer-beian a:hover {
+            color: #ffffff;
+        }
+
+        .rules-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            background: rgba(46,36,24,0.46);
+        }
+
+        .rules-modal.is-open {
+            display: flex;
+        }
+
+        .rules-dialog {
+            width: min(760px, 100%);
+            max-height: min(78vh, 760px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.62);
+            border-radius: 18px;
+            background: rgba(255,255,255,0.96);
+            box-shadow: 0 28px 70px rgba(46,36,24,0.32);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .rules-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 16px;
+            border-bottom: 1px solid rgba(225,210,186,0.9);
+        }
+
+        .rules-title {
+            color: var(--primary-dark);
+            font-size: 1.08rem;
+            font-weight: 950;
+        }
+
+        .rules-close {
+            width: 34px;
+            height: 34px;
+            border: 1px solid rgba(163,109,39,0.16);
+            border-radius: 50%;
+            background: rgba(163,109,39,0.08);
+            color: var(--primary-dark);
+            font: inherit;
+            font-size: 1.2rem;
+            font-weight: 950;
+            cursor: pointer;
+        }
+
+        .rules-content {
+            overflow: auto;
+            padding: 18px;
+            color: var(--text);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            background:
+                linear-gradient(180deg, rgba(163,109,39,0.05), transparent 180px),
+                rgba(255,255,255,0.72);
+        }
+
+        .rules-intro {
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border: 1px solid rgba(163,109,39,0.12);
+            border-radius: 14px;
+            background: rgba(163,109,39,0.07);
+            color: var(--primary-dark);
+            font-weight: 900;
+        }
+
+        .rules-section {
+            padding: 14px;
+            border: 1px solid rgba(225,210,186,0.92);
+            border-radius: 14px;
+            background: rgba(255,255,255,0.86);
+            box-shadow: 0 10px 22px rgba(46,36,24,0.06);
+        }
+
+        .rules-section + .rules-section {
+            margin-top: 12px;
+        }
+
+        .rules-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+            font-size: 1rem;
+            font-weight: 950;
+        }
+
+        .rules-section-title::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            flex: 0 0 auto;
+        }
+
+        .rules-list {
+            display: grid;
+            gap: 7px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .rules-list li {
+            position: relative;
+            padding-left: 18px;
+            color: var(--text-secondary);
+            font-weight: 750;
+        }
+
+        .rules-list li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 0.78em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(163,109,39,0.48);
+        }
+
+        .rules-message {
+            padding: 22px;
+            color: var(--text-secondary);
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .back-to-top {
+            position: fixed;
+            right: 24px;
+            bottom: 86px;
+            z-index: 30;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            font-weight: 950;
+            box-shadow: 0 12px 28px rgba(46,36,24,0.18);
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .back-to-top.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            border-color: rgba(163,109,39,0.48);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .back-to-top {
+                right: 16px;
+                bottom: 72px;
+                width: 44px;
+                height: 44px;
+            }
+
+            .main-title {
+                font-size: 1.9rem;
+            }
+
+            .topbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .candidate-search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .strategy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pair-row {
+                grid-template-columns: 1fr;
+            }
+
+            .plus {
+                justify-self: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="hero-eyebrow">ADVENTURE</div>
+            <h1 class="main-title">异色刷取推荐</h1>
+            <p class="desc-font">按自定义优先级排序，寻找更快触发异色事件且更少歪异色的刷取方案。</p>
+        </header>
+
+        <div class="topbar">
+            <a class="btn" href="index.html">‹ 返回主页</a>
+            <div class="topbar-actions">
+                <div class="count-pill" id="resultCount">数据加载中</div>
+                <button id="rulesHelp" class="help-button" type="button">推荐规则说明</button>
+            </div>
+        </div>
+
+        <section class="panel controls">
+            <div class="adventure-control-section">
+                <div class="control-title">选择异色家族</div>
+                <div id="targetStrip" class="target-strip"></div>
+            </div>
+            <div class="adventure-control-section">
+                <div class="control-title">限定刷取家族（可选）</div>
+                <div id="brushMode" class="mode-toggle" role="radiogroup" aria-label="刷取模式">
+                    <button class="mode-option active" type="button" data-mode="mixed" role="radio" aria-checked="true">混刷</button>
+                    <button class="mode-option" type="button" data-mode="single" role="radio" aria-checked="false">单刷</button>
+                </div>
+                <div class="candidate-search-grid">
+                    <div class="candidate-field">
+                        <input id="candidateInputA" class="search-input" type="search" placeholder="输入第一只精灵名称或编号" autocomplete="off" aria-controls="candidateSuggestA">
+                        <div id="candidateSuggestA" class="suggest-menu" role="listbox"></div>
+                    </div>
+                    <div class="candidate-field">
+                        <input id="candidateInputB" class="search-input" type="search" placeholder="输入第二只精灵名称或编号" autocomplete="off" aria-controls="candidateSuggestB">
+                        <div id="candidateSuggestB" class="suggest-menu" role="listbox"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="adventure-control-section">
+                <div class="control-title">排序优先级</div>
+                <div id="sortPriority" class="sort-priority" aria-label="排序优先级"></div>
+            </div>
+            <div class="controls-actions">
+                <button id="startSearch" class="btn btn-primary" type="button">开始搜索</button>
+                <button id="clearSearch" class="btn" type="button">清空条件</button>
+            </div>
+        </section>
+
+        <main>
+            <section id="strategyGrid" class="strategy-grid">
+                <div class="panel empty-state">正在计算推荐策略...</div>
+            </section>
+            <div class="load-more-wrap">
+                <button id="loadMore" class="btn" type="button" style="display:none;">显示更多</button>
+            </div>
+        </main>
+    </div>
+
+    <div class="footer-beian">
+        <a href="https://beian.mps.gov.cn/#/query/webSearch?code=32058102002843" rel="noreferrer" target="_blank">
+            <img src="https://img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png" alt="" style="width: 20px; height: 20px;">
+            苏公网安备32058102002843号
+        </a>
+    </div>
+
+    <button id="backToTop" class="back-to-top" type="button" aria-label="回到顶部">↑</button>
+
+    <div id="rulesModal" class="rules-modal" aria-hidden="true">
+        <div class="rules-dialog" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+            <div class="rules-head">
+                <div id="rulesTitle" class="rules-title">推荐规则说明</div>
+                <button id="rulesClose" class="rules-close" type="button" aria-label="关闭推荐规则">×</button>
+            </div>
+            <div id="rulesContent" class="rules-content">正在加载推荐规则...</div>
+        </div>
+    </div>
+
+    <script>
+        const ATTRIBUTES = ['普通', '草', '火', '水', '光', '地', '冰', '龙', '电', '毒', '虫', '武', '翼', '萌', '幽', '恶', '机械', '幻'];
+        const ATTRIBUTE_LOGOS = Object.fromEntries(
+            ATTRIBUTES.map(attr => [attr, `./web_images/types/${attr}.png`])
+        );
+        const ATTRIBUTE_COLORS = {
+            '普通': '#3F89B4',
+            '草': '#4EBC73',
+            '火': '#DB5525',
+            '水': '#6AA9FE',
+            '光': '#4FC0FF',
+            '地': '#9A7E3F',
+            '冰': '#5FADDD',
+            '龙': '#ED4962',
+            '电': '#E7C506',
+            '毒': '#BA62E0',
+            '虫': '#9ECE21',
+            '武': '#FF9636',
+            '翼': '#3EC7CA',
+            '萌': '#FC7CAC',
+            '幽': '#9446EC',
+            '恶': '#CF467A',
+            '机械': '#40CBA9',
+            '幻': '#9FA7F8'
+        };
+        const STARLIGHT_BADGE = './web_images/values/base-starlight-value.png';
+        const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
+        const PAGE_SIZE = 80;
+
+        let records = [];
+        let canonicalRecordByNumber = new Map();
+        let adventureTargets = [];
+        let adventureNumbers = new Set();
+        let rareTargets = [];
+        let candidates = [];
+        let allStrategies = [];
+        let filteredStrategies = [];
+        let visibleCount = PAGE_SIZE;
+        let activeTarget = '';
+        let activeBrushMode = 'mixed';
+        let sortPriority = ['rare', 'score'];
+
+        const BRUSH_MODE_LABELS = {
+            mixed: '混刷',
+            single: '单刷'
+        };
+
+        const SORT_LABELS = {
+            score: '星光值',
+            rare: '少歪异色'
+        };
+
+        const sortPriorityGroup = document.getElementById('sortPriority');
+        const brushMode = document.getElementById('brushMode');
+        const candidateInputA = document.getElementById('candidateInputA');
+        const candidateInputB = document.getElementById('candidateInputB');
+        const candidateSuggestA = document.getElementById('candidateSuggestA');
+        const candidateSuggestB = document.getElementById('candidateSuggestB');
+        const startSearch = document.getElementById('startSearch');
+        const clearSearch = document.getElementById('clearSearch');
+        const targetStrip = document.getElementById('targetStrip');
+        const strategyGrid = document.getElementById('strategyGrid');
+        const resultCount = document.getElementById('resultCount');
+        const loadMore = document.getElementById('loadMore');
+        const backToTop = document.getElementById('backToTop');
+        const rulesHelp = document.getElementById('rulesHelp');
+        const rulesModal = document.getElementById('rulesModal');
+        const rulesClose = document.getElementById('rulesClose');
+        const rulesContent = document.getElementById('rulesContent');
+        let rulesTextCache = '';
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function normalize(value) {
+            return String(value || '').replace(/\s+/g, '').toLowerCase();
+        }
+
+        function normalizeNumber(value) {
+            const digits = String(value || '').replace(/\D/g, '');
+            return digits ? digits.padStart(3, '0') : '';
+        }
+
+        function leadingNumber(value) {
+            const match = String(value || '').match(/^(\d+)/);
+            return match ? match[1].padStart(3, '0') : '';
+        }
+
+        function buildFirstRecordIndex(sourceRecords) {
+            const index = new Map();
+            sourceRecords.forEach(record => {
+                const number = normalizeNumber(record.number);
+                if (number && !index.has(number)) index.set(number, record);
+            });
+            return index;
+        }
+
+        function parseCsv(text) {
+            const rows = [];
+            let row = [];
+            let cell = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < text.length; i += 1) {
+                const char = text[i];
+                const next = text[i + 1];
+
+                if (char === '"' && inQuotes && next === '"') {
+                    cell += '"';
+                    i += 1;
+                } else if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    row.push(cell);
+                    cell = '';
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (char === '\r' && next === '\n') i += 1;
+                    row.push(cell);
+                    if (row.some(value => value !== '')) rows.push(row);
+                    row = [];
+                    cell = '';
+                } else {
+                    cell += char;
+                }
+            }
+
+            if (cell || row.length) {
+                row.push(cell);
+                if (row.some(value => value !== '')) rows.push(row);
+            }
+
+            const headers = rows.shift() || [];
+            return rows.map(values => Object.fromEntries(headers.map((header, index) => [header.trim(), (values[index] || '').trim()])));
+        }
+
+        function cleanList(values) {
+            return (values || []).filter(Boolean);
+        }
+
+        function setKey(values) {
+            return [...values].filter(Boolean).sort((a, b) => a.localeCompare(b, 'zh-CN')).join('|');
+        }
+
+        function intersect(a, b) {
+            const second = new Set(b);
+            return a.filter(item => second.has(item));
+        }
+
+        function addToIndex(index, key, target) {
+            if (!key) return;
+            if (!index.has(key)) index.set(key, new Set());
+            index.get(key).add(target);
+        }
+
+        function buildTargetIndex(targets) {
+            const attributeIndex = new Map();
+
+            targets.forEach(target => {
+                targetTriggerAttributes(target).forEach(attribute => addToIndex(attributeIndex, attribute, target));
+            });
+
+            return { attributeIndex };
+        }
+
+        function recordAttributes(record) {
+            return cleanList(record.attributes).length ? cleanList(record.attributes) : ['普通'];
+        }
+
+        function targetTriggerAttributes(target) {
+            return recordAttributes(target && target.representative ? target.representative : target);
+        }
+
+        function brushAttributes(record) {
+            return [primaryAttribute(record)].filter(Boolean);
+        }
+
+        function hasUsableEggGroup(record) {
+            return cleanList(record && record.eggGroups).length > 0;
+        }
+
+        function primaryAttribute(record) {
+            return recordAttributes(record)[0] || '普通';
+        }
+
+        function portraitSmallPath(record) {
+            return String(record && record.portrait ? record.portrait : '').replace('/portrait/', '/portrait-small/');
+        }
+
+        function recordStarlight(record) {
+            const value = Number(record && record.baseStarlightValue);
+            return Number.isFinite(value) ? value : 0;
+        }
+
+        function familyKey(record) {
+            const evolution = Array.isArray(record.evolution) && record.evolution.length
+                ? record.evolution
+                : [record.id];
+            return uniqueList(evolution.map(id => {
+                const number = leadingNumber(id);
+                return (number && canonicalRecordByNumber.get(number))
+                    ? canonicalRecordByNumber.get(number).id
+                    : id;
+            })).join('|');
+        }
+
+        function familyRepresentative(members, evolutionIds) {
+            const firstEvolutionId = evolutionIds[0];
+            return (
+                members.find(member => member.id === firstEvolutionId)
+                || members.slice().sort((a, b) => a.number.localeCompare(b.number))[0]
+            );
+        }
+
+        function weightedFamilyStarlight(members, evolutionIds) {
+            const orderedMembers = evolutionIds
+                .map(id => members.find(member => member.id === id))
+                .filter(Boolean);
+            const usableMembers = orderedMembers.length ? orderedMembers : members;
+
+            if (usableMembers.length === 1) {
+                return recordStarlight(usableMembers[0]);
+            }
+            if (usableMembers.length === 2) {
+                return (recordStarlight(usableMembers[0]) * 3.5 + recordStarlight(usableMembers[1]) * 1.5) / 5;
+            }
+            if (usableMembers.length === 3) {
+                return (
+                    recordStarlight(usableMembers[0]) * 2.5
+                    + recordStarlight(usableMembers[1]) * 1.5
+                    + recordStarlight(usableMembers[2])
+                ) / 5;
+            }
+
+            return usableMembers.reduce((sum, member) => sum + recordStarlight(member), 0) / usableMembers.length;
+        }
+
+        function formatScore(score) {
+            const value = Number(score);
+            if (!Number.isFinite(value)) return '-';
+            return Number.isInteger(value) ? String(value) : value.toFixed(1).replace(/\.0$/, '');
+        }
+
+        function uniqueList(values) {
+            return [...new Set(values.filter(Boolean))];
+        }
+
+        function buildCandidateFamilies(sourceRecords) {
+            const familyMap = new Map();
+            sourceRecords.forEach(record => {
+                const key = familyKey(record);
+                if (!familyMap.has(key)) {
+                    familyMap.set(key, {
+                        key,
+                        evolutionIds: key.split('|').filter(Boolean),
+                        members: []
+                    });
+                }
+                familyMap.get(key).members.push(record);
+            });
+
+            return [...familyMap.values()].map(family => {
+                const representative = familyRepresentative(family.members, family.evolutionIds);
+                const sortedMembers = family.evolutionIds
+                    .map(id => family.members.find(member => member.id === id))
+                    .filter(Boolean);
+                const members = sortedMembers.length ? sortedMembers : family.members;
+                const memberNames = members.map(member => member.title);
+                const memberNumbers = members.map(member => member.number);
+                const attributes = uniqueList(members.flatMap(recordAttributes));
+                const score = weightedFamilyStarlight(family.members, family.evolutionIds);
+                const title = members.length > 1 ? `${representative.title}家族` : representative.title;
+                const firstAttribute = primaryAttribute(representative);
+
+                return {
+                    id: family.key,
+                    key: family.key,
+                    number: representative.number,
+                    title,
+                    portrait: representative.portrait,
+                    representative,
+                    attributes,
+                    firstAttribute,
+                    baseStarlightValue: score,
+                    members,
+                    memberNames,
+                    memberNumbers,
+                    searchText: normalize([
+                        title,
+                        representative.number,
+                        representative.title,
+                        ...memberNames,
+                        ...memberNumbers
+                    ].join(' '))
+                };
+            }).sort((a, b) => a.number.localeCompare(b.number));
+        }
+
+        function attributeColor(attr) {
+            return ATTRIBUTE_COLORS[attr] || FALLBACK_ATTRIBUTE_COLOR;
+        }
+
+        function spriteStyle(record) {
+            const colors = recordAttributes(record).slice(0, 2).map(attributeColor);
+            return `--type-a:${colors[0] || FALLBACK_ATTRIBUTE_COLOR};--type-b:${colors[1] || colors[0] || FALLBACK_ATTRIBUTE_COLOR};`;
+        }
+
+        function renderAttributeLogo(attr) {
+            const logo = ATTRIBUTE_LOGOS[attr] || '';
+            return logo
+                ? `<img class="type-logo" src="${escapeHtml(logo)}" alt="" aria-hidden="true" onerror="this.style.display='none'">`
+                : '';
+        }
+
+        function renderTypeChips(record) {
+            return recordAttributes(record).map(attr => (
+                `<span class="type-chip">${renderAttributeLogo(attr)}<span>${escapeHtml(attr)}</span></span>`
+            )).join('');
+        }
+
+        function formatNo(number) {
+            return `NO.${escapeHtml(number)}`;
+        }
+
+        function candidateInputLabel(record) {
+            return `${record.number} ${record.title}`;
+        }
+
+        function candidateSearchText(record) {
+            return normalize([
+                record.number,
+                record.title,
+                record.title,
+                record.number,
+                record.searchText || ''
+            ].join(' '));
+        }
+
+        function candidateMatchesTerm(record, term) {
+            return !term || candidateSearchText(record).includes(term);
+        }
+
+        function strategyMatchesCandidates(strategy, firstTerm, secondTerm) {
+            const participants = [strategy.first, strategy.second].filter(Boolean);
+            if (!firstTerm && !secondTerm) return true;
+            if (firstTerm && !secondTerm) {
+                return participants.some(record => candidateMatchesTerm(record, firstTerm));
+            }
+            if (!firstTerm && secondTerm) {
+                return participants.some(record => candidateMatchesTerm(record, secondTerm));
+            }
+            if (participants.length < 2) return false;
+
+            const [first, second] = participants;
+            return (
+                (candidateMatchesTerm(first, firstTerm) && candidateMatchesTerm(second, secondTerm))
+                || (candidateMatchesTerm(first, secondTerm) && candidateMatchesTerm(second, firstTerm))
+            );
+        }
+
+        function renderCandidateSuggestOption(record) {
+            return `
+                <button class="suggest-option" type="button" data-number="${escapeHtml(record.number)}">
+                    <img src="${escapeHtml(portraitSmallPath(record))}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span>
+                        <span class="suggest-name">${escapeHtml(record.title)}</span>
+                        <span class="suggest-number">${formatNo(record.number)}</span>
+                    </span>
+                </button>
+            `;
+        }
+
+        function closeSuggestMenu(menu) {
+            menu.classList.remove('is-open');
+        }
+
+        function updateCandidateSuggestions(input, menu) {
+            const keyword = normalize(input.value);
+            if (!keyword) {
+                closeSuggestMenu(menu);
+                return;
+            }
+
+            const matches = candidates
+                .filter(record => candidateMatchesTerm(record, keyword))
+                .slice(0, 10);
+
+            if (!matches.length) {
+                menu.innerHTML = '<div class="empty-state" style="padding:12px;">没有匹配的候选家族。</div>';
+                menu.classList.add('is-open');
+                return;
+            }
+
+            menu.innerHTML = matches.map(renderCandidateSuggestOption).join('');
+            menu.classList.add('is-open');
+            menu.querySelectorAll('.suggest-option').forEach(option => {
+                option.addEventListener('mousedown', event => {
+                    event.preventDefault();
+                    const record = candidates.find(item => item.number === option.dataset.number);
+                    if (record) input.value = candidateInputLabel(record);
+                    closeSuggestMenu(menu);
+                });
+            });
+        }
+
+        function renderSprite(record) {
+            return `
+                <div class="sprite-card" style="${spriteStyle(record)}">
+                    <div class="sprite-image-wrap">
+                        <img class="sprite-image" src="${escapeHtml(portraitSmallPath(record))}" alt="${escapeHtml(record.title)}" loading="lazy" onerror="this.style.display='none'">
+                    </div>
+                    <div class="sprite-number">${formatNo(record.number)}</div>
+                    <div class="sprite-name">${escapeHtml(record.title)}</div>
+                    <div class="chip-row">${renderTypeChips(record)}</div>
+                </div>
+            `;
+        }
+
+        function renderOtherTarget(item) {
+            const target = item.target;
+            const rules = item.rules.map(rule => `<span class="other-rule">${escapeHtml(rule)}</span>`).join('');
+            return `
+                <span class="other-item" title="${formatNo(target.number)} ${escapeHtml(target.title)}">
+                    <img src="${escapeHtml(portraitSmallPath(target))}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span class="other-info">
+                        <span class="other-name">${formatNo(target.number)} ${escapeHtml(target.title)}</span>
+                        <span class="other-rules">${rules}</span>
+                    </span>
+                </span>
+            `;
+        }
+
+        function renderScoreBadge(score) {
+            const scoreText = formatScore(score);
+            return `
+                <div class="score-badge" title="家族星光值之和：${escapeHtml(scoreText)}" aria-label="家族星光值之和：${escapeHtml(scoreText)}">
+                    <img class="score-badge-image" src="${escapeHtml(STARLIGHT_BADGE)}" alt="" aria-hidden="true" onerror="this.style.display='none'">
+                    <span class="score-badge-number">${escapeHtml(scoreText)}</span>
+                </div>
+            `;
+        }
+
+        function renderStrategy(strategy) {
+            const others = strategy.otherTargets.length
+                ? strategy.otherTargets.map(renderOtherTarget).join('')
+                : '<span class="other-item">暂无</span>';
+            const ruleChips = strategy.rules.map(rule => `<span class="rule-chip">${escapeHtml(rule)}</span>`).join('');
+            const candidateRow = strategy.second
+                ? `
+                    <div class="pair-row">
+                        ${renderSprite(strategy.first)}
+                        <span class="plus">+</span>
+                        ${renderSprite(strategy.second)}
+                    </div>
+                `
+                : `
+                    <div class="pair-row is-single">
+                        ${renderSprite(strategy.first)}
+                    </div>
+                `;
+
+            return `
+                <article class="panel strategy-card">
+                    <div class="strategy-head">
+                        <div class="target-mini">
+                            <img class="mini-img" src="${escapeHtml(portraitSmallPath(strategy.target))}" alt="${escapeHtml(strategy.target.title)}" loading="lazy" onerror="this.style.display='none'">
+                            <div>
+                                <div class="mini-label">目标异色</div>
+                                <div class="mini-name">${formatNo(strategy.target.number)} ${escapeHtml(strategy.target.title)}</div>
+                            </div>
+                        </div>
+                        ${renderScoreBadge(strategy.score)}
+                    </div>
+                    <div class="strategy-body">
+                        ${candidateRow}
+                        <div class="chip-row">${ruleChips}</div>
+                        <div class="others">
+                            <div class="others-title">还可能触发</div>
+                            <div class="other-list">${others}</div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function strategySearchTextParts(strategy, otherTargets) {
+            return [
+                strategy.target.number,
+                strategy.target.title,
+                strategy.target.searchText,
+                strategy.first.number,
+                strategy.first.title,
+                strategy.first.searchText,
+                strategy.second && strategy.second.number,
+                strategy.second && strategy.second.title,
+                strategy.second && strategy.second.searchText,
+                ...otherTargets.map(rareItem => `${rareItem.target.number}${rareItem.target.title}${rareItem.target.searchText}${rareItem.rules.join('')}`)
+            ];
+        }
+
+        function addRuleTarget(map, target, rule) {
+            const item = map.get(target.key) || { target, rules: [] };
+            if (!item.rules.includes(rule)) item.rules.push(rule);
+            map.set(target.key, item);
+        }
+
+        function collectTriggeredTargets(targetIndex, attributes, rulePrefix) {
+            const triggered = new Map();
+            uniqueList(attributes).forEach(attribute => {
+                const rule = `${rulePrefix}：${attribute}`;
+                (targetIndex.attributeIndex.get(attribute) || []).forEach(target => addRuleTarget(triggered, target, rule));
+            });
+            return triggered;
+        }
+
+        function pushStrategiesForRuleMaps(strategies, first, second, targetRuleMap, rareTargetRuleMap) {
+            if (!targetRuleMap.size) return;
+
+            const rareTriggeredItems = [...rareTargetRuleMap.values()].map(item => ({
+                target: item.target,
+                rules: item.rules
+            }));
+            const score = first.baseStarlightValue + (second ? second.baseStarlightValue : 0);
+
+            targetRuleMap.forEach(item => {
+                const otherTargets = rareTriggeredItems.filter(rareItem => rareItem.target.key !== item.target.key);
+                const strategy = {
+                    target: item.target,
+                    first,
+                    second,
+                    score,
+                    rules: item.rules,
+                    otherTargets
+                };
+                strategy.searchText = normalize(strategySearchTextParts(strategy, otherTargets).join(' '));
+                strategies.push(strategy);
+            });
+        }
+
+        function buildStrategies() {
+            const adventureIndex = buildTargetIndex(adventureTargets);
+            const rareIndex = buildTargetIndex(rareTargets);
+            const strategies = [];
+
+            for (let i = 0; i < candidates.length; i += 1) {
+                const single = candidates[i];
+                pushStrategiesForRuleMaps(
+                    strategies,
+                    single,
+                    null,
+                    collectTriggeredTargets(adventureIndex, brushAttributes(single), '单刷第一属性'),
+                    collectTriggeredTargets(rareIndex, brushAttributes(single), '单刷第一属性')
+                );
+
+                for (let j = i + 1; j < candidates.length; j += 1) {
+                    const first = candidates[i];
+                    const second = candidates[j];
+                    if (first.key === second.key) continue;
+
+                    const commonAttributes = first.firstAttribute && first.firstAttribute === second.firstAttribute
+                        ? [first.firstAttribute]
+                        : [];
+                    pushStrategiesForRuleMaps(
+                        strategies,
+                        first,
+                        second,
+                        collectTriggeredTargets(adventureIndex, commonAttributes, '共同第一属性'),
+                        collectTriggeredTargets(rareIndex, commonAttributes, '共同第一属性')
+                    );
+                }
+            }
+
+            return strategies;
+        }
+
+        function compareStrategyFallback(a, b) {
+            return (
+                a.target.number.localeCompare(b.target.number)
+                || a.target.key.localeCompare(b.target.key, 'zh-CN')
+                || a.first.number.localeCompare(b.first.number)
+                || Number(Boolean(a.second)) - Number(Boolean(b.second))
+                || String(a.second && a.second.number || '').localeCompare(String(b.second && b.second.number || ''))
+            );
+        }
+
+        function otherTriggerMethodCount(strategy) {
+            return strategy.otherTargets.reduce((total, item) => total + item.rules.length, 0);
+        }
+
+        function compareBySortKey(a, b, sortKey) {
+            if (sortKey === 'score') return b.score - a.score;
+            if (sortKey === 'rare') {
+                return (a.otherTargets.length - b.otherTargets.length)
+                    || (otherTriggerMethodCount(a) - otherTriggerMethodCount(b));
+            }
+
+            return 0;
+        }
+
+        function compareStrategies(a, b) {
+            for (const sortKey of sortPriority) {
+                const result = compareBySortKey(a, b, sortKey);
+                if (result) return result;
+            }
+            return compareStrategyFallback(a, b);
+        }
+
+        function sortStrategies(strategies) {
+            return strategies.slice().sort(compareStrategies);
+        }
+
+        function renderSortPriority() {
+            sortPriorityGroup.innerHTML = sortPriority.map((sortKey, index) => `
+                <div class="sort-priority-item" data-sort="${escapeHtml(sortKey)}">
+                    <span class="sort-rank">${index + 1}</span>
+                    <span class="sort-label">${escapeHtml(SORT_LABELS[sortKey])}</span>
+                    <button class="sort-move" type="button" data-sort="${escapeHtml(sortKey)}" data-move="up" ${index === 0 ? 'disabled' : ''} aria-label="上移${escapeHtml(SORT_LABELS[sortKey])}">↑</button>
+                    <button class="sort-move" type="button" data-sort="${escapeHtml(sortKey)}" data-move="down" ${index === sortPriority.length - 1 ? 'disabled' : ''} aria-label="下移${escapeHtml(SORT_LABELS[sortKey])}">↓</button>
+                </div>
+            `).join('');
+        }
+
+        function moveSortPriority(sortKey, direction) {
+            const index = sortPriority.indexOf(sortKey);
+            if (index < 0) return;
+
+            const nextIndex = direction === 'up' ? index - 1 : index + 1;
+            if (nextIndex < 0 || nextIndex >= sortPriority.length) return;
+
+            [sortPriority[index], sortPriority[nextIndex]] = [sortPriority[nextIndex], sortPriority[index]];
+            renderSortPriority();
+            visibleCount = PAGE_SIZE;
+            applyFilters();
+        }
+
+        function renderBrushModeControls() {
+            brushMode.querySelectorAll('.mode-option').forEach(button => {
+                const isActive = button.dataset.mode === activeBrushMode;
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-checked', String(isActive));
+            });
+
+            const isSingle = activeBrushMode === 'single';
+            candidateInputA.placeholder = isSingle ? '输入单刷精灵名称或编号' : '输入第一只精灵名称或编号';
+            candidateInputB.disabled = isSingle;
+            candidateInputB.placeholder = isSingle ? '单刷模式不需要第二只精灵' : '输入第二只精灵名称或编号';
+            if (isSingle) {
+                candidateInputB.value = '';
+                closeSuggestMenu(candidateSuggestB);
+            }
+        }
+
+        function renderTargetControls() {
+            targetStrip.innerHTML = [
+                `<button class="target-chip ${activeTarget === '' ? 'active' : ''}" type="button" data-target="">全部</button>`,
+                ...adventureTargets.map(target => `
+                    <button class="target-chip ${activeTarget === target.key ? 'active' : ''}" type="button" data-target="${escapeHtml(target.key)}">
+                        <img src="${escapeHtml(portraitSmallPath(target))}" alt="" loading="lazy" onerror="this.style.display='none'">
+                        <span>${escapeHtml(target.title)}</span>
+                    </button>
+                `)
+            ].join('');
+
+            targetStrip.querySelectorAll('.target-chip').forEach(button => {
+                button.addEventListener('click', () => {
+                    activeTarget = button.dataset.target || '';
+                    visibleCount = PAGE_SIZE;
+                    applyFilters();
+                });
+            });
+        }
+
+        function applyFilters() {
+            const firstTerm = normalize(candidateInputA.value);
+            const secondTerm = normalize(candidateInputB.value);
+            filteredStrategies = allStrategies.filter(strategy => {
+                const matchesTarget = !activeTarget || strategy.target.key === activeTarget;
+                const matchesMode = activeBrushMode === 'single' ? !strategy.second : Boolean(strategy.second);
+                const matchesCandidates = strategyMatchesCandidates(strategy, firstTerm, secondTerm);
+                return matchesTarget && matchesMode && matchesCandidates;
+            });
+            filteredStrategies = sortStrategies(filteredStrategies);
+
+            resultCount.textContent = `共 ${filteredStrategies.length} 条${BRUSH_MODE_LABELS[activeBrushMode]}推荐`;
+            renderTargetControls();
+            renderStrategies();
+        }
+
+        function renderStrategies() {
+            if (!filteredStrategies.length) {
+                strategyGrid.innerHTML = `<div class="panel empty-state">没有匹配的${escapeHtml(BRUSH_MODE_LABELS[activeBrushMode])}方案。</div>`;
+                loadMore.style.display = 'none';
+                return;
+            }
+
+            const visible = filteredStrategies.slice(0, visibleCount);
+            strategyGrid.innerHTML = visible.map(renderStrategy).join('');
+            loadMore.style.display = visibleCount < filteredStrategies.length ? 'inline-flex' : 'none';
+            loadMore.textContent = `显示更多（${Math.min(PAGE_SIZE, filteredStrategies.length - visibleCount)}）`;
+        }
+
+        async function init() {
+            try {
+                const [handbookResponse, adventureResponse, rareResponse] = await Promise.all([
+                    fetch('handbook_data.json'),
+                    fetch('adventure.csv'),
+                    fetch('rare.csv')
+                ]);
+                const handbook = await handbookResponse.json();
+                const adventureRows = parseCsv(await adventureResponse.text());
+                const rareRows = parseCsv(await rareResponse.text());
+
+                canonicalRecordByNumber = buildFirstRecordIndex(handbook.records || []);
+                records = [...canonicalRecordByNumber.values()];
+                adventureNumbers = new Set(adventureRows.map(row => normalizeNumber(row['图鉴编号'])));
+                const rareNumbers = new Set(rareRows.map(row => normalizeNumber(row['图鉴编号'])));
+                const allFamilies = buildCandidateFamilies(records);
+                adventureTargets = allFamilies.filter(family => family.members.some(member => adventureNumbers.has(member.number)));
+                rareTargets = allFamilies.filter(family => family.members.some(member => rareNumbers.has(member.number)));
+                candidates = buildCandidateFamilies(records.filter(record => (
+                    Number.isFinite(record.baseStarlightValue)
+                    && hasUsableEggGroup(record)
+                )))
+                    .filter(family => !family.members.some(member => adventureNumbers.has(member.number)));
+
+                renderSortPriority();
+                renderBrushModeControls();
+                renderTargetControls();
+                allStrategies = buildStrategies();
+                applyFilters();
+            } catch (error) {
+                console.error(error);
+                resultCount.textContent = '加载失败';
+                strategyGrid.innerHTML = '<div class="panel empty-state">推荐数据暂时加载失败，请稍后刷新重试。</div>';
+            }
+        }
+
+        startSearch.addEventListener('click', () => {
+            visibleCount = PAGE_SIZE;
+            applyFilters();
+        });
+
+        brushMode.addEventListener('click', event => {
+            const button = event.target.closest('.mode-option');
+            if (!button || button.dataset.mode === activeBrushMode) return;
+            activeBrushMode = button.dataset.mode;
+            visibleCount = PAGE_SIZE;
+            renderBrushModeControls();
+            applyFilters();
+        });
+
+        sortPriorityGroup.addEventListener('click', event => {
+            const button = event.target.closest('.sort-move');
+            if (!button || button.disabled) return;
+            moveSortPriority(button.dataset.sort, button.dataset.move);
+        });
+
+        candidateInputA.addEventListener('input', () => updateCandidateSuggestions(candidateInputA, candidateSuggestA));
+        candidateInputB.addEventListener('input', () => updateCandidateSuggestions(candidateInputB, candidateSuggestB));
+        candidateInputA.addEventListener('focus', () => updateCandidateSuggestions(candidateInputA, candidateSuggestA));
+        candidateInputB.addEventListener('focus', () => updateCandidateSuggestions(candidateInputB, candidateSuggestB));
+        candidateInputA.addEventListener('blur', () => setTimeout(() => closeSuggestMenu(candidateSuggestA), 120));
+        candidateInputB.addEventListener('blur', () => setTimeout(() => closeSuggestMenu(candidateSuggestB), 120));
+        candidateInputA.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                visibleCount = PAGE_SIZE;
+                applyFilters();
+            }
+        });
+        candidateInputB.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                visibleCount = PAGE_SIZE;
+                applyFilters();
+            }
+        });
+
+        clearSearch.addEventListener('click', () => {
+            candidateInputA.value = '';
+            candidateInputB.value = '';
+            activeTarget = '';
+            activeBrushMode = 'mixed';
+            visibleCount = PAGE_SIZE;
+            closeSuggestMenu(candidateSuggestA);
+            closeSuggestMenu(candidateSuggestB);
+            renderBrushModeControls();
+            applyFilters();
+        });
+
+        loadMore.addEventListener('click', () => {
+            visibleCount += PAGE_SIZE;
+            renderStrategies();
+        });
+
+        function renderRulesText(text) {
+            const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+            const sections = [];
+            let intro = '';
+            let current = null;
+
+            lines.forEach(line => {
+                const sectionMatch = line.match(/^[一二三四五六七八九十]+、(.+)$/);
+                const itemMatch = line.match(/^\d+\.\s*(.+)$/);
+
+                if (sectionMatch) {
+                    current = { title: sectionMatch[1], items: [] };
+                    sections.push(current);
+                    return;
+                }
+
+                if (itemMatch && current) {
+                    current.items.push(itemMatch[1]);
+                    return;
+                }
+
+                if (current) {
+                    current.items.push(line.replace(/^-\s*/, ''));
+                } else {
+                    intro = intro ? `${intro} ${line}` : line;
+                }
+            });
+
+            const introHtml = intro
+                ? `<div class="rules-intro">${escapeHtml(intro)}</div>`
+                : '';
+            const sectionHtml = sections.map(section => `
+                <section class="rules-section">
+                    <div class="rules-section-title">${escapeHtml(section.title)}</div>
+                    <ul class="rules-list">
+                        ${section.items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}
+                    </ul>
+                </section>
+            `).join('');
+
+            return introHtml + sectionHtml;
+        }
+
+        async function openRulesModal() {
+            rulesModal.classList.add('is-open');
+            rulesModal.setAttribute('aria-hidden', 'false');
+
+            if (rulesTextCache) {
+                rulesContent.innerHTML = renderRulesText(rulesTextCache);
+                return;
+            }
+
+            rulesContent.innerHTML = '<div class="rules-message">正在加载推荐规则...</div>';
+            try {
+                const response = await fetch('adventure_rules.txt', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                rulesTextCache = await response.text();
+                rulesContent.innerHTML = renderRulesText(rulesTextCache);
+            } catch (error) {
+                console.error(error);
+                rulesContent.innerHTML = '<div class="rules-message">推荐规则暂时加载失败，请稍后再试。</div>';
+            }
+        }
+
+        function closeRulesModal() {
+            rulesModal.classList.remove('is-open');
+            rulesModal.setAttribute('aria-hidden', 'true');
+        }
+
+        rulesHelp.addEventListener('click', openRulesModal);
+        rulesClose.addEventListener('click', closeRulesModal);
+        rulesModal.addEventListener('click', event => {
+            if (event.target === rulesModal) closeRulesModal();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && rulesModal.classList.contains('is-open')) {
+                closeRulesModal();
+            }
+        });
+
+        function syncBackToTop() {
+            backToTop.classList.toggle('is-visible', window.scrollY > 320);
+        }
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        window.addEventListener('scroll', syncBackToTop, { passive: true });
+        syncBackToTop();
+
+        init();
+    </script>
+    <script>
+    (function(){
+        var bp = document.createElement('script');
+        bp.src = '//push.zhanzhang.baidu.com/push.js';
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+</body>
+</html>
