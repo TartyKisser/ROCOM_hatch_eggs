@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Check } from '@rocokingdom-ui/icons'
 import {
   Button, ButtonNormal, Divider, Input, Layout, LayoutContent, LayoutFooter,
-  Material, Modal, Panel, RadioGroup, RadioItem, RocoShape, RocoTheme, Space, Stack,
+  Modal, Panel, RadioGroup, RadioItem, RocoShape, RocoTheme, Space, Stack,
   Tab, TabList, TabPanel, Tabs, Textarea,
 } from 'rocokingdom-ui'
 import 'rocokingdom-ui/style.css'
@@ -39,16 +39,6 @@ const rewardImageConfig = {
 
 const feedbackTypes = ['改进建议', '问题反馈', '想要功能']
 const feedbackEmail = 'tartykisser1022@gmail.com'
-
-function ActionLink({ children, href, material = 'primary' }) {
-  return (
-    <Material asChild material={material}>
-      <RocoShape as="a" href={href} className="hero-action" contentClassName="hero-action-content">
-        {children}
-      </RocoShape>
-    </Material>
-  )
-}
 
 function Feedback() {
   const [type, setType] = useState(feedbackTypes[0])
@@ -133,10 +123,6 @@ function Hero() {
           <span className="hero-title-label">世界工具站</span>
         </h1>
         <p>查精灵、配对孵蛋、规划家园。<br />远行商人今天的货单，也在这里。</p>
-        <Space wrap className="hero-actions">
-          <ActionLink href="handbook.html">查看精灵图鉴 <span aria-hidden="true">→</span></ActionLink>
-          <ActionLink href="#tools" material="paperSoft">浏览全部工具 <span aria-hidden="true">↓</span></ActionLink>
-        </Space>
       </div>
     </section>
   )
@@ -294,8 +280,8 @@ function App() {
         <LayoutContent className="site-width home-main" padded={false}>
           <Hero />
           <div className="home-content">
-            <ToolDirectory />
             <Merchant />
+            <ToolDirectory />
           </div>
         </LayoutContent>
         <Divider className="footer-divider" />
