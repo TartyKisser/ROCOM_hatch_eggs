@@ -16,12 +16,24 @@ const entries = await Promise.all(pages.map(async page => {
   return { page, destination, before: await readFile(destination) }
 }))
 
+const favicon = {
+  name: 'rocom-favicon',
+  transformIndexHtml: {
+    order: 'pre',
+    handler: () => [{
+      tag: 'link',
+      attrs: { rel: 'icon', type: 'image/png', sizes: '180x180', href: './assets/dimo-favicon.png' },
+      injectTo: 'head',
+    }],
+  },
+}
+
 const result = await build({
   root: source,
   base: './',
   configFile: false,
   publicDir: false,
-  plugins: tools ? [tools.toolPagesPlugin()] : [],
+  plugins: tools ? [tools.toolPagesPlugin(), favicon] : [favicon],
   build: {
     assetsDir: 'home-ui/assets',
     license: { fileName: noticesPath },

@@ -31,7 +31,7 @@ a:focus-visible, button:focus-visible {
 .startup nav a { text-decoration: underline; }
 
 .site-layout {
-  --hero-height: clamp(350px, 30vw, 420px);
+  --hero-height: clamp(310px, 27vw, 380px);
   --header-height: 66px;
   position: relative;
   isolation: isolate;
@@ -144,7 +144,7 @@ a:focus-visible, button:focus-visible {
 
 .hero-copy {
   max-width: 100%;
-  padding: 38px clamp(28px, 5vw, 66px);
+  padding: 38px clamp(28px, 5vw, 66px) 24px;
   color: #fff6e6;
 }
 
@@ -171,7 +171,7 @@ a:focus-visible, button:focus-visible {
   grid-template-columns: minmax(278px, 31%) minmax(0, 1fr);
   align-items: start;
   gap: 30px;
-  margin-top: 38px;
+  margin-top: 14px;
 }
 
 .tool-directory, .merchant { min-width: 0; scroll-margin-top: calc(var(--header-height) + 26px); }
@@ -403,14 +403,13 @@ a:focus-visible, button:focus-visible {
   .site-width { width: calc(100% - 36px); }
   .home-content {
     grid-template-columns: minmax(0, 1fr);
-    margin-top: 28px;
     gap: 28px;
   }
   .site-layout .home-main { padding-top: 16px; padding-bottom: 32px; }
 }
 
 @media (max-width: 560px) {
-  .site-layout { --hero-height: 428px; }
+  .site-layout { --hero-height: 410px; }
   .site-wallpaper {
     --wallpaper-shade: linear-gradient(180deg, transparent 27%, #17263bd9 82%);
     top: 0;
@@ -419,7 +418,7 @@ a:focus-visible, button:focus-visible {
   .site-wallpaper img { object-position: center 41%; }
 
   .hero { align-items: flex-end; }
-  .hero-copy { padding: 24px 19px; }
+  .hero-copy { padding: 24px 19px 16px; }
   .hero h1 { --wordmark-width: clamp(198px, 63vw, 304px); }
 }
 
