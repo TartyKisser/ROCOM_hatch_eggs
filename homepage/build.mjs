@@ -22,7 +22,7 @@ const favicon = {
     order: 'pre',
     handler: () => [{
       tag: 'link',
-      attrs: { rel: 'icon', type: 'image/png', sizes: '180x180', href: './assets/dimo-favicon.png' },
+      attrs: { rel: 'icon', type: 'image/png', sizes: '162x162', href: './assets/dimo-favicon-cropped.png' },
       injectTo: 'head',
     }],
   },
