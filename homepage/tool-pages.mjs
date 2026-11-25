@@ -1,3 +1,4 @@
+import { readdir } from 'node:fs/promises'
 import { basename } from 'node:path'
 import { createElement as h } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -232,8 +233,24 @@ export function toolPagesPlugin() {
     name: 'rocom-tool-pages',
     transformIndexHtml: {
       order: 'pre',
-      handler(html, context) {
-        return renderToolPage(html, basename(context.filename))
+      async handler(html, context) {
+        const page = basename(context.filename)
+        const rendered = renderToolPage(html, page)
+        if (page !== 'adventure.html') return rendered
+
+        // The handbook reserves icon paths even when a fruit is unavailable.
+        const directory = 'sprite_imgs/icon-fruit'
+        const entries = await readdir(new URL(`../${directory}/`, import.meta.url), { withFileTypes: true })
+        const fruitPaths = entries.filter(entry => entry.isFile()).map(entry => `${directory}/${entry.name}`).sort()
+        return {
+          html: rendered,
+          tags: [{
+            tag: 'script',
+            attrs: { id: 'fruit-paths', type: 'application/json' },
+            children: JSON.stringify(fruitPaths).replaceAll('<', '\\u003c'),
+            injectTo: 'body-prepend',
+          }],
+        }
       },
     },
   }

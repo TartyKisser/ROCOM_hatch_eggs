@@ -1721,6 +1721,7 @@
                 const handbook = await handbookResponse.json();
                 const adventureRows = parseCsv(await adventureResponse.text());
                 const rareRows = parseCsv(await rareResponse.text());
+                const fruitPaths = new Set(JSON.parse(document.getElementById('fruit-paths').textContent));
 
                 canonicalRecordByNumber = buildFirstRecordIndex(handbook.records || []);
                 records = [...canonicalRecordByNumber.values()];
@@ -1729,11 +1730,15 @@
                 const allFamilies = buildCandidateFamilies(records);
                 adventureTargets = allFamilies.filter(family => family.members.some(member => adventureNumbers.has(member.number)));
                 rareTargets = allFamilies.filter(family => family.members.some(member => rareNumbers.has(member.number)));
-                candidates = buildCandidateFamilies(records.filter(record => (
+                const brushRecords = records.filter(record => (
                     Number.isFinite(record.baseStarlightValue)
                     && hasUsableEggGroup(record)
-                )))
-                    .filter(family => !family.members.some(member => adventureNumbers.has(member.number)));
+                ));
+                const adventureBrushKeys = new Set(
+                    brushRecords.filter(record => adventureNumbers.has(record.number)).map(familyKey)
+                );
+                candidates = buildCandidateFamilies(brushRecords.filter(record => fruitPaths.has(record['icon-fruit'])))
+                    .filter(family => !adventureBrushKeys.has(family.key));
 
                 renderSortPriority();
                 renderBrushModeControls();

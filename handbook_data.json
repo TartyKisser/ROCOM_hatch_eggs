@@ -344344,7 +344344,7 @@
       ],
       "portrait": "sprite_imgs/portrait/313-果冻-portrait.png",
       "icon-egg": "sprite_imgs/icon-egg/313-果冻-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/313-果冻-icon-fruit.png",
+      "icon-fruit": null,
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -344919,7 +344919,7 @@
       ],
       "portrait": "sprite_imgs/portrait/314-抹茶布丁-portrait.png",
       "icon-egg": "sprite_imgs/icon-egg/314-抹茶布丁-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/314-抹茶布丁-icon-fruit.png",
+      "icon-fruit": null,
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -345659,7 +345659,7 @@
       ],
       "portrait": "sprite_imgs/portrait/315-椰浆布丁-portrait.png",
       "icon-egg": "sprite_imgs/icon-egg/315-椰浆布丁-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/315-椰浆布丁-icon-fruit.png",
+      "icon-fruit": null,
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -346386,7 +346386,7 @@
       ],
       "portrait": "sprite_imgs/portrait/316-熔岩布丁-portrait.png",
       "icon-egg": "sprite_imgs/icon-egg/316-熔岩布丁-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/316-熔岩布丁-icon-fruit.png",
+      "icon-fruit": null,
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -347125,7 +347125,7 @@
       ],
       "portrait": "sprite_imgs/portrait/317-星尘虫-portrait.png",
       "icon-egg": "sprite_imgs/icon-egg/317-星尘虫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/317-星尘虫-icon-fruit.png",
+      "icon-fruit": null,
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -347856,7 +347856,7 @@
       ],
       "portrait": "sprite_imgs/portrait/318-落星虫-portrait.png",
       "icon-egg": "sprite_imgs/icon-egg/318-落星虫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/318-落星虫-icon-fruit.png",
+      "icon-fruit": null,
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -348587,7 +348587,7 @@
       ],
       "portrait": "sprite_imgs/portrait/319-陨星虫-portrait.png",
       "icon-egg": "sprite_imgs/icon-egg/319-陨星虫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/319-陨星虫-icon-fruit.png",
+      "icon-fruit": null,
       "rare": false,
       "rarePath": "",
       "stats": {
