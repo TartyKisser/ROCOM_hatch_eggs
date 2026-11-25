@@ -1033,11 +1033,8 @@
         const FALLBACK_ATTRIBUTE_COLOR = '#6366f1';
         const PAGE_SIZE = 80;
 
-        let records = [];
         let canonicalRecordByNumber = new Map();
-        let adventureTargets = [];
-        let adventureNumbers = new Set();
-        let rareTargets = [];
+        let targetFamilies = [];
         let candidates = [];
         let allStrategies = [];
         let filteredStrategies = [];
@@ -1525,59 +1522,52 @@
             return triggered;
         }
 
-        function pushStrategiesForRuleMaps(strategies, first, second, targetRuleMap, rareTargetRuleMap) {
-            if (!targetRuleMap.size) return;
+        function appendStrategies(strategies, first, second, matches) {
+            if (!matches.size) return;
 
-            const rareTriggeredItems = [...rareTargetRuleMap.values()].map(item => ({
-                target: item.target,
-                rules: item.rules
-            }));
+            const triggered = [...matches.values()];
             const score = first.baseStarlightValue + (second ? second.baseStarlightValue : 0);
 
-            targetRuleMap.forEach(item => {
-                const otherTargets = rareTriggeredItems.filter(rareItem => rareItem.target.key !== item.target.key);
+            for (const { target, rules } of triggered) {
+                const otherTargets = triggered.filter(item => item.target.key !== target.key);
                 const strategy = {
-                    target: item.target,
+                    target,
                     first,
                     second,
                     score,
-                    rules: item.rules,
+                    rules,
                     otherTargets
                 };
                 strategy.searchText = normalize(strategySearchTextParts(strategy, otherTargets).join(' '));
                 strategies.push(strategy);
-            });
+            }
         }
 
         function buildStrategies() {
-            const adventureIndex = buildTargetIndex(adventureTargets);
-            const rareIndex = buildTargetIndex(rareTargets);
+            const targetIndex = buildTargetIndex(targetFamilies);
             const strategies = [];
 
             for (let i = 0; i < candidates.length; i += 1) {
-                const single = candidates[i];
-                pushStrategiesForRuleMaps(
+                const first = candidates[i];
+                appendStrategies(
                     strategies,
-                    single,
+                    first,
                     null,
-                    collectTriggeredTargets(adventureIndex, brushAttributes(single), '单刷第一属性'),
-                    collectTriggeredTargets(rareIndex, brushAttributes(single), '单刷第一属性')
+                    collectTriggeredTargets(targetIndex, brushAttributes(first), '单刷第一属性')
                 );
 
                 for (let j = i + 1; j < candidates.length; j += 1) {
-                    const first = candidates[i];
                     const second = candidates[j];
                     if (first.key === second.key) continue;
 
                     const commonAttributes = first.firstAttribute && first.firstAttribute === second.firstAttribute
                         ? [first.firstAttribute]
                         : [];
-                    pushStrategiesForRuleMaps(
+                    appendStrategies(
                         strategies,
                         first,
                         second,
-                        collectTriggeredTargets(adventureIndex, commonAttributes, '共同第一属性'),
-                        collectTriggeredTargets(rareIndex, commonAttributes, '共同第一属性')
+                        collectTriggeredTargets(targetIndex, commonAttributes, '共同第一属性')
                     );
                 }
             }
@@ -1665,7 +1655,7 @@
         function renderTargetControls() {
             targetStrip.innerHTML = [
                 `<button class="target-chip ${activeTarget === '' ? 'active' : ''}" type="button" data-target="">全部</button>`,
-                ...adventureTargets.map(target => `
+                ...targetFamilies.map(target => `
                     <button class="target-chip ${activeTarget === target.key ? 'active' : ''}" type="button" data-target="${escapeHtml(target.key)}">
                         <img src="${escapeHtml(portraitSmallPath(target))}" alt="" loading="lazy" onerror="this.style.display='none'">
                         <span>${escapeHtml(target.title)}</span>
@@ -1713,32 +1703,26 @@
 
         async function init() {
             try {
-                const [handbookResponse, adventureResponse, rareResponse] = await Promise.all([
+                const [handbookResponse, rareResponse] = await Promise.all([
                     fetch('handbook_data.json'),
-                    fetch('adventure.csv'),
-                    fetch('rare.csv')
+                    fetch('rare.csv', { cache: 'no-cache' })
                 ]);
+                if (!rareResponse.ok) throw new Error(`rare.csv HTTP ${rareResponse.status}`);
                 const handbook = await handbookResponse.json();
-                const adventureRows = parseCsv(await adventureResponse.text());
                 const rareRows = parseCsv(await rareResponse.text());
                 const fruitPaths = new Set(JSON.parse(document.getElementById('fruit-paths').textContent));
 
                 canonicalRecordByNumber = buildFirstRecordIndex(handbook.records || []);
-                records = [...canonicalRecordByNumber.values()];
-                adventureNumbers = new Set(adventureRows.map(row => normalizeNumber(row['图鉴编号'])));
+                const records = [...canonicalRecordByNumber.values()];
                 const rareNumbers = new Set(rareRows.map(row => normalizeNumber(row['图鉴编号'])));
-                const allFamilies = buildCandidateFamilies(records);
-                adventureTargets = allFamilies.filter(family => family.members.some(member => adventureNumbers.has(member.number)));
-                rareTargets = allFamilies.filter(family => family.members.some(member => rareNumbers.has(member.number)));
-                const brushRecords = records.filter(record => (
+                targetFamilies = buildCandidateFamilies(records)
+                    .filter(family => family.members.some(member => rareNumbers.has(member.number)));
+                const targetKeys = new Set(targetFamilies.map(family => family.key));
+                candidates = buildCandidateFamilies(records.filter(record => (
                     Number.isFinite(record.baseStarlightValue)
                     && hasUsableEggGroup(record)
-                ));
-                const adventureBrushKeys = new Set(
-                    brushRecords.filter(record => adventureNumbers.has(record.number)).map(familyKey)
-                );
-                candidates = buildCandidateFamilies(brushRecords.filter(record => fruitPaths.has(record['icon-fruit'])))
-                    .filter(family => !adventureBrushKeys.has(family.key));
+                    && fruitPaths.has(record['icon-fruit'])
+                ))).filter(family => !targetKeys.has(family.key));
 
                 renderSortPriority();
                 renderBrushModeControls();
