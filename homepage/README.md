@@ -18,6 +18,20 @@ npm run build
 
 通过 GitHub 发布时，把本次构建对应的 HTML 入口和 `home-ui/` 放在同一次提交中。保存 `homepage/` 源码与锁文件即可在 A100 上重建。
 
+### 更新世界地图
+
+在 A100 的仓库根目录使用 Python 3 和带 `libwebp` 编码器的 FFmpeg 更新资料。使用 `fonttools[woff]` 生成地图字体子集，再单独构建地图页面。
+
+```bash
+python3 homepage/sync-map.py
+python3 homepage/prepare-fonts.py map
+npm --prefix homepage run build:map
+```
+
+同步脚本核对 Wiki 发布的点位、类别计数和详情，再把标准底图合成为 WebP。数据文件和图片采用内容哈希命名，最后切换 `map_data/manifest.json`。一次发布应包含 `map.html`、`map_data/` 和新增的 `home-ui/assets/` 文件。阿里云由 Nginx 直接提供这些文件。访客打开某张地图时只读取这张地图和缩略底图，放大后按视野取分片，详情点开后加载。
+
+点位与分类资料由洛克王国世界 WIKI 及贡献者整理，本站进行了格式转换与分片，派生数据采用 CC BY-SA 4.0。游戏图片权属见 Wiki 站点声明。收集记录保存在访客的浏览器内。[Wiki 地图](https://wiki.biligame.com/nrc/地图) · [Wiki 站点声明](https://wiki.biligame.com/nrc/Project:站点声明) · [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hans)
+
 ### 预览
 
 在 A100 的项目根目录运行静态预览。

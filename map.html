@@ -1,629 +1,82 @@
 <!DOCTYPE html><html lang="zh-CN"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>世界地图资料 - 洛克王国世界工具站</title>
-    <style>:root{--primary:#ad7427;--primary-dark:#694a23;--secondary:#ec4899;--text:#282522;--text-secondary:#61584c;--border:#e1d2bae6;--panel:#ffffffeb;--shadow:0 18px 45px #2e241833}*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}body{color:var(--text);background:#e1d2ba;font-family:Segoe UI,system-ui,-apple-system,BlinkMacSystemFont,sans-serif}.map-shell{background:radial-gradient(circle at 50% 45%,#ffffffb8,#e1d2babd 48%,#94a3b875),linear-gradient(135deg,#cbd5e1,#e0f2fe);position:fixed;inset:0;overflow:hidden}.map-canvas{cursor:grab;-webkit-user-select:none;user-select:none;touch-action:none;position:absolute;inset:0}.map-canvas.is-dragging{cursor:grabbing}.map-canvas:before{content:"";z-index:0;pointer-events:none;background-color:#0000;background-image:linear-gradient(#a36d2714 1px,#0000 1px),linear-gradient(90deg,#a36d2714 1px,#0000 1px);background-position:0 0,0 0;background-repeat:repeat,repeat;background-size:42px 42px;background-attachment:scroll,scroll;background-origin:padding-box,padding-box;background-clip:border-box,border-box;position:absolute;inset:0}.map-content,.map-layer,.marker-layer,.popup-layer{position:absolute;inset:0}.map-content{z-index:1;will-change:transform;transform:translate(0,0)}.map-layer{z-index:1}.marker-layer{z-index:2}.popup-layer{z-index:6;pointer-events:none}.map-tile{object-fit:cover;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;width:256px;height:256px;position:absolute}.map-marker{appearance:none;filter:drop-shadow(0 7px 10px #2e241847);cursor:pointer;background:0 0;border:0;width:30px;height:30px;padding:0;transition:transform .15s,filter .15s;position:absolute;transform:translate(-50%,-50%)}.map-marker img{object-fit:contain;width:100%;height:100%;display:block}.map-marker:hover,.map-marker.is-active{z-index:3;filter:drop-shadow(0 11px 16px #2e241857);transform:translate(-50%,-50%)scale(1.18)}.panel{background:var(--panel);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(14px);border:1px solid #ffffff9e;border-radius:18px}.topbar{z-index:8;pointer-events:none;justify-content:space-between;align-items:flex-start;gap:14px;display:flex;position:absolute;top:18px;left:18px;right:18px}.topbar-left,.topbar-right{pointer-events:auto;flex-wrap:wrap;align-items:flex-start;gap:10px;display:flex}.btn{min-height:40px;color:var(--primary-dark);font:inherit;cursor:pointer;background:#ffffffeb;border:1px solid #ffffff94;border-radius:12px;justify-content:center;align-items:center;gap:8px;padding:9px 14px;font-size:.92rem;font-weight:900;text-decoration:none;display:inline-flex;box-shadow:0 10px 24px #2e241829}.source-card{color:#fff;text-shadow:0 2px 8px #2e24184d;background:#ffffff29;border-color:#ffffff47;border-radius:16px;max-width:min(520px,44vw);padding:12px 14px;font-size:.86rem;font-weight:750;line-height:1.55;box-shadow:0 14px 35px #2e241829}.source-card strong{color:#fff;font-weight:950}.source-link{color:#fff;background:#ffffff29;border-radius:999px;margin-top:8px;padding:5px 9px;font-weight:900;text-decoration:none;display:inline-flex}.filter-panel{z-index:7;color:#fff;text-shadow:0 2px 8px #2e24184d;background:#ffffff29;border-color:#ffffff47;flex-direction:column;width:min(390px,100vw - 36px);transition:transform .22s,opacity .22s,visibility .22s;display:flex;position:absolute;top:76px;bottom:18px;left:18px;overflow:hidden;box-shadow:0 14px 35px #2e241829}.filter-panel.is-hidden{opacity:0;visibility:hidden;pointer-events:none;transform:translate(calc(-100% - 24px))}.filter-collapse-btn{z-index:8;color:#fff;min-height:40px;font:inherit;text-shadow:0 2px 8px #2e24184d;cursor:pointer;-webkit-backdrop-filter:blur(14px);background:#ffffff29;border:1px solid #ffffff94;border-radius:12px;padding:9px 14px;font-size:.9rem;font-weight:950;display:none;position:absolute;bottom:18px;left:18px;box-shadow:0 14px 35px #2e241829}.filter-collapse-btn.is-visible{justify-content:center;align-items:center;display:inline-flex}.panel-head{background:#00000014;border-bottom:1px solid #00000038;padding:16px 16px 12px}.panel-title-row{justify-content:space-between;align-items:center;gap:10px;display:flex}.panel-actions{align-items:center;gap:4px;display:flex}.panel-title{color:#fff;font-size:1.12rem;font-weight:950}.visible-count{color:#fff;background:#00000029;border:1px solid #00000038;border-radius:999px;flex:none;min-height:28px;padding:5px 9px;font-size:.78rem;font-weight:950}.panel-fold-btn{color:#fff;min-height:28px;font:inherit;cursor:pointer;background:#00000029;border:1px solid #00000038;border-radius:999px;flex:none;padding:5px 9px;font-size:.78rem;font-weight:950}.panel-subtitle{color:#ffffffe0;margin-top:6px;font-size:.82rem;font-weight:760}.filter-actions{border-bottom:1px solid #00000038;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px 14px;display:grid}.action-btn{color:#fff;min-height:34px;font:inherit;cursor:pointer;background:#00000029;border:1px solid #0000004d;border-radius:11px;font-size:.84rem;font-weight:950}.group-list{flex:1;padding:12px 14px 16px;overflow:auto}.group-block+.group-block{margin-top:12px}.group-head{color:#fff;width:100%;min-height:38px;font:inherit;cursor:pointer;text-align:left;background:#00000024;border:1px solid #00000042;border-radius:12px;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:9px;padding:8px 10px;display:grid}.group-head.is-active{background:#00000038;border-color:#00000080}.group-toggle{color:#fff;width:22px;height:22px;font:inherit;cursor:pointer;background:#0000001f;border:1px solid #00000052;border-radius:999px;font-size:.74rem;font-weight:950;transition:transform .18s,background .18s}.group-toggle.is-collapsed{transform:rotate(-90deg)}.group-name{min-width:0;font-size:.92rem;font-weight:950}.group-count{color:#ffffffc7;font-size:.76rem;font-weight:900}.category-grid{flex-wrap:wrap;gap:7px;padding:9px 2px 0;display:flex}.category-grid[hidden]{display:none}.category-chip{color:#fff;max-width:100%;min-height:30px;font:inherit;cursor:pointer;background:#0000001f;border:1px solid #0000003d;border-radius:999px;align-items:center;gap:5px;padding:5px 8px;font-size:.8rem;font-weight:850;display:inline-flex}.category-chip.is-active{color:#fff;background:linear-gradient(135deg, var(--primary), var(--secondary));border-color:#ffffff6b;box-shadow:0 8px 18px #a36d2733}.category-chip img{object-fit:contain;flex:none;width:18px;height:18px}.chip-text{text-overflow:ellipsis;white-space:nowrap;min-width:0;overflow:hidden}.map-tools{z-index:7;gap:8px;display:grid;position:absolute;top:142px;right:18px}.map-tool-btn{width:38px;height:38px;color:var(--primary-dark);font:inherit;cursor:pointer;background:#ffffffed;border:1px solid #ffffffb8;border-radius:12px;font-size:1.2rem;font-weight:950;box-shadow:0 10px 22px #2e241829}.map-tip{z-index:7;color:#fffffff0;pointer-events:none;background:#2e2418a8;border-radius:999px;max-width:min(520px,100vw - 36px);padding:8px 12px;font-size:.8rem;font-weight:850;position:absolute;bottom:18px;right:18px}.location-popup{pointer-events:auto;-webkit-backdrop-filter:blur(14px);background:#fffffff5;border:1px solid #ffffffad;border-radius:16px;width:min(340px,100vw - 32px);position:absolute;overflow:hidden;transform:translate(-50%,calc(-100% - 22px));box-shadow:0 18px 45px #2e241847}.location-popup:after{content:"";background:#fffffff5;border-bottom:1px solid #ffffffad;border-right:1px solid #ffffffad;width:16px;height:16px;position:absolute;bottom:-8px;left:50%;transform:translate(-50%)rotate(45deg)}.popup-image{aspect-ratio:16/9;object-fit:cover;background:#a36d2714;width:100%;display:block}.popup-body{padding:13px 14px 14px}.popup-head{grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:9px;margin-bottom:9px;display:grid}.popup-icon{object-fit:contain;background:#a36d2714;border-radius:10px;width:34px;height:34px;padding:5px}.popup-title{color:var(--text);text-overflow:ellipsis;white-space:nowrap;font-size:1rem;font-weight:950;line-height:1.25;overflow:hidden}.popup-meta{color:var(--text-secondary);margin-top:3px;font-size:.78rem;font-weight:850}.popup-close{width:30px;height:30px;color:var(--primary-dark);font:inherit;cursor:pointer;background:#a36d2714;border:1px solid #a36d2724;border-radius:50%;font-size:1rem;font-weight:950}.popup-desc{color:var(--text-secondary);font-size:.86rem;line-height:1.55}.popup-tags{flex-wrap:wrap;gap:7px;margin-top:10px;display:flex}.tag{min-height:24px;color:var(--primary-dark);background:#a36d2714;border-radius:999px;align-items:center;padding:4px 8px;font-size:.76rem;font-weight:900;display:inline-flex}.loading{z-index:9;color:var(--primary-dark);box-shadow:var(--shadow);background:#fffffff0;border-radius:999px;padding:10px 14px;font-size:.9rem;font-weight:950;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}.loading.is-hidden{display:none}@media (width<=760px){.topbar{top:10px;left:10px;right:10px}.topbar-right{display:none}.filter-panel{width:auto;max-height:42vh;inset:auto 10px 10px}.filter-panel.is-hidden{transform:translateY(calc(100% + 20px))}.filter-collapse-btn{bottom:10px;left:10px}.map-tools{top:74px;right:10px}.map-tip{display:none}}</style>
-<link rel="preload" as="font" href="./home-ui/assets/roco-kingdom-sans-tools-DSIgwiYK.woff2" type="font/woff2" crossorigin="">  <link rel="icon" type="image/png" sizes="162x162" href="./home-ui/assets/dimo-favicon-cropped-CMQnv8v8.png">
-  <link rel="stylesheet" crossorigin href="./home-ui/assets/tool-theme-CPjHfPzy.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="洛克王国世界地图，查询卡洛西亚大陆、魔法学院、地下图层和探索点位。">
+    <title>世界地图 - 洛克王国世界工具站</title>
+<link rel="preload" as="font" href="./home-ui/assets/roco-kingdom-sans-map-Ct8NJFeO.woff2" type="font/woff2" crossorigin="">  <link rel="icon" type="image/png" sizes="162x162" href="./home-ui/assets/dimo-favicon-cropped-CMQnv8v8.png">
+  <script type="module" crossorigin src="./home-ui/assets/map-Kk92eAk8.js"></script>
+  <link rel="stylesheet" crossorigin href="./home-ui/assets/map-DeaZBXy0.css">
 </head>
 <body class="tool-page tool-page-map"><link rel="preload" as="image" href="./home-ui/assets/roco-kingdom-logo-DYlvikuo.png"><div class="rk-theme" style="--rk-paper:#f5f0e6;--rk-paper-soft:#fffaf1;--rk-paper-muted:#ede4d5;--rk-paper-strong:#d3bda0;--rk-stone:#272624;--rk-stone-soft:#41403a;--rk-stone-muted:#555145;--rk-stone-strong:#201f1d;--rk-primary:#ffca63;--rk-primary-soft:#ffdf98;--rk-primary-muted:#f6bb57;--rk-primary-strong:#d99327;--rk-on-paper:#282522;--rk-on-paper-soft:#282522;--rk-on-paper-muted:#282522;--rk-on-paper-strong:#282522;--rk-on-stone:#fff6e6;--rk-on-stone-soft:#fff6e6;--rk-on-stone-muted:#fff6e6;--rk-on-stone-strong:#fff6e6;--rk-on-primary:#272421;--rk-on-primary-soft:#272421;--rk-on-primary-muted:#272421;--rk-on-primary-strong:#272421"><div class="rk-material ztMaoa_material rk-layout VduyCW_layout VduyCW_vertical site-layout tool-layout tool-map-layout" data-direction="vertical" material="paper" style="--rk-material-background:var(--rk-paper);--rk-material-color:var(--rk-on-paper)"><header class="rk-material ztMaoa_material rk-layout-header VduyCW_header site-header" style="--rk-material-background:var(--rk-stone);--rk-material-color:var(--rk-on-stone)" material="stone"><div class="site-width header-inner"><a class="brand" href="./" aria-label="洛克王国世界工具站首页"><span class="kingdom-wordmark" aria-hidden="true"><img src="./home-ui/assets/roco-kingdom-logo-DYlvikuo.png" width="851" height="295" alt=""></span><span>世界工具站</span></a><h1 class="rk-rune-text Jyxoua_text Jyxoua_base tool-map-title">世界地图</h1><div class="rk-space fFUITG_space fFUITG_horizontal" data-direction="horizontal" style="--rk-space-column-gap:8px;--rk-space-row-gap:8px"><a href="./" material="paperSoft" class="rk-roco-shape khU0fa_shape khU0fa_withContent rk-material ztMaoa_material tool-home-link" style="--rk-material-background:var(--rk-paper-soft);--rk-material-color:var(--rk-on-paper-soft)"><span aria-hidden="true" class="khU0fa_layer khU0fa_fill"><svg class="khU0fa_edge" focusable="false" preserveAspectRatio="xMidYMid meet" viewBox="0 0 158 246"><g transform="translate(158 246) scale(-1 -1)"><path class="khU0fa_cap" d="M0.0332642 0.499313C9.53326 0.999313 47.0333 0.999313 88.0333 16.4993C129.033 31.9993 163.533 63.4993 156.033 141.999C148.533 220.499 82.5333 230.499 66.5333 235.999C50.5333 241.499 15.0333 243.999 0.0332642 244.999Z"></path></g></svg><span class="khU0fa_center"></span><svg class="khU0fa_edge" focusable="false" preserveAspectRatio="xMidYMid meet" viewBox="0 0 158 246"><g><path class="khU0fa_cap" d="M0.0332642 0.499313C9.53326 0.999313 47.0333 0.999313 88.0333 16.4993C129.033 31.9993 163.533 63.4993 156.033 141.999C148.533 220.499 82.5333 230.499 66.5333 235.999C50.5333 241.499 15.0333 243.999 0.0332642 244.999Z"></path></g></svg></span><span class="khU0fa_content">返回首页</span></a></div></div></header><div class="rk-material ztMaoa_material rk-layout-content VduyCW_content VduyCW_unpadded tool-main" data-padded="false" material="paperSoft" style="--rk-material-background:var(--rk-paper-soft);--rk-material-color:var(--rk-on-paper-soft)"><div class="tool-content" id="tool-content">
     <main class="map-shell">
-        <section class="map-canvas" id="mapCanvas" aria-label="洛克王国世界地图">
-            <div class="map-content" id="mapContent">
-                <div class="map-layer" id="mapLayer"></div>
-                <div class="marker-layer" id="markerLayer"></div>
-                <div class="popup-layer" id="popupLayer"></div>
+        <aside class="rk-panel _Urbza_panel _Urbza_paperSoft tool-panel panel filter-panel" id="mapFilters" aria-label="地图筛选"><div class="rk-panel-content _Urbza_content tool-panel-content">
+            <div class="map-side-heading">
+                <div>
+                    <h2 class="panel-title">地图筛选</h2>
+                    <p class="map-summary" id="mapSummary" role="status"></p>
+                </div>
+                <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="foldFilterButton" aria-controls="mapFilters" aria-expanded="true">收起</button>
             </div>
-        </section>
 
-        <div class="topbar">
-            <div class="topbar-left">
-
-            </div>
-            <div class="topbar-right">
-                <div class="rk-panel _Urbza_panel _Urbza_paperSoft tool-panel panel source-card"><div class="rk-panel-content _Urbza_content tool-panel-content">
-                    <strong>数据来源与感谢：</strong>地图点位和底图来自 17173 洛克王国世界互动地图，感谢 17173 与地图贡献者维护公开资料。
-                    <a class="source-link" href="https://map.17173.com/rocom/maps/shijie" target="_blank" rel="noreferrer">查看原网站</a>
-                </div></div>
-            </div>
-        </div>
-
-        <aside class="rk-panel _Urbza_panel _Urbza_paperSoft tool-panel panel filter-panel" aria-label="分类筛选"><div class="rk-panel-content _Urbza_content tool-panel-content">
-            <div class="panel-head">
-                <div class="panel-title-row">
-                    <div class="panel-title">分类分组</div>
-                    <div class="panel-actions">
-                        <div class="visible-count" id="visibleCount">0 个点位</div>
-                        <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button panel-fold-btn" type="button" id="foldFilterButton">收起</button>
+            <div class="map-filter-scroll">
+                <div class="map-selectors">
+                    <div class="map-field">
+                        <label for="mapSelect">地图</label>
+                        <select class="rk-material ztMaoa_material tool-select" material="paperMuted" style="--rk-material-background:var(--rk-paper-muted);--rk-material-color:var(--rk-on-paper-muted)" id="mapSelect"></select>
+                    </div>
+                    <div class="map-field">
+                        <label for="floorSelect">图层</label>
+                        <select class="rk-material ztMaoa_material tool-select" material="paperMuted" style="--rk-material-background:var(--rk-paper-muted);--rk-material-color:var(--rk-on-paper-muted)" id="floorSelect"></select>
                     </div>
                 </div>
-                <div class="panel-subtitle">默认隐藏点位，选择对应类别后显示图标。</div>
-            </div>
-            <div class="filter-actions">
-                <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button action-btn" type="button" id="showAllButton">全部显示</button>
-                <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button action-btn" type="button" id="hideAllButton">全部隐藏</button>
-            </div>
-            <div class="group-list" id="groupList"></div>
-        </div></aside>
-        <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button filter-collapse-btn" type="button" id="restoreFilterButton">展开分类</button>
+                <div class="map-field">
+                    <label for="mapSearch">搜索点位</label>
+                    <label material="paperMuted" class="rk-roco-shape khU0fa_shape khU0fa_withContent rk-material ztMaoa_material rk-input g-B19a_input g-B19a_large tool-input" style="--rk-material-background:var(--rk-paper-muted);--rk-material-color:var(--rk-on-paper-muted)"><span aria-hidden="true" class="khU0fa_layer khU0fa_fill"><svg class="khU0fa_edge" focusable="false" preserveAspectRatio="xMidYMid meet" viewBox="0 0 158 246"><g transform="translate(158 246) scale(-1 -1)"><path class="khU0fa_cap" d="M0.0332642 0.499313C9.53326 0.999313 47.0333 0.999313 88.0333 16.4993C129.033 31.9993 163.533 63.4993 156.033 141.999C148.533 220.499 82.5333 230.499 66.5333 235.999C50.5333 241.499 15.0333 243.999 0.0332642 244.999Z"></path></g></svg><span class="khU0fa_center"></span><svg class="khU0fa_edge" focusable="false" preserveAspectRatio="xMidYMid meet" viewBox="0 0 158 246"><g><path class="khU0fa_cap" d="M0.0332642 0.499313C9.53326 0.999313 47.0333 0.999313 88.0333 16.4993C129.033 31.9993 163.533 63.4993 156.033 141.999C148.533 220.499 82.5333 230.499 66.5333 235.999C50.5333 241.499 15.0333 243.999 0.0332642 244.999Z"></path></g></svg></span><span class="khU0fa_content g-B19a_content"><input class="rk-input-control g-B19a_control" type="search" id="mapSearch" autocomplete="off" placeholder="输入地名、精灵或点位名称"></span></label>
+                </div>
+                <div class="map-search-results" id="mapSearchResults" aria-label="搜索结果" hidden=""></div>
 
-        <div class="map-tools" aria-label="地图缩放">
-            <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button map-tool-btn" type="button" id="zoomInButton" aria-label="放大地图">+</button>
-            <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button map-tool-btn" type="button" id="zoomOutButton" aria-label="缩小地图">-</button>
-        </div>
-        <div class="map-tip">拖拽移动地图，滚轮缩放，点击图标查看点位详情</div>
-        <div class="loading" id="loading">正在加载地图数据...</div>
+                <div class="map-presets" id="mapPresets" aria-label="常用筛选"></div>
+                <div class="map-filter-actions">
+                    <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="showAllButton">全部显示</button>
+                    <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="hideAllButton">全部隐藏</button>
+                    <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="resetFiltersButton">恢复默认</button>
+                    <label class="map-collection-filter"><input id="hideCollected" type="checkbox"> 隐藏已收集</label>
+                </div>
+                <div id="groupList" class="map-group-list"></div>
+            </div>
+
+            <p class="map-source">
+                地图资料来自 <a href="https://wiki.biligame.com/nrc/地图" target="_blank" rel="noopener noreferrer">洛克王国世界 WIKI</a> 及贡献者。
+                数据经整理并按 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hans" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a> 发布。
+            </p>
+        </div></aside>
+
+        <section class="map-viewport" id="mapViewport" tabindex="0" aria-label="互动地图，方向键移动，加减键缩放">
+            <canvas id="mapCanvas" aria-label="世界地图">可通过点位搜索查询地图资料。</canvas>
+            <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button map-restore" type="button" id="restoreFilterButton" aria-controls="mapFilters" aria-expanded="false" hidden="">展开筛选</button>
+            <div class="map-tools" aria-label="地图缩放">
+                <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="zoomInButton" aria-label="放大地图">+</button>
+                <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="zoomOutButton" aria-label="缩小地图">−</button>
+                <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="fitMapButton" aria-label="回到全图">全图</button>
+            </div>
+            <div class="map-status">
+                <span id="mapRegion"></span>
+                <span id="visibleCount">视野内 0 个点位</span>
+                <span id="mapZoom">100%</span>
+            </div>
+            <div class="map-loading" id="mapLoading" role="status">
+                <span id="mapLoadingText">正在加载地图资料…</span>
+                <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="mapRetry" hidden="">重试</button>
+            </div>
+            <aside class="rk-panel _Urbza_panel _Urbza_paperSoft tool-panel panel location-popup" id="mapDetails" aria-label="点位详情" hidden=""><div class="rk-panel-content _Urbza_content tool-panel-content">
+                <div class="map-detail-toolbar">
+                    <button class="rk-button-normal d5oCwa_button d5oCwa_paperMuted d5oCwa_middle d5oCwa_solid tool-button" type="button" id="closeMapDetails" aria-label="关闭点位详情">关闭</button>
+                </div>
+                <div id="mapDetailContent"></div>
+            </div></aside>
+        </section>
     </main>
 
 
 
-
-</div></div></div></div><script>
-        const TILE_SIZE = 256;
-        const DEFAULT_CATEGORY_KEYWORDS = ['炼金台', '眠枭庇护所', '魔力之源', '稀兽花种', 'BOSS'];
-        const WHEEL_ZOOM_COOLDOWN = 140;
-
-        const state = {
-            metadata: null,
-            categories: [],
-            groups: [],
-            locations: [],
-            selectedCategoryIds: new Set(),
-            collapsedGroups: new Set(),
-            popupLocation: null,
-            filterPanelHidden: false,
-        };
-
-        const mapView = {
-            zoom: 11,
-            center: { lng: -0.7, lat: 0.7 },
-            minZoom: 9,
-            maxZoom: 13,
-            bounds: [-1.4, 0, 0, 1.4],
-            dragging: null,
-            lastWheelZoomAt: 0,
-        };
-
-        const elements = {
-            mapCanvas: document.getElementById('mapCanvas'),
-            mapContent: document.getElementById('mapContent'),
-            mapLayer: document.getElementById('mapLayer'),
-            markerLayer: document.getElementById('markerLayer'),
-            popupLayer: document.getElementById('popupLayer'),
-            filterPanel: document.querySelector('.filter-panel'),
-            groupList: document.getElementById('groupList'),
-            visibleCount: document.getElementById('visibleCount'),
-            foldFilterButton: document.getElementById('foldFilterButton'),
-            restoreFilterButton: document.getElementById('restoreFilterButton'),
-            showAllButton: document.getElementById('showAllButton'),
-            hideAllButton: document.getElementById('hideAllButton'),
-            zoomInButton: document.getElementById('zoomInButton'),
-            zoomOutButton: document.getElementById('zoomOutButton'),
-            loading: document.getElementById('loading'),
-        };
-
-        async function loadJson(path) {
-            const response = await fetch(path);
-            if (!response.ok) {
-                throw new Error(`${path} 加载失败`);
-            }
-            return response.json();
-        }
-
-        function escapeHtml(value) {
-            return String(value ?? '').replace(/[&<>"']/g, char => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;',
-            }[char]));
-        }
-
-        function formatNumber(value) {
-            return Number(value || 0).toLocaleString('zh-CN');
-        }
-
-        function categoryId(location) {
-            return String(location.category_id || '');
-        }
-
-        function visibleLocations() {
-            if (!state.selectedCategoryIds.size) return [];
-            return state.locations.filter(location => state.selectedCategoryIds.has(categoryId(location)));
-        }
-
-        function buildCategoryCounts() {
-            const counts = new Map();
-            state.locations.forEach(location => {
-                const id = categoryId(location);
-                counts.set(id, (counts.get(id) || 0) + 1);
-            });
-            return counts;
-        }
-
-        function categoriesByGroup() {
-            const groupOrder = state.groups.map(group => group.title).filter(Boolean);
-            const groupMap = new Map();
-            state.categories.forEach(category => {
-                const name = category.group_title || '未分组';
-                if (!groupMap.has(name)) groupMap.set(name, []);
-                groupMap.get(name).push(category);
-            });
-            return Array.from(groupMap.entries()).sort((a, b) => {
-                const ai = groupOrder.indexOf(a[0]);
-                const bi = groupOrder.indexOf(b[0]);
-                if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
-                return a[0].localeCompare(b[0], 'zh-CN');
-            });
-        }
-
-        function renderCategoryPanel() {
-            const counts = buildCategoryCounts();
-            elements.groupList.innerHTML = categoriesByGroup().map(([groupName, categories]) => {
-                const sortedCategories = categories
-                    .slice()
-                    .sort((a, b) => String(a.title || '').localeCompare(String(b.title || ''), 'zh-CN'));
-                const groupIds = sortedCategories.map(category => String(category.id || ''));
-                const selectedCount = groupIds.filter(id => state.selectedCategoryIds.has(id)).length;
-                const pointCount = groupIds.reduce((sum, id) => sum + (counts.get(id) || 0), 0);
-                const isActive = selectedCount > 0;
-                const isCollapsed = state.collapsedGroups.has(groupName);
-
-                return `
-                    <section class="group-block">
-                        <div class="group-head ${isActive ? 'is-active' : ''}" data-group="${escapeHtml(groupName)}" title="选择或取消 ${escapeHtml(groupName)} 下全部小类">
-                            <button class="group-toggle ${isCollapsed ? 'is-collapsed' : ''}" type="button" data-toggle-group="${escapeHtml(groupName)}" aria-label="${isCollapsed ? '展开' : '收起'}${escapeHtml(groupName)}">⌄</button>
-                            <span class="group-name">${escapeHtml(groupName)}</span>
-                            <span class="group-count">${selectedCount}/${groupIds.length} · ${formatNumber(pointCount)}</span>
-                        </div>
-                        <div class="category-grid" ${isCollapsed ? 'hidden' : ''}>
-                            ${sortedCategories.map(category => {
-                                const id = String(category.id || '');
-                                const active = state.selectedCategoryIds.has(id);
-                                const count = counts.get(id) || 0;
-                                return `
-                                    <button class="category-chip ${active ? 'is-active' : ''}" type="button" data-category="${escapeHtml(id)}" title="${escapeHtml(category.title || id)}">
-                                        ${category.icon ? `<img src="${escapeHtml(category.icon)}" alt="">` : ''}
-                                        <span class="chip-text">${escapeHtml(category.title || id)}</span>
-                                        <span>${formatNumber(count)}</span>
-                                    </button>
-                                `;
-                            }).join('')}
-                        </div>
-                    </section>
-                `;
-            }).join('');
-            updateVisibleCount();
-        }
-
-        function updateVisibleCount() {
-            elements.visibleCount.textContent = `${formatNumber(visibleLocations().length)} 个点位`;
-        }
-
-        function tileBasePath() {
-            const map = state.metadata?.map || {};
-            const mapId = map.id || state.metadata?.map_id || 4010;
-            const gameName = map.gameName || 'rocom';
-            const version = map.version ? `${mapId}_${map.version}` : String(mapId);
-            return `https://ue.17173cdn.com/a/terra/tiles/${gameName}/${version}`;
-        }
-
-        function project(lng, lat, zoom = mapView.zoom) {
-            const scale = TILE_SIZE * 2 ** zoom;
-            const sin = Math.sin((lat * Math.PI) / 180);
-            return {
-                x: ((lng + 180) / 360) * scale,
-                y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * scale,
-            };
-        }
-
-        function unproject(x, y, zoom = mapView.zoom) {
-            const scale = TILE_SIZE * 2 ** zoom;
-            const lng = (x / scale) * 360 - 180;
-            const mercator = Math.PI - (2 * Math.PI * y) / scale;
-            const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(mercator) - Math.exp(-mercator)));
-            return { lng, lat };
-        }
-
-        function clampCenter(center) {
-            const rect = elements.mapCanvas.getBoundingClientRect();
-            const [west, south, east, north] = mapView.bounds;
-            const nw = project(west, north);
-            const se = project(east, south);
-            const point = project(center.lng, center.lat);
-            const halfWidth = rect.width / 2;
-            const halfHeight = rect.height / 2;
-            const leftInset = visibleLeftInset();
-            const minX = nw.x + halfWidth - leftInset;
-            const maxX = se.x - halfWidth;
-            const minY = nw.y + halfHeight;
-            const maxY = se.y - halfHeight;
-            const clampedX = minX > maxX ? (nw.x + se.x) / 2 : Math.min(maxX, Math.max(minX, point.x));
-            const clampedY = minY > maxY ? (nw.y + se.y) / 2 : Math.min(maxY, Math.max(minY, point.y));
-            return unproject(clampedX, clampedY);
-        }
-
-        function visibleLeftInset() {
-            if (state.filterPanelHidden || window.matchMedia('(max-width: 760px)').matches || !elements.filterPanel) {
-                return 0;
-            }
-            const panelRect = elements.filterPanel.getBoundingClientRect();
-            return Math.max(0, Math.min(panelRect.right + 18, window.innerWidth * 0.42));
-        }
-
-        function viewportState() {
-            const rect = elements.mapCanvas.getBoundingClientRect();
-            const centerPx = project(mapView.center.lng, mapView.center.lat);
-            return {
-                width: rect.width,
-                height: rect.height,
-                leftPx: centerPx.x - rect.width / 2,
-                topPx: centerPx.y - rect.height / 2,
-            };
-        }
-
-        function renderTiles() {
-            const { width, height, leftPx, topPx } = viewportState();
-            const zoom = mapView.zoom;
-            const maxTile = 2 ** zoom - 1;
-            const [west, south, east, north] = mapView.bounds;
-            const boundsNw = project(west, north, zoom);
-            const boundsSe = project(east, south, zoom);
-            const minTileX = Math.max(0, Math.floor(leftPx / TILE_SIZE), Math.floor(boundsNw.x / TILE_SIZE));
-            const maxTileX = Math.min(maxTile, Math.floor((leftPx + width) / TILE_SIZE), Math.floor((boundsSe.x - 1) / TILE_SIZE));
-            const minTileY = Math.max(0, Math.floor(topPx / TILE_SIZE), Math.floor(boundsNw.y / TILE_SIZE));
-            const maxTileY = Math.min(maxTile, Math.floor((topPx + height) / TILE_SIZE), Math.floor((boundsSe.y - 1) / TILE_SIZE));
-            const base = tileBasePath();
-            const fragment = document.createDocumentFragment();
-
-            if (minTileX > maxTileX || minTileY > maxTileY) {
-                elements.mapLayer.replaceChildren();
-                return;
-            }
-
-            for (let x = minTileX; x <= maxTileX; x += 1) {
-                for (let y = minTileY; y <= maxTileY; y += 1) {
-                    const img = document.createElement('img');
-                    img.className = 'map-tile';
-                    img.alt = '';
-                    img.draggable = false;
-                    img.src = `${base}/${zoom}/${y}_${x}.png?v1`;
-                    img.onerror = () => img.remove();
-                    img.style.left = `${Math.round(x * TILE_SIZE - leftPx)}px`;
-                    img.style.top = `${Math.round(y * TILE_SIZE - topPx)}px`;
-                    fragment.appendChild(img);
-                }
-            }
-
-            elements.mapLayer.replaceChildren(fragment);
-        }
-
-        function markerPosition(location) {
-            const { leftPx, topPx } = viewportState();
-            const point = project(location.longitude, location.latitude);
-            return {
-                left: point.x - leftPx,
-                top: point.y - topPx,
-            };
-        }
-
-        function renderMarkers() {
-            const { width, height } = viewportState();
-            const locations = visibleLocations();
-            const fragment = document.createDocumentFragment();
-            const margin = 40;
-
-            locations.forEach(location => {
-                if (!Number.isFinite(location.longitude) || !Number.isFinite(location.latitude)) return;
-                const { left, top } = markerPosition(location);
-                if (left < -margin || left > width + margin || top < -margin || top > height + margin) return;
-
-                const marker = document.createElement('button');
-                marker.className = `map-marker ${state.popupLocation?.id === location.id ? 'is-active' : ''}`;
-                marker.type = 'button';
-                marker.style.left = `${left}px`;
-                marker.style.top = `${top}px`;
-                marker.title = `${location.title || '未命名点位'} / ${location.category_name || location.category_title || '未分类'}`;
-                marker.innerHTML = location.category_icon ? `<img src="${escapeHtml(location.category_icon)}" alt="">` : '';
-                marker.addEventListener('click', event => {
-                    event.stopPropagation();
-                    state.popupLocation = location;
-                    renderMarkers();
-                    renderPopup();
-                });
-                fragment.appendChild(marker);
-            });
-
-            elements.markerLayer.replaceChildren(fragment);
-            updateVisibleCount();
-        }
-
-        function renderPopup() {
-            const location = state.popupLocation;
-            elements.popupLayer.innerHTML = '';
-            if (!location || !state.selectedCategoryIds.has(categoryId(location))) return;
-
-            const { width, height } = viewportState();
-            const { left, top } = markerPosition(location);
-            if (left < 0 || left > width || top < 0 || top > height) return;
-
-            const title = location.title || '未命名点位';
-            const category = location.category_name || location.category_title || '未分类';
-            const group = location.group_name || location.category_group_title || '未分组';
-            const image = location.image || (location.images && location.images[0]) || '';
-            const desc = location.description || '暂无文字说明';
-            const latitude = Number.isFinite(location.latitude) ? Number(location.latitude).toFixed(6) : '-';
-            const longitude = Number.isFinite(location.longitude) ? Number(location.longitude).toFixed(6) : '-';
-
-            const popup = document.createElement('article');
-            popup.className = 'location-popup';
-            popup.style.left = `${left}px`;
-            popup.style.top = `${top}px`;
-            popup.innerHTML = `
-                ${image ? `<img class="popup-image" src="${escapeHtml(image)}" alt="${escapeHtml(title)}">` : ''}
-                <div class="popup-body">
-                    <div class="popup-head">
-                        ${location.category_icon ? `<img class="popup-icon" src="${escapeHtml(location.category_icon)}" alt="">` : '<div class="popup-icon"></div>'}
-                        <div>
-                            <div class="popup-title" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
-                            <div class="popup-meta">${escapeHtml(group)} / ${escapeHtml(category)}</div>
-                        </div>
-                        <button class="popup-close" type="button" aria-label="关闭">×</button>
-                    </div>
-                    <div class="popup-desc">${escapeHtml(desc)}</div>
-                    <div class="popup-tags">
-                        <span class="tag">经度 ${escapeHtml(longitude)}</span>
-                        <span class="tag">纬度 ${escapeHtml(latitude)}</span>
-                    </div>
-                </div>
-            `;
-            popup.querySelector('.popup-close').addEventListener('click', event => {
-                event.stopPropagation();
-                state.popupLocation = null;
-                elements.popupLayer.innerHTML = '';
-                renderMarkers();
-            });
-            popup.addEventListener('click', event => {
-                event.stopPropagation();
-            });
-            elements.popupLayer.appendChild(popup);
-        }
-
-        function renderMap() {
-            setMapContentOffset(0, 0);
-            mapView.center = clampCenter(mapView.center);
-            renderTiles();
-            renderMarkers();
-            renderPopup();
-        }
-
-        function setMapContentOffset(x, y) {
-            elements.mapContent.style.transform = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
-        }
-
-        function setFilterPanelHidden(hidden) {
-            state.filterPanelHidden = hidden;
-            elements.filterPanel.classList.toggle('is-hidden', hidden);
-            elements.restoreFilterButton.classList.toggle('is-visible', hidden);
-            elements.foldFilterButton.textContent = hidden ? '展开' : '收起';
-            requestAnimationFrame(renderMap);
-        }
-
-        function setZoom(nextZoom, anchorX = null, anchorY = null) {
-            const oldZoom = mapView.zoom;
-            const zoom = Math.min(mapView.maxZoom, Math.max(mapView.minZoom, nextZoom));
-            if (zoom === oldZoom) return;
-
-            const { width, height, leftPx, topPx } = viewportState();
-            const focalX = anchorX ?? width / 2;
-            const focalY = anchorY ?? height / 2;
-            const focalLngLat = unproject(leftPx + focalX, topPx + focalY, oldZoom);
-            mapView.zoom = zoom;
-
-            const focalPx = project(focalLngLat.lng, focalLngLat.lat, zoom);
-            const newCenterPx = {
-                x: focalPx.x - focalX + width / 2,
-                y: focalPx.y - focalY + height / 2,
-            };
-            mapView.center = clampCenter(unproject(newCenterPx.x, newCenterPx.y, zoom));
-            renderMap();
-        }
-
-        function canScrollInside(element, deltaY) {
-            const scrollable = element.closest('.group-list');
-            if (!scrollable) return false;
-            if (deltaY < 0) return scrollable.scrollTop > 0;
-            if (deltaY > 0) return scrollable.scrollTop + scrollable.clientHeight < scrollable.scrollHeight - 1;
-            return false;
-        }
-
-        function handleWheelZoom(event) {
-            if (canScrollInside(event.target, event.deltaY)) return;
-            event.preventDefault();
-            const now = performance.now();
-            if (now - mapView.lastWheelZoomAt < WHEEL_ZOOM_COOLDOWN) return;
-            mapView.lastWheelZoomAt = now;
-
-            const rect = elements.mapCanvas.getBoundingClientRect();
-            const anchorX = Math.min(rect.width, Math.max(0, event.clientX - rect.left));
-            const anchorY = Math.min(rect.height, Math.max(0, event.clientY - rect.top));
-            const direction = event.deltaY < 0 ? 1 : -1;
-            setZoom(mapView.zoom + direction, anchorX, anchorY);
-        }
-
-        function setupMapView() {
-            const map = state.metadata?.map || {};
-            if (Array.isArray(map.bounds) && map.bounds.length === 4) {
-                mapView.bounds = map.bounds.map(Number);
-            }
-            mapView.minZoom = Number(map.minZoom || mapView.minZoom);
-            mapView.maxZoom = Number(map.maxZoom || mapView.maxZoom);
-            mapView.zoom = Number(map.initialZoom || mapView.zoom);
-
-            const [west, south, east, north] = mapView.bounds;
-            mapView.center = clampCenter({
-                lng: (west + east) / 2,
-                lat: (south + north) / 2,
-            });
-        }
-
-        function setAllVisible(visible) {
-            state.popupLocation = null;
-            state.selectedCategoryIds = visible
-                ? new Set(state.categories.map(category => String(category.id || '')).filter(Boolean))
-                : new Set();
-            renderCategoryPanel();
-            renderMap();
-        }
-
-        function toggleCategory(id) {
-            if (state.selectedCategoryIds.has(id)) {
-                state.selectedCategoryIds.delete(id);
-            } else {
-                state.selectedCategoryIds.add(id);
-            }
-            if (state.popupLocation && !state.selectedCategoryIds.has(categoryId(state.popupLocation))) {
-                state.popupLocation = null;
-            }
-            renderCategoryPanel();
-            renderMap();
-        }
-
-        function toggleGroup(groupName) {
-            const ids = state.categories
-                .filter(category => (category.group_title || '未分组') === groupName)
-                .map(category => String(category.id || ''))
-                .filter(Boolean);
-            const allSelected = ids.every(id => state.selectedCategoryIds.has(id));
-            ids.forEach(id => {
-                if (allSelected) state.selectedCategoryIds.delete(id);
-                else state.selectedCategoryIds.add(id);
-            });
-            if (state.popupLocation && !state.selectedCategoryIds.has(categoryId(state.popupLocation))) {
-                state.popupLocation = null;
-            }
-            renderCategoryPanel();
-            renderMap();
-        }
-
-        function toggleGroupCollapse(groupName) {
-            if (state.collapsedGroups.has(groupName)) {
-                state.collapsedGroups.delete(groupName);
-            } else {
-                state.collapsedGroups.add(groupName);
-            }
-            renderCategoryPanel();
-        }
-
-        function applyDefaultCategories() {
-            state.selectedCategoryIds = new Set(
-                state.categories
-                    .filter(category => DEFAULT_CATEGORY_KEYWORDS.some(keyword => String(category.title || '').includes(keyword)))
-                    .map(category => String(category.id || ''))
-                    .filter(Boolean)
-            );
-        }
-
-        async function init() {
-            try {
-                const [metadata, categoryData, locations] = await Promise.all([
-                    loadJson('./map_data/metadata.json'),
-                    loadJson('./map_data/categories.json'),
-                    loadJson('./map_data/locations.json'),
-                ]);
-                state.metadata = metadata;
-                state.categories = categoryData.categories || [];
-                state.groups = categoryData.groups || [];
-                state.locations = locations || [];
-                setupMapView();
-                applyDefaultCategories();
-                renderCategoryPanel();
-                renderMap();
-                elements.loading.classList.add('is-hidden');
-            } catch (error) {
-                elements.loading.textContent = error.message || '地图数据加载失败';
-            }
-        }
-
-        elements.groupList.addEventListener('click', event => {
-            const toggleButton = event.target.closest('.group-toggle');
-            if (toggleButton) {
-                event.stopPropagation();
-                toggleGroupCollapse(toggleButton.dataset.toggleGroup || '');
-                return;
-            }
-            const categoryButton = event.target.closest('.category-chip');
-            if (categoryButton) {
-                toggleCategory(categoryButton.dataset.category || '');
-                return;
-            }
-            const groupButton = event.target.closest('.group-head');
-            if (groupButton) {
-                toggleGroup(groupButton.dataset.group || '');
-            }
-        });
-
-        elements.showAllButton.addEventListener('click', () => setAllVisible(true));
-        elements.hideAllButton.addEventListener('click', () => setAllVisible(false));
-        elements.foldFilterButton.addEventListener('click', () => setFilterPanelHidden(true));
-        elements.restoreFilterButton.addEventListener('click', () => setFilterPanelHidden(false));
-
-        elements.zoomInButton.addEventListener('click', event => {
-            event.stopPropagation();
-            setZoom(mapView.zoom + 1);
-        });
-
-        elements.zoomOutButton.addEventListener('click', event => {
-            event.stopPropagation();
-            setZoom(mapView.zoom - 1);
-        });
-
-        elements.mapCanvas.addEventListener('click', () => {
-            state.popupLocation = null;
-            elements.popupLayer.innerHTML = '';
-            renderMarkers();
-        });
-
-        window.addEventListener('wheel', handleWheelZoom, { passive: false, capture: true });
-
-        elements.mapCanvas.addEventListener('pointerdown', event => {
-            if (event.target.closest('.map-marker, .location-popup')) return;
-            const centerPx = project(mapView.center.lng, mapView.center.lat);
-            mapView.dragging = {
-                id: event.pointerId,
-                x: event.clientX,
-                y: event.clientY,
-                centerPx,
-            };
-            elements.mapCanvas.classList.add('is-dragging');
-            elements.mapCanvas.setPointerCapture(event.pointerId);
-        });
-
-        elements.mapCanvas.addEventListener('pointermove', event => {
-            const drag = mapView.dragging;
-            if (!drag || drag.id !== event.pointerId) return;
-            const dx = event.clientX - drag.x;
-            const dy = event.clientY - drag.y;
-            mapView.center = clampCenter(unproject(drag.centerPx.x - dx, drag.centerPx.y - dy));
-            const currentPx = project(mapView.center.lng, mapView.center.lat);
-            setMapContentOffset(drag.centerPx.x - currentPx.x, drag.centerPx.y - currentPx.y);
-        });
-
-        function endMapDrag(event) {
-            const drag = mapView.dragging;
-            if (!drag || drag.id !== event.pointerId) return;
-            mapView.dragging = null;
-            elements.mapCanvas.classList.remove('is-dragging');
-            if (elements.mapCanvas.hasPointerCapture(event.pointerId)) {
-                elements.mapCanvas.releasePointerCapture(event.pointerId);
-            }
-            renderMap();
-        }
-
-        elements.mapCanvas.addEventListener('pointerup', endMapDrag);
-        elements.mapCanvas.addEventListener('pointercancel', endMapDrag);
-        window.addEventListener('resize', renderMap);
-
-        init();
-    </script></body></html>
+</div></div></div></div></body></html>

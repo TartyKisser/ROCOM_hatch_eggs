@@ -210,9 +210,11 @@ function renderToolPage(html, page) {
   }
   setChildren(body, [...shell.childNodes, ...original.filter(node => node.tagName === 'script')])
 
+  const font = isMap ? 'map' : 'tools'
   const links = parseFragment(
-    '<link rel="preload" as="font" href="./fonts/roco-kingdom-sans-tools.woff2" type="font/woff2" crossorigin>' +
-    '<link rel="stylesheet" href="./src/tools/tool-theme.css">',
+    `<link rel="preload" as="font" href="./fonts/roco-kingdom-sans-${font}.woff2" type="font/woff2" crossorigin>` +
+    '<link rel="stylesheet" href="./src/tools/tool-theme.css">' +
+    `<link rel="stylesheet" href="./fonts/roco-fonts-${font}.css">`,
   )
   setChildren(head, [...head.childNodes, ...links.childNodes])
   for (const node of findAll(document, item => item.nodeName === '#text')) {

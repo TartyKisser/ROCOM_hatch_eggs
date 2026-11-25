@@ -1,6 +1,5 @@
 @import 'rocokingdom-ui/style.css' layer(rocokingdom-ui);
 @import '../../fonts/roco-fonts.css';
-@import '../../fonts/roco-fonts-tools.css';
 @import '../home.css';
 
 body.tool-page {
@@ -192,33 +191,14 @@ body.tool-page {
 
 .tool-map-layout { min-height: 0; height: 100dvh; --header-height: 58px; }
 .tool-map-layout .tool-main { position: relative; flex: 1 1 auto; min-height: 0; padding: 0; overflow: hidden; }
-.tool-map-layout .map-shell { position: absolute; inset: 0; background: #eaddc7; }
-.tool-map-layout .map-canvas::before { content: none; }
-.tool-map-layout .map-shell .topbar { justify-content: flex-end; }
-.tool-map-layout .source-card { color: #524231; text-shadow: none; }
-.tool-map-layout .source-card strong { color: inherit; }
-.tool-map-layout .source-link { color: #694a23; background: #f0e6d4; }
-.tool-map-layout .filter-panel { top: 18px; }
-.tool-map-layout .filter-collapse-btn:not(.is-visible) { display: none; }
-.tool-map-layout .group-head { border-color: #494036; background: #34302a; color: #fff6e6; }
-.tool-map-layout .group-head.is-active { border-color: #86663c; background: #574631; }
-.tool-map-layout .group-toggle { border-color: #887454; background: #69583f; }
+.tool-map-layout .map-shell { position: absolute; inset: 0; }
 .tool-map-title { color: #fff6e6; font-size: clamp(15px, 2vw, 22px); white-space: nowrap; }
-.tool-map-layout :is(.location-popup, .loading, .map-tip) {
-  border-color: #dbcaac;
-  background: #fffaf1;
-  color: #53432f;
-}
-.tool-map-layout .location-popup::after { background: #fffaf1; border-color: #dbcaac; }
-.tool-map-layout .map-tools .map-tool-btn { min-height: 38px; width: 38px; font-size: 20px; }
 
 @media (max-width: 760px) {
   .tool-layout .tool-main { padding-bottom: 28px; }
   .tool-layout .tool-content .container { min-width: 0; }
   .tool-layout .tool-content .topbar { gap: 7px; }
   .tool-map-layout .tool-main { padding-bottom: 0; }
-  .tool-map-layout .filter-panel { top: auto; }
-  .tool-map-layout .map-tools { top: 10px; }
 }
 
 @media (max-width: 560px) {

@@ -7,9 +7,9 @@ import { build } from 'vite'
 const source = dirname(fileURLToPath(import.meta.url))
 const site = resolve(source, '..')
 const target = process.argv[2] ?? 'index.html'
-const tools = target === 'tools' ? await import('./tool-pages.mjs') : null
+const tools = ['tools', 'map.html'].includes(target) ? await import('./tool-pages.mjs') : null
 if (!tools && target !== 'index.html' && target !== 'handbook.html') throw new Error(`未知的页面入口 ${target}`)
-const pages = tools?.pages ?? [target]
+const pages = target === 'tools' ? tools.pages : [target]
 const noticesPath = 'home-ui/assets/third-party-licenses.md'
 const entries = await Promise.all(pages.map(async page => {
   const destination = join(site, page)

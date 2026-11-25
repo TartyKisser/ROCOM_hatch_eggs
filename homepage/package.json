@@ -5,7 +5,8 @@
   "scripts": {
     "build": "node build.mjs",
     "build:handbook": "node build.mjs handbook.html",
-    "build:tools": "node build.mjs tools"
+    "build:tools": "node build.mjs tools",
+    "build:map": "node build.mjs map.html"
   },
   "engines": {
     "node": ">=22.12.0"
