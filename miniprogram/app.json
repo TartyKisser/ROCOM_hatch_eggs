@@ -1,15 +1,72 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/detail/index"
   ],
   "window": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "世界工具站",
+    "navigationBarBackgroundColor": "#272624",
+    "backgroundColor": "#f5f0e6"
   },
   "style": "v2",
   "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "subPackages": [
+    {
+      "root": "generated/dex-01",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-02",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-03",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-04",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-05",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-06",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-07",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-08",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-09",
+      "pages": [
+        "index"
+      ]
+    }
+  ]
 }

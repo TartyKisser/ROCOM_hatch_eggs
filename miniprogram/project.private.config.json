@@ -17,7 +17,7 @@
     "checkInvalidKey": true,
     "useStaticServer": false,
     "useLanDebug": false,
-    "ignoreDevUnusedFiles": true
+    "ignoreDevUnusedFiles": false
   },
   "libVersion": "3.18.1"
 }
