@@ -7,13 +7,8 @@
         <text wx:else class="muted">暂无立绘</text>
       </view>
       <view class="profile-copy">
-        <view class="profile-heading">
-          <view class="profile-identity">
-            <text class="profile-number">No. {{record.number}}</text>
-            <text class="profile-title">{{record.title}}</text>
-          </view>
-          <button class="button return-button" hover-class="pressed" bindtap="backToCatalogue">‹ 返回图鉴</button>
-        </view>
+        <text class="profile-number">No. {{record.number}}</text>
+        <text class="profile-title">{{record.title}}</text>
         <view wx:if="{{tab === 'overview'}}" class="profile-badges">
           <view class="badge-row">
             <view wx:for="{{record.types}}" wx:key="label" class="tag">
@@ -158,8 +153,5 @@
 
     <button wx:if="{{record.url}}" class="button source-button" hover-class="pressed" bindtap="copySource">复制 WIKI 链接</button>
   </block>
-  <view wx:else class="panel empty-state muted">
-    <view>{{loading ? '正在加载图鉴资料…' : '没有找到这只精灵。'}}</view>
-    <button class="button return-button" hover-class="pressed" bindtap="backToCatalogue">‹ 返回图鉴</button>
-  </view>
+  <view wx:else class="panel empty-state muted">{{loading ? '正在加载图鉴资料…' : '没有找到这只精灵。'}}</view>
 </view>

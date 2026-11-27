@@ -19,11 +19,7 @@
 .portrait { width: 100%; height: 100%; }
 .profile-compact .portrait-stage { height: 88rpx; }
 .profile-copy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 5rpx; }
-.profile-heading { display: flex; width: 100%; justify-content: space-between; align-items: flex-start; gap: 8rpx; }
-.profile-identity { display: flex; min-width: 0; flex-direction: column; gap: 3rpx; }
-.profile-compact .profile-heading { align-items: center; }
 .profile-number { color: #8a632b; font-size: max(11px, 22rpx); }
-button.return-button { flex: none; min-height: max(33px, 57rpx); padding: 0 10rpx; border-radius: 10rpx; color: #695437; }
 .profile-title { font-size: max(18px, 36rpx); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
 .profile-compact .profile-title { font-size: max(16px, 31rpx); }
 .profile-badges, .facts { display: flex; flex-wrap: wrap; align-items: center; gap: 6rpx 12rpx; }
@@ -114,4 +110,3 @@ button.shiny-toggle { min-height: max(32px, 56rpx); gap: 5rpx; padding: 0 10rpx;
 .research-number { flex: 0 0 31rpx; color: #8a632b; font-size: max(12px, 23rpx); }
 .research-text { min-width: 0; overflow-wrap: anywhere; }
 button.source-button { display: flex; width: fit-content; margin: 14rpx auto 0; border-radius: 11rpx; }
-.detail .empty-state button { margin-top: 10rpx; }

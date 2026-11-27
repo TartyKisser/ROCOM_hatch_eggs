@@ -3,9 +3,12 @@ const { syncHandbook } = require('../../lib/sync')
 const { uiImages } = require('../../lib/site')
 
 const PAGE_SIZE = 24
+const BACK_TO_TOP_OFFSET = 320
 const emptyFilters = { query: '', attribute: '', eggGroup: '', rare: '' }
-const typeChoices = [{ label: '全部', value: '' }, ...typeOptions.map(type => ({ ...type, value: type.label }))]
-const rareChoices = [{ label: '全部', value: '' }, { label: '有异色', value: 'yes' }, { label: '无异色', value: 'no' }]
+const filterLabels = { attribute: '系别', eggGroup: '蛋组', rare: '异色' }
+const allChoice = { label: '全部', value: '' }
+const typeChoices = [allChoice, ...typeOptions.map(type => ({ ...type, value: type.label }))]
+const rareChoices = [allChoice, { label: '有异色', value: 'yes' }, { label: '无异色', value: 'no' }]
 
 Page({
   data: {
@@ -13,17 +16,13 @@ Page({
     wallpaper: uiImages.wallpaper,
     logo: uiImages.logo,
     rareIcon: uiImages.rare,
-    typeOptions: typeChoices,
-    selectedType: typeChoices[0],
-    showTypes: false,
-    rareOptions: rareChoices,
-    rareIndex: 0,
-    eggOptions: ['全部'],
-    eggIndex: 0,
+    filterControls: [],
+    filterChoices: {},
+    openFilter: '',
     cards: [],
     count: 0,
     matching: 0,
-    hasMore: false,
+    showBackToTop: false,
     isFiltered: false,
     syncNote: '',
   },
@@ -67,16 +66,22 @@ Page({
     if (filters.eggGroup && !eggGroups.includes(filters.eggGroup)) filters = { ...filters, eggGroup: '' }
     this.matchingCards = filterCards(filters, this.catalogue)
     const cards = this.matchingCards.slice(0, limit).map(card => this.withThumbnail(card))
+    const filterChoices = {
+      attribute: typeChoices,
+      eggGroup: [allChoice, ...eggGroups.map(label => ({ label, value: label }))],
+      rare: rareChoices,
+    }
     this.setData({
       filters,
       cards,
       count: index.length,
-      selectedType: typeChoices.find(option => option.value === filters.attribute) || typeChoices[0],
-      rareIndex: Math.max(0, rareChoices.findIndex(option => option.value === filters.rare)),
-      eggOptions: ['全部', ...eggGroups],
-      eggIndex: eggGroups.indexOf(filters.eggGroup) + 1,
+      filterChoices,
+      filterControls: Object.entries(filterLabels).map(([key, label]) => ({
+        key,
+        label,
+        selected: filterChoices[key].find(option => option.value === filters[key]) || allChoice,
+      })),
       matching: this.matchingCards.length,
-      hasMore: this.matchingCards.length > cards.length,
       isFiltered: Object.values(filters).some(Boolean),
     })
   },
@@ -85,34 +90,37 @@ Page({
     this.updateFilters({ ...this.data.filters, query: event.detail.value })
   },
 
-  onEggGroupChange(event) {
-    this.updateFilters({ ...this.data.filters, eggGroup: this.catalogue.eggGroups[Number(event.detail.value) - 1] || '' })
+  toggleFilter(event) {
+    const { filter } = event.currentTarget.dataset
+    this.setData({ openFilter: this.data.openFilter === filter ? '' : filter })
   },
 
-  toggleTypes() {
-    this.setData({ showTypes: !this.data.showTypes })
-  },
-
-  onTypeChange(event) {
-    this.setData({ showTypes: false })
-    this.updateFilters({ ...this.data.filters, attribute: event.currentTarget.dataset.value || '' })
-  },
-
-  onRareChange(event) {
-    const choice = rareChoices[Number(event.detail.value)]
-    this.updateFilters({ ...this.data.filters, rare: choice?.value || '' })
+  selectFilter(event) {
+    const { filter, value } = event.currentTarget.dataset
+    if (filter !== this.data.openFilter) return
+    this.setData({ openFilter: '' })
+    this.updateFilters({ ...this.data.filters, [filter]: value || '' })
   },
 
   clearFilters() {
-    this.setData({ showTypes: false })
+    this.setData({ openFilter: '' })
     this.updateFilters(emptyFilters)
   },
 
+  onPageScroll({ scrollTop }) {
+    const showBackToTop = scrollTop >= BACK_TO_TOP_OFFSET
+    if (showBackToTop !== this.data.showBackToTop) this.setData({ showBackToTop })
+  },
+
+  backToTop() {
+    wx.pageScrollTo({ scrollTop: 0, duration: 240 })
+  },
+
   onReachBottom() {
-    if (!this.data.hasMore) return
     const start = this.data.cards.length
+    if (start >= this.matchingCards.length) return
     const next = this.matchingCards.slice(start, start + PAGE_SIZE)
-    const patch = { hasMore: start + next.length < this.matchingCards.length }
+    const patch = {}
     next.forEach((card, index) => { patch[`cards[${start + index}]`] = this.withThumbnail(card) })
     this.setData(patch)
   },

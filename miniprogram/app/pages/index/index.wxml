@@ -2,7 +2,9 @@
   <image class="hero-cover" src="{{wallpaper}}" mode="aspectFill" webp="{{true}}" />
   <view class="hero-shade" />
   <view class="shell hero-inner">
-    <image class="hero-logo" src="{{logo}}" mode="aspectFit" aria-label="洛克王国" />
+    <view class="hero-wordmark">
+      <image class="hero-logo" src="{{logo}}" mode="aspectFit" aria-label="洛克王国" />
+    </view>
     <text class="hero-title">精灵图鉴</text>
   </view>
 </view>
@@ -10,40 +12,29 @@
 <view class="shell catalogue">
   <view class="panel filters">
     <view class="search-row">
-      <input class="search" aria-label="搜索精灵" placeholder="搜索编号、名称或分布"
-        value="{{filters.query}}" bindinput="onSearch" confirm-type="search" />
+      <view class="search-field">
+        <input class="search" aria-label="搜索编号、名称或分布" value="{{filters.query}}" bindinput="onSearch" confirm-type="search" />
+        <text wx:if="{{!filters.query}}" class="search-hint" aria-hidden="true">搜索编号、名称或分布</text>
+      </view>
       <button class="button button-dark" hover-class="pressed" disabled="{{!isFiltered}}" bindtap="clearFilters">清空</button>
     </view>
 
     <view class="filter-controls">
-      <button class="button filter-control {{filters.attribute || showTypes ? 'filter-active' : ''}}" hover-class="pressed"
-        aria-label="系别 {{selectedType.label}}" aria-expanded="{{showTypes}}" bindtap="toggleTypes">
-        <text class="filter-label">系别</text>
+      <button wx:for="{{filterControls}}" wx:key="key" class="button filter-control {{filters[item.key] || openFilter === item.key ? 'filter-active' : ''}}"
+        hover-class="pressed" aria-label="{{item.label}} {{item.selected.label}}" aria-expanded="{{openFilter === item.key}}"
+        data-filter="{{item.key}}" bindtap="toggleFilter">
+        <text class="filter-label">{{item.label}}</text>
         <view class="filter-value">
-          <image wx:if="{{selectedType.icon}}" class="filter-icon" src="{{selectedType.icon}}" mode="aspectFit" />
-          <text>{{selectedType.label}}</text>
+          <image wx:if="{{item.selected.icon}}" class="filter-icon" src="{{item.selected.icon}}" mode="aspectFit" />
+          <text>{{item.selected.label}}</text>
         </view>
-        <view class="filter-arrow {{showTypes ? 'filter-arrow-up' : ''}}" />
+        <view class="filter-arrow {{openFilter === item.key ? 'filter-arrow-up' : ''}}" />
       </button>
-      <picker class="filter-picker" mode="selector" range="{{eggOptions}}" value="{{eggIndex}}" bindchange="onEggGroupChange"
-        aria-label="蛋组 {{eggOptions[eggIndex]}}">
-        <view class="filter-control {{filters.eggGroup ? 'filter-active' : ''}}">
-          <text class="filter-label">蛋组</text><view class="filter-value"><text>{{eggOptions[eggIndex]}}</text></view>
-          <view class="filter-arrow" />
-        </view>
-      </picker>
-      <picker class="filter-picker" mode="selector" range="{{rareOptions}}" range-key="label" value="{{rareIndex}}" bindchange="onRareChange"
-        aria-label="异色 {{rareOptions[rareIndex].label}}">
-        <view class="filter-control {{filters.rare ? 'filter-active' : ''}}">
-          <text class="filter-label">异色</text><view class="filter-value"><text>{{rareOptions[rareIndex].label}}</text></view>
-          <view class="filter-arrow" />
-        </view>
-      </picker>
     </view>
 
-    <view wx:if="{{showTypes}}" class="type-grid">
-      <button wx:for="{{typeOptions}}" wx:key="value" class="button type-choice {{filters.attribute === item.value ? 'button-selected' : ''}}"
-        hover-class="pressed" data-value="{{item.value}}" bindtap="onTypeChange">
+    <view wx:if="{{openFilter}}" class="filter-grid">
+      <button wx:for="{{filterChoices[openFilter]}}" wx:key="value" class="button filter-choice {{filters[openFilter] === item.value ? 'button-selected' : ''}}"
+        hover-class="pressed" data-filter="{{openFilter}}" data-value="{{item.value}}" bindtap="selectFilter">
         <image wx:if="{{item.icon}}" class="filter-icon" src="{{item.icon}}" mode="aspectFit" />
         <text>{{item.label}}</text>
       </button>
@@ -78,5 +69,5 @@
     </view>
   </view>
   <view wx:else class="panel empty-state muted">没有符合条件的精灵。</view>
-  <button wx:if="{{hasMore}}" class="button load-more" hover-class="pressed" bindtap="onReachBottom">显示更多</button>
+  <button wx:if="{{showBackToTop}}" class="button button-dark back-to-top" hover-class="pressed" bindtap="backToTop">↑ 返回顶部</button>
 </view>

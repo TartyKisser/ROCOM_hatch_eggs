@@ -143,10 +143,6 @@ function createDetailPage(bundle) {
       return true
     },
 
-    backToCatalogue() {
-      wx.navigateBack({ fail: () => wx.reLaunch({ url: '/pages/index/index' }) })
-    },
-
     openEvolution(event) {
       const stage = getCard(event.currentTarget.dataset.id, this.catalogue)
       if (!stage || stage.id === this.data.record.id) return
