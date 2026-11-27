@@ -78,6 +78,22 @@ def export_records(records):
     return cards, details, definitions
 
 
+def pack_catalogue_record(card):
+    """Store only exceptions to IDs, search text and thumbnail paths derived from each row."""
+    number, title = card['number'], card['title']
+    attributes, distribution = card['attributes'], card['distribution']
+    row = [number, title, attributes, card['eggGroups'], distribution, card['package'], card['rare']]
+    attribute_text = ''.join(attributes or ())
+    search_text = f'{number}{title}{attribute_text}{distribution or ""}'
+    defaults = {
+        'id': f'{number}-{title}',
+        'search': ''.join(search_text.split()).lower(),
+        'thumb': f"sprite_imgs/portrait-small/{card['id']}-portrait.png",
+    }
+    overrides = {field: card[field] for field, value in defaults.items() if card[field] != value}
+    return [*row, overrides] if overrides else row
+
+
 def write_detail_package(directory, name, records, definitions):
     used = sorted({skill[0] for record in records.values() for skill in record['skills']})
     indexes = {index: local for local, index in enumerate(used)}
@@ -149,7 +165,7 @@ def build(output, app_config):
     app_config['subPackages'] = subpackages
     for card in cards:
         card['package'] = routes[card['id']]
-    write_module(output / 'catalog.js', {'types': TYPES, 'records': cards})
+    write_module(output / 'catalog.js', {'types': TYPES, 'records': [pack_catalogue_record(card) for card in cards]})
     write_font(output, records)
     source_size = sum(file_size(APP / d) for d in ('pages', 'lib', 'ui', 'components'))
     source_size += sum(file.stat().st_size for file in APP.glob('*') if file.is_file())

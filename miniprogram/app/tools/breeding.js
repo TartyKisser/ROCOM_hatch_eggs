@@ -1,5 +1,5 @@
-const { normalize, smallPortrait } = require('./tool-data')
-const { siteImage } = require('./site')
+const { normalize, smallPortrait } = require('../lib/tool-data')
+const { siteImage } = require('../lib/site')
 
 function breeders(records) {
   return records.flatMap(record => {

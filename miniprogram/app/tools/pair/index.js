@@ -1,5 +1,5 @@
 const { handbookRecords, normalize, appendRows } = require('../../lib/tool-data')
-const { breeders, sharesGroup } = require('../../lib/breeding')
+const { breeders, sharesGroup } = require('../breeding')
 const { buildPairMap } = require('./layout')
 
 const maxSelected = 10

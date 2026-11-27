@@ -16,45 +16,15 @@
   "lazyCodeLoading": "requiredComponents",
   "subPackages": [
     {
-      "root": "tools/skill",
+      "root": "tools",
       "pages": [
-        "index"
-      ]
-    },
-    {
-      "root": "tools/egg",
-      "pages": [
-        "index"
-      ]
-    },
-    {
-      "root": "tools/pair",
-      "pages": [
-        "index"
-      ]
-    },
-    {
-      "root": "tools/hatch",
-      "pages": [
-        "index"
-      ]
-    },
-    {
-      "root": "tools/garden",
-      "pages": [
-        "index"
-      ]
-    },
-    {
-      "root": "tools/adventure",
-      "pages": [
-        "index"
-      ]
-    },
-    {
-      "root": "tools/map",
-      "pages": [
-        "index"
+        "skill/index",
+        "egg/index",
+        "pair/index",
+        "hatch/index",
+        "garden/index",
+        "adventure/index",
+        "map/index"
       ]
     },
     {

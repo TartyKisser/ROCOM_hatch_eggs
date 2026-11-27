@@ -23,6 +23,15 @@ function normalize(value) {
   return String(value || '').replace(/\s+/g, '').toLowerCase()
 }
 
+function unpackRecord([number, title, attributes, eggGroups, distribution, detailPackage, rare, overrides = {}]) {
+  const {
+    id = `${number}-${title}`,
+    search = normalize([number, title, ...(attributes || []), distribution].join('')),
+  } = overrides
+  const { thumb = `sprite_imgs/portrait-small/${id}-portrait.png` } = overrides
+  return { id, number, title, attributes, eggGroups, distribution, package: detailPackage, rare, search, thumb }
+}
+
 function toEntry(record, online, version) {
   const attributes = Array.isArray(record.attributes) ? record.attributes.filter(Boolean) : []
   const [primary, secondary] = attributes
@@ -64,7 +73,7 @@ function createCatalogue(source, online, version) {
   }
 }
 
-const bundled = createCatalogue(records, false, '')
+const bundled = createCatalogue(records.map(unpackRecord), false, '')
 let online = null
 
 function setOnlineCatalogue(source, version) {

@@ -1,5 +1,5 @@
 const { handbookRecords, normalize } = require('../../lib/tool-data')
-const { breeders } = require('../../lib/breeding')
+const { breeders } = require('../breeding')
 const { canBreed, manhattanDistance, findOptimalLayout } = require('./solver')
 
 const counts = [2, 3, 4, 5, 6, 7, 8, 9, 10]
