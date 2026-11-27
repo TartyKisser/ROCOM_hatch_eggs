@@ -4,7 +4,6 @@
   <view class="shell hero-inner">
     <image class="hero-logo" src="{{logo}}" mode="aspectFit" aria-label="洛克王国" />
     <text class="hero-title">精灵图鉴</text>
-    <text class="hero-description">查看属性、进化、技能与分布</text>
   </view>
 </view>
 
@@ -16,36 +15,44 @@
       <button class="button button-dark" hover-class="pressed" disabled="{{!isFiltered}}" bindtap="clearFilters">清空</button>
     </view>
 
-    <view class="filter-row">
-      <text class="filter-label">蛋组</text>
-      <picker mode="selector" range="{{eggOptions}}" value="{{eggIndex}}" bindchange="onEggGroupChange">
-        <view class="picker-choice"><text>{{eggOptions[eggIndex]}}</text><text class="picker-chevron">⌄</text></view>
+    <view class="filter-controls">
+      <button class="button filter-control {{filters.attribute || showTypes ? 'filter-active' : ''}}" hover-class="pressed"
+        aria-label="系别 {{selectedType.label}}" aria-expanded="{{showTypes}}" bindtap="toggleTypes">
+        <text class="filter-label">系别</text>
+        <view class="filter-value">
+          <image wx:if="{{selectedType.icon}}" class="filter-icon" src="{{selectedType.icon}}" mode="aspectFit" />
+          <text>{{selectedType.label}}</text>
+        </view>
+        <view class="filter-arrow {{showTypes ? 'filter-arrow-up' : ''}}" />
+      </button>
+      <picker class="filter-picker" mode="selector" range="{{eggOptions}}" value="{{eggIndex}}" bindchange="onEggGroupChange"
+        aria-label="蛋组 {{eggOptions[eggIndex]}}">
+        <view class="filter-control {{filters.eggGroup ? 'filter-active' : ''}}">
+          <text class="filter-label">蛋组</text><view class="filter-value"><text>{{eggOptions[eggIndex]}}</text></view>
+          <view class="filter-arrow" />
+        </view>
+      </picker>
+      <picker class="filter-picker" mode="selector" range="{{rareOptions}}" range-key="label" value="{{rareIndex}}" bindchange="onRareChange"
+        aria-label="异色 {{rareOptions[rareIndex].label}}">
+        <view class="filter-control {{filters.rare ? 'filter-active' : ''}}">
+          <text class="filter-label">异色</text><view class="filter-value"><text>{{rareOptions[rareIndex].label}}</text></view>
+          <view class="filter-arrow" />
+        </view>
       </picker>
     </view>
 
-    <view class="filter-row">
-      <text class="filter-label">异色</text>
-      <view class="filter-choices">
-        <button wx:for="{{rareOptions}}" wx:key="value" class="button chip {{(filters.rare || 'all') === item.value ? 'button-selected' : ''}}"
-          hover-class="pressed" data-value="{{item.value}}" bindtap="onRareChange">{{item.label}}</button>
-      </view>
-    </view>
-
-    <view class="filter-row types-row">
-      <text class="filter-label">系别</text>
-      <view class="filter-choices">
-        <button wx:for="{{typeOptions}}" wx:key="value" class="button chip {{(filters.attribute || 'all') === item.value ? 'button-selected' : ''}}"
-          hover-class="pressed" data-value="{{item.value}}" bindtap="onTypeChange">
-          <image wx:if="{{item.icon}}" class="type-icon" src="{{item.icon}}" mode="aspectFit" />
-          <text>{{item.label}}</text>
-        </button>
-      </view>
+    <view wx:if="{{showTypes}}" class="type-grid">
+      <button wx:for="{{typeOptions}}" wx:key="value" class="button type-choice {{filters.attribute === item.value ? 'button-selected' : ''}}"
+        hover-class="pressed" data-value="{{item.value}}" bindtap="onTypeChange">
+        <image wx:if="{{item.icon}}" class="filter-icon" src="{{item.icon}}" mode="aspectFit" />
+        <text>{{item.label}}</text>
+      </button>
     </view>
   </view>
 
   <view class="results-heading">
     <text class="results-title">精灵列表</text>
-    <text class="result-count">显示 {{matching}} / {{count}} 只</text>
+    <text class="result-count">{{matching}} / {{count}} 只</text>
   </view>
   <view wx:if="{{syncNote}}" class="muted sync-note">{{syncNote}}，可下拉更新。</view>
 

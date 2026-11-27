@@ -4,6 +4,8 @@ const { uiImages } = require('../../lib/site')
 
 const PAGE_SIZE = 24
 const emptyFilters = { query: '', attribute: '', eggGroup: '', rare: '' }
+const typeChoices = [{ label: '全部', value: '' }, ...typeOptions.map(type => ({ ...type, value: type.label }))]
+const rareChoices = [{ label: '全部', value: '' }, { label: '有异色', value: 'yes' }, { label: '无异色', value: 'no' }]
 
 Page({
   data: {
@@ -11,9 +13,12 @@ Page({
     wallpaper: uiImages.wallpaper,
     logo: uiImages.logo,
     rareIcon: uiImages.rare,
-    typeOptions: [{ label: '全部', value: 'all' }, ...typeOptions.map(type => ({ ...type, value: type.label }))],
-    rareOptions: [{ label: '全部', value: 'all' }, { label: '有异色', value: 'yes' }, { label: '无异色', value: 'no' }],
-    eggOptions: ['全部蛋组'],
+    typeOptions: typeChoices,
+    selectedType: typeChoices[0],
+    showTypes: false,
+    rareOptions: rareChoices,
+    rareIndex: 0,
+    eggOptions: ['全部'],
     eggIndex: 0,
     cards: [],
     count: 0,
@@ -66,7 +71,9 @@ Page({
       filters,
       cards,
       count: index.length,
-      eggOptions: ['全部蛋组', ...eggGroups],
+      selectedType: typeChoices.find(option => option.value === filters.attribute) || typeChoices[0],
+      rareIndex: Math.max(0, rareChoices.findIndex(option => option.value === filters.rare)),
+      eggOptions: ['全部', ...eggGroups],
       eggIndex: eggGroups.indexOf(filters.eggGroup) + 1,
       matching: this.matchingCards.length,
       hasMore: this.matchingCards.length > cards.length,
@@ -82,17 +89,22 @@ Page({
     this.updateFilters({ ...this.data.filters, eggGroup: this.catalogue.eggGroups[Number(event.detail.value) - 1] || '' })
   },
 
+  toggleTypes() {
+    this.setData({ showTypes: !this.data.showTypes })
+  },
+
   onTypeChange(event) {
-    const value = event.currentTarget.dataset.value
-    this.updateFilters({ ...this.data.filters, attribute: value === 'all' ? '' : value })
+    this.setData({ showTypes: false })
+    this.updateFilters({ ...this.data.filters, attribute: event.currentTarget.dataset.value || '' })
   },
 
   onRareChange(event) {
-    const value = event.currentTarget.dataset.value
-    this.updateFilters({ ...this.data.filters, rare: value === 'all' ? '' : value })
+    const choice = rareChoices[Number(event.detail.value)]
+    this.updateFilters({ ...this.data.filters, rare: choice?.value || '' })
   },
 
   clearFilters() {
+    this.setData({ showTypes: false })
     this.updateFilters(emptyFilters)
   },
 

@@ -32,8 +32,8 @@ function getSkillCards(records, bundle, version) {
       level,
       unlock,
       description: valueOr(skill.description, '暂无描述。'),
-      tags: [source, skill.cost && `耗能 ${skill.cost}`, skill.category,
-        skill.type && `${skill.type}系`, Number(skill.power) > 0 && `威力 ${skill.power}`].filter(Boolean),
+      meta: [source, skill.cost && `耗能 ${skill.cost}`, skill.category,
+        skill.type && `${skill.type}系`, Number(skill.power) > 0 && `威力 ${skill.power}`].filter(Boolean).join(' · '),
     }
   })
 }
@@ -196,14 +196,15 @@ function createDetailPage(bundle) {
 
     selectTab(event) {
       const tab = event.currentTarget.dataset.tab
-      if (tab !== 'skills' || this.skillCards) {
-        this.setData({ tab })
-        return
+      if (tab === this.data.tab) return
+      const patch = { tab }
+      if (tab === 'skills' && !this.skillCards) {
+        this.skillCards = getSkillCards(this.detail.skills, bundle, this.catalogue.version)
+        const sources = [...new Set(this.skillCards.map(skill => skill.source).filter(Boolean))]
+        patch.skillChoices = [{ value: 'all', label: '全部' }, ...sources.map(source => ({ value: source, label: source }))]
+        patch.skills = this.skillCards
       }
-      this.skillCards = getSkillCards(this.detail.skills, bundle, this.catalogue.version)
-      const sources = [...new Set(this.skillCards.map(skill => skill.source).filter(Boolean))]
-      const skillChoices = [{ value: 'all', label: '全部' }, ...sources.map(source => ({ value: source, label: source }))]
-      this.setData({ tab, skillChoices, skills: this.skillCards })
+      this.setData(patch, () => wx.pageScrollTo({ scrollTop: 0, duration: 0 }))
     },
 
     selectSkillSource(event) {
