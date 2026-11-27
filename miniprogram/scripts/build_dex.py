@@ -5,7 +5,6 @@ from base64 import b64encode
 from io import BytesIO
 import json
 from pathlib import Path
-import re
 import shutil
 from tempfile import TemporaryDirectory
 
@@ -99,17 +98,22 @@ def write_detail_package(directory, name, records, definitions):
     (directory / 'index.wxss').write_text('@import "../../ui/detail.wxss";\n', encoding='utf-8')
 
 
-def write_font(output, cards):
-    labels = ''.join(file.read_text(encoding='utf-8') for file in (APP / 'pages').rglob('*.wxml'))
-    labels += (APP / 'ui/detail.wxml').read_text(encoding='utf-8')
-    text = labels + ''.join(card['title'] for card in cards) + ''.join(TYPES)
-    glyphs = ''.join(sorted(set(re.findall(r'[\u3000-\u303f\u3400-\u9fff\uff00-\uffef]', text))))
+def write_font(output, records):
+    characters = set(json_bytes(records).decode('utf-8'))
+    characters.update(''.join(TYPES))
+    sources = list(APP.glob('app.*'))
+    for directory in ('pages', 'lib', 'ui'):
+        sources.extend(file for file in (APP / directory).rglob('*') if file.is_file())
+    for file in sources:
+        if file.suffix in ('.js', '.json', '.wxml', '.wxss'):
+            characters.update(file.read_text(encoding='utf-8'))
+
     options = subset.Options()
     options.flavor = 'woff2'
-    font = subset.load_font(SITE / 'homepage/fonts/roco-kingdom-sans-handbook.woff2', options)
+    font = subset.load_font(SITE / 'homepage/fonts/roco-kingdom-sans.woff2', options)
     font.recalcTimestamp = False
     sub = subset.Subsetter(options=options)
-    sub.populate(text=glyphs + '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .-/')
+    sub.populate(unicodes={ord(char) for char in characters} | set(range(0x20, 0x7F)))
     sub.subset(font)
     output_font = BytesIO()
     subset.save_font(font, output_font, options)
@@ -143,7 +147,7 @@ def build(output, app_config):
     for card in cards:
         card['package'] = routes[card['id']]
     write_module(output / 'catalog.js', {'types': TYPES, 'records': cards})
-    write_font(output, cards)
+    write_font(output, records)
     source_size = sum(file_size(APP / d) for d in ('pages', 'lib', 'ui'))
     source_size += sum(file.stat().st_size for file in APP.glob('*') if file.is_file())
     main_size = file_size(output) - sum(sizes) + source_size
