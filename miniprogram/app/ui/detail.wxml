@@ -1,0 +1,146 @@
+<view class="shell detail">
+  <button class="button button-dark return-button" hover-class="pressed" bindtap="backToCatalogue">‹ 返回图鉴</button>
+  <block wx:if="{{record}}">
+    <view class="panel profile">
+      <view class="portrait-stage" style="background: {{record.background}}">
+        <image wx:if="{{portrait}}" class="portrait" src="{{portrait}}" mode="aspectFit" aria-label="{{record.title}}"
+          data-src="{{portrait}}" binderror="onPortraitError" />
+        <text wx:else class="muted">暂无立绘</text>
+        <button wx:if="{{record.images.shiny}}" class="button shiny-toggle {{shiny ? 'button-selected' : ''}}" hover-class="pressed" bindtap="toggleShiny">
+          <image class="type-icon" src="{{shiny ? rareIcon : noRareIcon}}" mode="aspectFit" />
+          <text>{{shiny ? '异色形态' : '切换异色'}}</text>
+        </button>
+      </view>
+      <view class="profile-copy">
+        <text class="profile-number">No. {{record.number}}</text>
+        <text class="profile-title">{{record.title}}</text>
+        <view class="badge-row">
+          <view wx:for="{{record.types}}" wx:key="label" class="tag">
+            <image wx:if="{{item.icon}}" class="type-icon" src="{{item.icon}}" mode="aspectFit" />
+            <text>{{item.label}}</text>
+          </view>
+        </view>
+        <view class="facts"><text><text class="fact-label">蛋组</text> {{record.groups}}</text><text><text class="fact-label">性别</text> {{record.gender}}</text></view>
+        <text class="prose">{{record.description}}</text>
+        <view class="measurements">
+          <view wx:for="{{record.measurements}}" wx:key="label" class="measure"><text>{{item.label}}</text><text>{{item.value}}</text></view>
+        </view>
+        <view class="values">
+          <view><image src="{{starlightIcon}}" mode="aspectFit" />基础星光值 <text>{{record.starlight}}</text></view>
+          <view><image src="{{rockCoinIcon}}" mode="aspectFit" />基础回顾洛克贝 <text>{{record.rockCoin}}</text></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="detail-tabs">
+      <button wx:for="{{tabs}}" wx:key="value" class="button {{tab === item.value ? 'button-selected' : 'button-dark'}}"
+        hover-class="pressed" data-tab="{{item.value}}" bindtap="selectTab">{{item.label}}</button>
+    </view>
+
+    <view wx:if="{{tab === 'overview'}}" class="sections">
+      <view class="panel section">
+        <text class="section-title">精灵蛋与精灵果实</text>
+        <view class="choices">
+          <button class="button {{itemKind === 'egg' ? 'button-selected' : ''}}" hover-class="pressed" data-kind="egg" bindtap="selectItem">精灵蛋</button>
+          <button class="button {{itemKind === 'fruit' ? 'button-selected' : ''}}" hover-class="pressed" data-kind="fruit" bindtap="selectItem">精灵果实</button>
+        </view>
+        <view class="item-preview">
+          <image wx:if="{{itemImage}}" src="{{itemImage}}" mode="aspectFit" aria-label="{{itemLabel}}" data-src="{{itemImage}}" binderror="onItemImageError" />
+          <text wx:else class="muted">暂无{{itemLabel}}图片</text>
+        </view>
+        <view wx:if="{{itemKind === 'egg' && record.images.shinyEgg}}" class="choices">
+          <button class="button {{!shinyEgg ? 'button-selected' : ''}}" hover-class="pressed" data-shiny="no" bindtap="selectEgg">普通</button>
+          <button class="button {{shinyEgg ? 'button-selected' : ''}}" hover-class="pressed" data-shiny="yes" bindtap="selectEgg">异色</button>
+        </view>
+      </view>
+
+      <view class="panel section">
+        <text class="section-title">进化链</text>
+        <scroll-view wx:if="{{record.evolution.length > 1}}" scroll-x="{{true}}" class="evolution-scroll">
+          <view class="evolution">
+            <block wx:for="{{record.evolution}}" wx:for-item="stage" wx:key="id">
+              <text wx:if="{{index}}" class="evolution-arrow">→</text>
+              <view class="evolution-card {{stage.id === record.id ? 'current-stage' : ''}}" style="background: {{stage.background}}"
+                data-id="{{stage.id}}" bindtap="openEvolution" hover-class="pressed" aria-role="button">
+                <image src="{{stage.thumb}}" mode="aspectFit" />
+                <text class="stage-number">No. {{stage.number}}</text>
+                <text>{{stage.title}}</text>
+              </view>
+            </block>
+          </view>
+        </scroll-view>
+        <text wx:else class="muted">当前精灵无进化链。</text>
+      </view>
+
+      <view class="panel section">
+        <text class="section-title">分布</text>
+        <text class="prose">{{record.distribution}}</text>
+        <view class="section-divider" />
+        <text class="subheading">精灵蛋尺寸</text>
+        <view wx:if="{{record.eggMeasures.length}}" class="measurements">
+          <view wx:for="{{record.eggMeasures}}" wx:key="label" class="measure"><text>{{item.label}}</text><text>{{item.value}}</text></view>
+        </view>
+        <text wx:else class="muted">暂无精灵蛋尺寸资料。</text>
+      </view>
+
+      <view class="panel section">
+        <text class="section-title">能力值</text>
+        <view class="stats">
+          <view wx:for="{{record.stats}}" wx:key="name" class="stat">
+            <text>{{item.name}}</text>
+            <view class="stat-track"><view class="stat-fill" style="width: {{item.width}}%; background: {{record.accent}}" /></view>
+            <text>{{item.value}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="panel section">
+        <text class="section-title">特性</text>
+        <block wx:if="{{record.abilities.length}}">
+          <view wx:for="{{record.abilities}}" wx:key="key" class="ability">
+            <text class="subheading">{{item.name}}</text><text class="prose">{{item.description}}</text>
+          </view>
+        </block>
+        <text wx:else class="muted">暂无特性资料。</text>
+      </view>
+    </view>
+
+    <view wx:elif="{{tab === 'skills'}}" class="panel section">
+      <text class="section-title">技能</text>
+      <view class="choices">
+        <button wx:for="{{skillChoices}}" wx:key="value" class="button {{skillSource === item.value ? 'button-selected' : ''}}"
+          hover-class="pressed" data-source="{{item.value}}" bindtap="selectSkillSource">{{item.label}}</button>
+      </view>
+      <block wx:if="{{skills.length}}">
+        <view wx:for="{{skills}}" wx:for-item="skill" wx:key="key" class="skill-card">
+          <image wx:if="{{skill.icon}}" class="skill-icon" src="{{skill.icon}}" mode="aspectFit" lazy-load="{{true}}"
+            data-key="{{skill.key}}" binderror="onSkillImageError" />
+          <view wx:else class="skill-icon" />
+          <view class="skill-info">
+            <view class="skill-heading"><text>{{skill.name}}</text><text wx:if="{{skill.level}}" class="skill-secondary">{{skill.level}}</text></view>
+            <view class="badge-row"><text wx:for="{{skill.tags}}" wx:for-item="tag" wx:key="*this" class="tag">{{tag}}</text></view>
+            <text class="prose">{{skill.description}}</text>
+            <text wx:if="{{skill.unlock}}" class="skill-secondary">解锁 {{skill.unlock}}</text>
+          </view>
+        </view>
+      </block>
+      <text wx:else class="muted">暂无技能资料。</text>
+    </view>
+
+    <view wx:else class="panel section">
+      <view class="section-heading">
+        <text class="section-title">图鉴课题</text>
+        <text wx:if="{{record.progress}}" class="research-progress">进度 {{record.progress}}</text>
+      </view>
+      <block wx:if="{{record.tasks.length}}">
+        <view wx:for="{{record.tasks}}" wx:key="key" class="research-task">
+          <text class="research-number">{{index + 1}}</text><text>{{item.name}}</text>
+        </view>
+      </block>
+      <text wx:else class="muted">暂无课题资料。</text>
+    </view>
+
+    <button wx:if="{{record.url}}" class="button source-button" hover-class="pressed" bindtap="copySource">复制洛克王国世界 WIKI 原页面链接</button>
+  </block>
+  <view wx:else class="panel empty-state muted">{{loading ? '正在加载图鉴资料…' : '没有找到这只精灵。'}}</view>
+</view>

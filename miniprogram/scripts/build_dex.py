@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Build the bundled WeChat handbook from the website's data and artwork."""
+"""Build the offline handbook text and font from the website's source data."""
 
 from base64 import b64encode
-from hashlib import sha256
 from io import BytesIO
 import json
 from pathlib import Path
@@ -11,13 +10,14 @@ import shutil
 from tempfile import TemporaryDirectory
 
 from fontTools import subset
-from PIL import Image, ImageOps
 
 
-APP = Path(__file__).resolve().parents[1]
-SITE = APP.parent
+PROJECT = Path(__file__).resolve().parents[1]
+APP = PROJECT / 'app'
+SITE = PROJECT.parent
 PACKAGE_LIMIT = 1_500_000
-DETAIL_TARGET = 1_470_000
+# Keep the existing twelve detail entry points for the current catalogue.
+RECORDS_PER_PACKAGE = 56
 TOTAL_LIMIT = 20_000_000
 TYPES = '普通 草 火 水 光 地 冰 龙 电 毒 虫 武 翼 萌 幽 恶 机械 幻'.split()
 DETAIL_FIELDS = (
@@ -35,40 +35,11 @@ def write_module(file, data):
     file.write_bytes(b'module.exports = ' + json_bytes(data) + b'\n')
 
 
-class Artwork:
-    def __init__(self):
-        self.by_source = {}
-        self.files = {}
-
-    def png(self, relative, dimensions, colors):
-        if not relative:
-            return ''
-        source = SITE / relative
-        cache_key = (source, dimensions, colors)
-        if cache_key not in self.by_source:
-            if not source.is_file():
-                self.by_source[cache_key] = ''
-                return ''
-            with Image.open(source) as original:
-                image = original.convert('RGBA')
-            image.thumbnail((dimensions, dimensions), Image.Resampling.LANCZOS)
-            image = image.quantize(colors=colors, method=Image.Quantize.FASTOCTREE)
-            output = BytesIO()
-            image.save(output, 'PNG', optimize=True)
-            content = output.getvalue()
-            filename = sha256(content).hexdigest()[:16] + '.png'
-            if self.files.setdefault(filename, content) != content:
-                raise ValueError(f'图片文件名冲突 {filename}')
-            self.by_source[cache_key] = filename
-        return self.by_source[cache_key]
-
-    def write(self, directory, names):
-        directory.mkdir(parents=True, exist_ok=True)
-        for name in sorted(names):
-            (directory / name).write_bytes(self.files[name])
+def existing_image(relative):
+    return relative if relative and (SITE / relative).is_file() else ''
 
 
-def export_records(records, artwork):
+def export_records(records):
     cards = []
     details = []
     definitions = []
@@ -80,59 +51,45 @@ def export_records(records, artwork):
             'id': record['id'], 'number': record['number'], 'title': record['title'],
             'attributes': record['attributes'], 'eggGroups': groups, 'rare': bool(record['rare']),
             'search': record['searchText'], 'distribution': record['distribution'],
-            'thumb': artwork.png(thumb, 48, 48),
+            'thumb': existing_image(thumb),
         }
         detail = {field: record.get(field) for field in DETAIL_FIELDS}
         detail['images'] = {
-            'portrait': artwork.png(record['portrait'], 232, 160),
-            'shiny': artwork.png(record.get('rarePath'), 232, 160) if record['rare'] else '',
-            'egg': artwork.png(record.get('icon-egg'), 88, 128),
-            'fruit': artwork.png(record.get('icon-fruit'), 88, 128),
-            'shinyEgg': artwork.png(record.get('icon-egg-rare'), 88, 128),
+            'portrait': existing_image(record['portrait']),
+            'shiny': existing_image(record.get('rarePath')) if record['rare'] else '',
+            'egg': existing_image(record.get('icon-egg')),
+            'fruit': existing_image(record.get('icon-fruit')),
+            'shinyEgg': existing_image(record.get('icon-egg-rare')),
         }
-        images = set(detail['images'].values()) - {''}
         detail['skills'] = []
         for skill in record.get('skills', ()):
             if not skill or not skill.get('name'):
                 continue
             definition = {field: skill.get(field) for field in SKILL_FIELDS}
-            icon = artwork.png(skill.get('icon'), 34, 88)
-            definition['icon'] = icon
+            definition['icon'] = existing_image(skill.get('icon'))
             key = tuple(definition.values())
             if key not in definition_indexes:
                 definition_indexes[key] = len(definitions)
                 definitions.append(definition)
             detail['skills'].append([definition_indexes[key], skill.get('level'), skill.get('source'), skill.get('unlock')])
-            if icon:
-                images.add(icon)
         cards.append(card)
-        details.append((record['id'], detail, images))
+        details.append((record['id'], detail))
     return cards, details, definitions
 
 
-def split_details(details, artwork):
-    packages = []
-    packed = {}
-    images = set()
-    current_size = 0
-    for record_id, record, required in details:
-        data_size = len(json_bytes({record_id: record}))
-        asset_size = sum(len(artwork.files[name]) for name in required - images)
-        if packed and current_size + data_size + asset_size > DETAIL_TARGET:
-            packages.append((packed, images))
-            packed, images, current_size = {}, set(), 0
-            asset_size = sum(len(artwork.files[name]) for name in required)
-        packed[record_id] = record
-        images.update(required)
-        current_size += data_size + asset_size
-    if packed:
-        packages.append((packed, images))
-    return packages
-
-
-def write_detail_package(directory, name, records, images, artwork):
+def write_detail_package(directory, name, records, definitions):
+    used = sorted({skill[0] for record in records.values() for skill in record['skills']})
+    indexes = {index: local for local, index in enumerate(used)}
+    package_records = {
+        record_id: {**record, 'skills': [[indexes[index], *fields] for index, *fields in record['skills']]}
+        for record_id, record in records.items()
+    }
     directory.mkdir()
-    write_module(directory / 'records.js', {'assetPath': f'/generated/{name}/art/', 'records': records})
+    write_module(directory / 'records.js', {
+        'root': f'/generated/{name}/',
+        'records': package_records,
+        'definitions': [definitions[index] for index in used],
+    })
     (directory / 'index.js').write_text(
         "const { createDetailPage } = require('../../lib/detail')\n"
         "Page(createDetailPage(require('./records')))\n", encoding='utf-8',
@@ -140,29 +97,9 @@ def write_detail_package(directory, name, records, images, artwork):
     (directory / 'index.json').write_text('{"navigationBarTitleText":"精灵详情"}\n', encoding='utf-8')
     (directory / 'index.wxml').write_text('<include src="../../ui/detail.wxml" />\n', encoding='utf-8')
     (directory / 'index.wxss').write_text('@import "../../ui/detail.wxss";\n', encoding='utf-8')
-    artwork.write(directory / 'art', images)
 
 
-def write_design_assets(output, artwork, cards):
-    assets = output / 'ui'
-    assets.mkdir()
-    with Image.open(SITE / 'homepage/assets/season-wallpaper-mobile.webp') as source:
-        cover = ImageOps.fit(source.convert('RGB'), (704, 440), Image.Resampling.LANCZOS, centering=(0.5, 0.34))
-        cover.save(assets / 'wallpaper.jpg', quality=85, optimize=True)
-    ui_images = {
-        'logo': ('homepage/assets/roco-kingdom-logo.png', 288),
-        'rare': ('web_images/rare.png', 48),
-        'no-rare': ('web_images/no-rare.png', 48),
-        'starlight': ('web_images/values/base-starlight-value.png', 48),
-        'rock-coin': ('web_images/values/base-review-rock-coin.png', 48),
-    }
-    for index, name in enumerate(TYPES):
-        ui_images[f'type-{index}'] = (f'web_images/types/{name}.png', 40)
-    for name, (source, size) in ui_images.items():
-        filename = artwork.png(source, size, 160)
-        if filename:
-            (assets / f'{name}.png').write_bytes(artwork.files[filename])
-
+def write_font(output, cards):
     labels = ''.join(file.read_text(encoding='utf-8') for file in (APP / 'pages').rglob('*.wxml'))
     labels += (APP / 'ui/detail.wxml').read_text(encoding='utf-8')
     text = labels + ''.join(card['title'] for card in cards) + ''.join(TYPES)
@@ -191,15 +128,14 @@ def build(output, app_config):
     records = json.loads((SITE / 'handbook_data.json').read_bytes())['records']
     if len({record['id'] for record in records}) != len(records):
         raise ValueError('图鉴含重复的精灵 ID')
-    artwork = Artwork()
-    cards, details, definitions = export_records(records, artwork)
-    packages = split_details(details, artwork)
+    cards, details, definitions = export_records(records)
     routes = {}
     subpackages = [item for item in app_config.get('subPackages', []) if not item['root'].startswith('generated/dex-')]
     sizes = []
-    for index, (data, images) in enumerate(packages, 1):
+    for index, offset in enumerate(range(0, len(details), RECORDS_PER_PACKAGE), 1):
+        data = dict(details[offset:offset + RECORDS_PER_PACKAGE])
         name = f'dex-{index:02d}'
-        write_detail_package(output / name, name, data, images, artwork)
+        write_detail_package(output / name, name, data, definitions)
         routes.update((record_id, index) for record_id in data)
         subpackages.append({'root': f'generated/{name}', 'pages': ['index']})
         sizes.append(file_size(output / name))
@@ -207,9 +143,7 @@ def build(output, app_config):
     for card in cards:
         card['package'] = routes[card['id']]
     write_module(output / 'catalog.js', {'types': TYPES, 'records': cards})
-    write_module(output / 'skills.js', definitions)
-    artwork.write(output / 'thumbs', {card['thumb'] for card in cards if card['thumb']})
-    write_design_assets(output, artwork, cards)
+    write_font(output, cards)
     source_size = sum(file_size(APP / d) for d in ('pages', 'lib', 'ui'))
     source_size += sum(file.stat().st_size for file in APP.glob('*') if file.is_file())
     main_size = file_size(output) - sum(sizes) + source_size
