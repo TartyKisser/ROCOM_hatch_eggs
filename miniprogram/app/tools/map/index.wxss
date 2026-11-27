@@ -18,4 +18,3 @@ button.map-small-button { min-height: 33px; padding: 0 11rpx; }
 .map-group-title { min-height: 35px; }
 .map-categories button, .map-presets button { flex: 0 0 auto; min-height: 32px; padding: 0 9rpx; }
 .map-categories image { width: 29rpx; height: 29rpx; }
-.map-attribution button { font-size: max(11px, 21rpx); }

@@ -49,10 +49,6 @@ function normalize(value) {
   return String(value || '').replace(/\s+/g, '').toLowerCase()
 }
 
-function copyText(data) {
-  if (data) wx.setClipboardData({ data: String(data) })
-}
-
 function appendRows(page, field, rows, state = {}) {
   const offset = page.data[field].length
   const patch = { ...state }
@@ -60,4 +56,4 @@ function appendRows(page, field, rows, state = {}) {
   page.setData(patch)
 }
 
-module.exports = { requestSite, bundledRecords, handbookRecords, smallPortrait, openRecord, normalize, copyText, appendRows }
+module.exports = { requestSite, bundledRecords, handbookRecords, smallPortrait, openRecord, normalize, appendRows }

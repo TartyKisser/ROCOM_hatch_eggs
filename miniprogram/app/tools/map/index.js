@@ -1,4 +1,3 @@
-const { copyText } = require('../../lib/tool-data')
 const { loadMapFile, normalizeMap, location, regionAt, presets, defaultCategory, collectible } = require('./data')
 const { WorldCanvas } = require('./canvas')
 const { detailRows } = require('./details')
@@ -327,5 +326,4 @@ Page({
     this.setData({ 'detail.collected': this.collected.has(point.id) })
     this.applyFilters()
   },
-  copyLicense() { copyText('https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hans') },
 })

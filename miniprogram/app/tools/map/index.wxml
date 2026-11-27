@@ -79,5 +79,8 @@
       </view>
     </view>
   </view>
-  <view class="tool-actions map-attribution"><button class="button" bindtap="copyLicense">复制 CC BY-SA 4.0 链接</button></view>
+  <view class="tool-note">
+    <view>地图资料许可 CC BY-SA 4.0</view>
+    <view>https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hans</view>
+  </view>
 </view>
