@@ -1,0 +1,61 @@
+<template name="skill-pet">
+  <view class="tool-row" data-id="{{id}}" bindtap="openPet" aria-role="button">
+    <image class="tool-icon" src="{{image}}" mode="aspectFit" lazy-load="{{true}}" />
+    <view class="tool-row-copy"><text class="tool-row-name">{{title}}</text><text class="tool-note">{{note || 'No. ' + number}}</text></view>
+  </view>
+</template>
+
+<view class="shell tool">
+  <block wx:if="{{!detail}}">
+    <view class="panel tool-section">
+      <view class="field-row"><input placeholder="搜索技能名称" value="{{query}}" bindinput="onSearch" /><button class="button" bindtap="clear">清空</button></view>
+      <input placeholder="输入精灵名称或编号筛选" value="{{petQuery}}" bindinput="searchPet" />
+      <view wx:if="{{suggestions.length}}" class="pet-suggestions">
+        <view wx:for="{{suggestions}}" wx:key="id" class="tool-row" data-id="{{item.id}}" bindtap="selectPet">
+          <image class="tool-icon" src="{{item.image}}" mode="aspectFit" /><text class="tool-row-name">No. {{item.number}} {{item.title}}</text>
+        </view>
+      </view>
+      <view class="field-row">
+        <picker class="skill-picker" range="{{types}}" value="{{typeIndex}}" data-key="typeIndex" bindchange="onFilter"><view class="tool-input tool-picker"><text>{{types[typeIndex]}}</text><text>⌄</text></view></picker>
+        <picker class="skill-picker" range="{{categories}}" value="{{categoryIndex}}" data-key="categoryIndex" bindchange="onFilter"><view class="tool-input tool-picker"><text>{{categories[categoryIndex]}}</text><text>⌄</text></view></picker>
+      </view>
+      <view wx:if="{{error}}" class="tool-actions"><text class="tool-note tool-error">{{error}}</text><button class="button" bindtap="load">重试</button></view>
+      <text wx:elif="{{loading}}" class="tool-note">正在整理技能与精灵…</text>
+      <text wx:else class="tool-note">{{petTitle ? petTitle + ' · ' : ''}}命中 {{count}} / {{total}} 个技能</text>
+    </view>
+    <view wx:if="{{rows.length}}" class="panel tool-section">
+      <view wx:for="{{rows}}" wx:key="name" class="tool-row" data-name="{{item.name}}" bindtap="openSkill" aria-role="button">
+        <image wx:if="{{item.icon}}" class="tool-icon" src="{{item.icon}}" mode="aspectFit" lazy-load="{{true}}" />
+        <view class="tool-row-copy"><text class="tool-row-name">{{item.name}}</text><text class="tool-meta">{{item.type}} · {{item.meta}} · {{item.users}} 只精灵</text></view>
+      </view>
+    </view>
+    <view wx:elif="{{!loading && !error}}" class="panel tool-section tool-empty">没有符合条件的技能</view>
+  </block>
+  <block wx:else>
+    <view class="panel tool-section">
+      <view class="tool-heading"><text class="tool-title">{{detail.name}}</text><button class="button" bindtap="closeSkill">技能列表</button></view>
+      <view class="tool-row"><image wx:if="{{detail.icon}}" class="tool-icon" src="{{detail.icon}}" mode="aspectFit" /><text class="tool-meta">{{detail.type}} · {{detail.meta}}</text></view>
+      <text class="tool-prose">{{detail.description || '暂无描述。'}}</text>
+    </view>
+    <view class="panel tool-section">
+      <text class="tool-title">获取方式</text>
+      <view wx:for="{{groups}}" wx:key="key" class="skill-source">
+        <view class="tool-heading" data-key="{{item.key}}" bindtap="toggleGroup"><text class="tool-row-name">{{item.label}}</text><text class="tag">{{item.count}} 只 {{openGroup === item.key ? '收起' : '展开'}}</text></view>
+        <block wx:if="{{openGroup === item.key}}">
+          <template wx:for="{{groupPets}}" wx:for-item="pet" wx:key="id" is="skill-pet" data="{{...pet}}" />
+          <button wx:if="{{groupPets.length < item.count}}" class="button tool-more" bindtap="expandGroup">更多精灵</button>
+        </block>
+      </view>
+    </view>
+    <view wx:if="{{research.length}}" class="panel tool-section">
+      <text class="tool-title">图鉴课题线索</text>
+      <template wx:for="{{research}}" wx:key="key" is="skill-pet" data="{{...item}}" />
+      <button wx:if="{{research.length < researchTotal}}" class="button tool-more" bindtap="moreResearch">更多课题</button>
+    </view>
+    <view class="panel tool-section">
+      <text class="tool-title">可使用精灵 {{userTotal}}</text>
+      <template wx:for="{{users}}" wx:key="id" is="skill-pet" data="{{...item}}" />
+      <button wx:if="{{users.length < userTotal}}" class="button tool-more" bindtap="moreUsers">更多精灵</button>
+    </view>
+  </block>
+</view>

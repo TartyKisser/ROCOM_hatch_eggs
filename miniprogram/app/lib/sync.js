@@ -101,10 +101,24 @@ async function checkHandbook() {
   }
 }
 
+async function restoreCache() {
+  if (getCatalogue().online) return false
+  const cached = savedCache()
+  if (cached) {
+    try {
+      const records = await readCatalogue(wx.getFileSystemManager(), cachePath(cached.slot))
+      setOnlineCatalogue(records, cached.version)
+    } catch (_) {
+      // The bundled catalogue remains available if the file is missing or incomplete.
+    }
+  }
+  return false
+}
+
 function syncHandbook(force = false) {
   if (inFlight) return inFlight
   if (!force && lastCheck && Date.now() - lastCheck < checkInterval) return Promise.resolve(reachable)
-  inFlight = checkHandbook().then(() => true, () => false).then(success => {
+  inFlight = checkHandbook().then(() => true, restoreCache).then(success => {
     reachable = success
     lastCheck = Date.now()
     inFlight = null

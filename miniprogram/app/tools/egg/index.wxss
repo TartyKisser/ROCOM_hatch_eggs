@@ -1,0 +1,6 @@
+@import "../../ui/tools.wxss";
+
+.result-summary { display: block; margin: 16rpx 0 10rpx; }
+.result-profile { padding: 0; }
+.probability { height: 8rpx; border-radius: 6rpx; background: #eadfcf; overflow: hidden; }
+.probability view { height: 100%; background: #c99547; border-radius: inherit; }

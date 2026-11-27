@@ -1,0 +1,12 @@
+@import "../../ui/tools.wxss";
+
+button.rules-button { min-height: 33px; padding: 0 11rpx; }
+.rules-panel { background: #f3ebdd; border-radius: 11rpx; padding: 9rpx; }
+.suggestion-icon { width: 48rpx; height: 48rpx; }
+.strategy-target, .strategy-score { display: flex; align-items: center; gap: 6rpx; }
+.strategy-target { flex: 1; min-width: 0; }
+.strategy-score { background: #f7e8c3; border-radius: 9rpx; padding: 6rpx; color: #785318; }
+.strategy-score image { width: 25rpx; height: 25rpx; }
+.strategy-pets { display: flex; gap: 8rpx; }
+.strategy-pets .tool-stat { flex: 1; flex-direction: row; align-items: center; }
+.strategy-pets .tool-icon { width: 55rpx; height: 55rpx; flex-basis: 55rpx; }

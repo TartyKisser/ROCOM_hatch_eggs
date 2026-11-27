@@ -1,0 +1,30 @@
+<view class="shell tool">
+  <view class="panel tool-section">
+    <view class="tool-heading"><text class="tool-title">精灵蛋尺寸</text><text class="tag" wx:if="{{count}}">{{count}} 个家族</text></view>
+    <view class="field-row">
+      <view class="tool-field"><text>身高（m）</text><input type="digit" placeholder="例如 0.31" value="{{height}}" data-field="height" bindinput="setMeasurement" bindconfirm="predict" /></view>
+      <view class="tool-field"><text>体重（kg）</text><input type="digit" placeholder="例如 18.5" value="{{weight}}" data-field="weight" bindinput="setMeasurement" bindconfirm="predict" /></view>
+    </view>
+    <view class="tool-actions">
+      <button class="button button-dark" bindtap="predict" disabled="{{loading || !count}}">开始预测</button>
+      <button class="button" bindtap="clear">清空</button>
+    </view>
+    <text wx:if="{{loading}}" class="tool-note">正在读取图鉴…</text>
+    <view wx:if="{{error}}" class="tool-actions"><text class="tool-note tool-error">{{error}}</text><button class="button" bindtap="load">重试</button></view>
+  </view>
+  <text wx:if="{{summary}}" class="result-summary tool-title">{{summary}}</text>
+  <view wx:for="{{results}}" wx:key="id" class="panel tool-section">
+    <view class="tool-row result-profile" data-id="{{item.id}}" bindtap="openPet" aria-role="button">
+      <image class="tool-icon" src="{{item.image}}" mode="aspectFit" lazy-load="{{true}}" />
+      <view class="tool-row-copy"><text class="tool-row-name">{{item.title}}</text><text class="tool-meta">No. {{item.number}} · {{item.attribute}}系 · {{item.members}} 个形态</text></view>
+      <text class="tool-title tool-em">{{item.probability}}</text>
+    </view>
+    <view class="probability"><view style="width: {{item.width}}%" /></view>
+    <view class="badge-row"><text class="tag">蛋身高 {{item.height}}</text><text class="tag">蛋体重 {{item.weight}}</text></view>
+    <view class="tool-stats">
+      <view class="tool-stat"><text class="tool-meta">中心贴近</text><text>{{item.center}}</text></view>
+      <view class="tool-stat"><text class="tool-meta">对角线贴近</text><text>{{item.diagonal}}</text></view>
+      <view class="tool-stat"><text class="tool-meta">区间精确</text><text>{{item.precision}}</text></view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,47 @@
+<view class="shell tool">
+  <view class="panel tool-section">
+    <view class="tool-heading"><text class="tool-title">异色抓取方案</text><button class="button rules-button" bindtap="toggleRules">{{showRules ? '收起规则' : '查看规则'}}</button></view>
+    <view wx:if="{{showRules}}" class="rules-panel">
+      <text wx:if="{{rulesLoading}}" class="tool-note">正在读取规则…</text>
+      <view wx:elif="{{rulesError}}" class="tool-actions"><text class="tool-note tool-error">{{rulesError}}</text><button class="button" bindtap="loadRules">重试</button></view>
+      <text wx:else selectable class="tool-prose">{{rules}}</text>
+    </view>
+    <picker range="{{targetOptions}}" range-key="label" value="{{targetIndex}}" bindchange="changeTarget"><view class="tool-input tool-picker"><text>{{targetOptions[targetIndex].label}}</text><text>⌄</text></view></picker>
+    <view class="tool-actions"><button class="button {{mode === 'single' ? 'button-selected' : ''}}" data-mode="single" bindtap="selectMode">单刷</button><button class="button {{mode === 'mixed' ? 'button-selected' : ''}}" data-mode="mixed" bindtap="selectMode">混刷</button></view>
+    <view class="field-row">
+      <view class="tool-field"><text>{{mode === 'single' ? '单刷精灵' : '第一只精灵'}}</text><input placeholder="名称或编号" value="{{firstQuery}}" data-field="firstQuery" bindinput="inputCandidate" bindconfirm="search" /></view>
+      <view wx:if="{{mode === 'mixed'}}" class="tool-field"><text>第二只精灵</text><input placeholder="名称或编号" value="{{secondQuery}}" data-field="secondQuery" bindinput="inputCandidate" bindconfirm="search" /></view>
+    </view>
+    <view wx:for="{{suggestions}}" wx:key="id" class="tool-row" data-title="{{item.title}}" bindtap="pickCandidate"><image class="suggestion-icon" src="{{item.image}}" mode="aspectFit" /><text>No. {{item.number}} {{item.title}}</text></view>
+    <view class="tool-actions"><button class="button button-dark" bindtap="search">查询方案</button><button class="button" bindtap="clear">清空</button></view>
+    <view class="tool-heading"><text class="tool-note">排序 {{sort[0].label}} → {{sort[1].label}}</text><button class="button rules-button" bindtap="changeSort">交换优先级</button></view>
+    <text wx:if="{{loading}}" class="tool-note">正在读取异色名单与图鉴…</text>
+    <view wx:elif="{{error}}" class="tool-actions"><text class="tool-note tool-error">{{error}}</text><button class="button" bindtap="load">重试</button></view>
+    <text wx:else class="tool-note">共 {{count}} 条{{mode === 'single' ? '单刷' : '混刷'}}推荐</text>
+  </view>
+  <view id="strategy-results">
+  <view wx:for="{{rows}}" wx:key="key" class="panel tool-section">
+    <view class="tool-heading strategy-heading">
+      <view class="strategy-target" data-id="{{item.target.id}}" bindtap="openPet"><image class="tool-icon" src="{{item.target.image}}" mode="aspectFit" lazy-load="{{true}}" /><view class="tool-row-copy"><text class="tool-meta">目标异色</text><text class="tool-row-name">No. {{item.target.number}} {{item.target.title}}</text></view></view>
+      <view class="strategy-score"><image src="{{starlight}}" mode="aspectFit" /><text>{{item.score}}</text></view>
+    </view>
+    <view class="strategy-pets">
+      <view wx:for="{{item.pets}}" wx:for-item="pet" wx:key="id" class="tool-stat" data-id="{{pet.id}}" bindtap="openPet">
+        <image class="tool-icon" src="{{pet.image}}" mode="aspectFit" lazy-load="{{true}}" /><view class="tool-row-copy"><text class="tool-row-name">{{pet.title}}</text><text class="tool-meta">{{pet.attribute}} · 星光 {{pet.score}}</text></view>
+      </view>
+    </view>
+    <view class="badge-row"><text wx:for="{{item.rules}}" wx:key="*this" class="tag">{{item}}</text></view>
+    <text class="tool-meta">还可能触发</text>
+    <view wx:if="{{item.others.length}}" class="badge-row">
+      <text wx:for="{{item.others}}" wx:for-item="other" wx:key="id" class="tag" data-id="{{other.id}}" bindtap="openPet">{{other.title}} · {{other.rules}}</text>
+    </view>
+    <text wx:else class="tool-note">暂无</text>
+  </view>
+  <view wx:if="{{pages > 1}}" class="tool-actions strategy-pages">
+    <button class="button" data-direction="-1" bindtap="turnPage" disabled="{{page <= 1}}">上一页</button>
+    <text class="tool-note">{{page}} / {{pages}}</text>
+    <button class="button" data-direction="1" bindtap="turnPage" disabled="{{page >= pages}}">下一页</button>
+  </view>
+  </view>
+  <text wx:if="{{!rows.length && !loading && !error}}" class="tool-note tool-empty">没有匹配的方案</text>
+</view>

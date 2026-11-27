@@ -1,0 +1,8 @@
+@import "../../ui/tools.wxss";
+
+.garden-pet-icon { width: 70rpx; min-height: 70rpx; flex: 0 0 70rpx; position: relative; }
+.garden-rare { width: 22rpx; height: 22rpx; position: absolute; right: 0; top: 0; }
+.farm-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7rpx; }
+.farm-plot { text-align: center; align-items: center; min-height: 103rpx; justify-content: center; }
+.farm-plot image { width: 57rpx; height: 57rpx; }
+.plot-ripe { background: #e4eed8; }

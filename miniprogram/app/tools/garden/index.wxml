@@ -1,0 +1,46 @@
+<template name="garden-pet">
+  <view class="tool-row" data-id="{{id}}" bindtap="openPet">
+    <view class="garden-pet-icon">
+      <image wx:if="{{image}}" class="tool-icon" src="{{image}}" mode="aspectFit" lazy-load="{{true}}" data-list="{{list}}" data-index="{{key}}" data-src="{{image}}" binderror="imageError" />
+      <image wx:if="{{badge}}" class="garden-rare" src="{{badge}}" mode="aspectFit" />
+    </view>
+    <view class="tool-row-copy">
+      <text class="tool-row-name">{{title}} <text class="tool-meta">{{level}} {{gender}}</text></text>
+      <view class="badge-row">
+        <view wx:for="{{types}}" wx:key="label" class="tag"><image class="type-icon" src="{{item.icon}}" mode="aspectFit" /><text>{{item.label}}</text></view>
+        <text wx:for="{{tags}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<view class="shell tool">
+  <view class="panel tool-section">
+    <view class="tool-field"><text class="tool-title">玩家 UID</text><input type="number" maxlength="10" placeholder="输入 5–10 位玩家 UID" value="{{uid}}" bindinput="editUid" bindconfirm="query" confirm-type="search" /></view>
+    <view class="tool-actions"><button class="button button-dark" bindtap="query" disabled="{{loading}}">{{loading ? '查询中' : '查询'}}</button><button class="button" bindtap="clear">清空</button></view>
+    <text wx:if="{{error}}" class="tool-note tool-error">{{error}}</text>
+    <text wx:elif="{{!home && !loading}}" class="tool-note">输入玩家 UID 后查看家园。</text>
+  </view>
+  <block wx:if="{{home}}">
+    <view class="panel tool-section">
+      <view class="tool-heading"><text class="tool-title">{{home.title}}</text><button class="button" bindtap="refresh" disabled="{{loading}}">刷新</button></view>
+      <text class="tool-note">UID {{home.uid}} · {{home.online}} · {{home.cached ? '已载入缓存' : '已同步'}}</text>
+      <view class="tool-stats"><view wx:for="{{home.stats}}" wx:key="label" class="tool-stat"><text class="tool-meta">{{item.label}}</text><text>{{item.value}}</text></view></view>
+    </view>
+    <view class="panel tool-section"><text class="tool-title">居住精灵 {{residents.length}}</text>
+      <text wx:if="{{!residents.length}}" class="tool-note">暂无居住精灵</text>
+      <template wx:for="{{residents}}" wx:key="key" is="garden-pet" data="{{...item, list: 'residents'}}" />
+    </view>
+    <view class="panel tool-section"><text class="tool-title">家园守卫 {{guards.length}}</text>
+      <text wx:if="{{!guards.length}}" class="tool-note">暂无家园守卫</text>
+      <template wx:for="{{guards}}" wx:key="key" is="garden-pet" data="{{...item, list: 'guards'}}" />
+    </view>
+    <view class="panel tool-section"><text class="tool-title">农场</text>
+      <text wx:if="{{!plants.length}}" class="tool-note">暂无农场资料</text>
+      <view class="farm-grid"><view wx:for="{{plants}}" wx:key="plot" class="tool-stat farm-plot {{item.ripe ? 'plot-ripe' : ''}}">
+        <image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFit" lazy-load="{{true}}" data-list="plants" data-index="{{index}}" data-src="{{item.image}}" binderror="imageError" />
+        <text class="tool-row-name">{{item.name}}</text><text class="tool-meta">{{item.status}}</text>
+      </view></view>
+    </view>
+  </block>
+</view>

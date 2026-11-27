@@ -104,7 +104,7 @@ def write_font(output, records):
     characters = set(json_bytes(records).decode('utf-8'))
     characters.update(''.join(TYPES))
     sources = list(APP.glob('app.*'))
-    for directory in ('pages', 'lib', 'ui'):
+    for directory in ('pages', 'lib', 'ui', 'tools'):
         sources.extend(file for file in (APP / directory).rglob('*') if file.is_file())
     for file in sources:
         if file.suffix in ('.js', '.json', '.wxml', '.wxss'):
@@ -137,6 +137,7 @@ def build(output, app_config):
     cards, details, definitions = export_records(records)
     routes = {}
     subpackages = [item for item in app_config.get('subPackages', []) if not item['root'].startswith('generated/dex-')]
+    tool_sizes = [file_size(APP / item['root']) for item in subpackages]
     sizes = []
     for index, offset in enumerate(range(0, len(details), RECORDS_PER_PACKAGE), 1):
         data = dict(details[offset:offset + RECORDS_PER_PACKAGE])
@@ -153,10 +154,11 @@ def build(output, app_config):
     source_size = sum(file_size(APP / d) for d in ('pages', 'lib', 'ui'))
     source_size += sum(file.stat().st_size for file in APP.glob('*') if file.is_file())
     main_size = file_size(output) - sum(sizes) + source_size
-    total_size = main_size + sum(sizes)
-    if max(main_size, max(sizes, default=0)) >= PACKAGE_LIMIT or total_size > TOTAL_LIMIT:
-        raise ValueError(f'图鉴超出代码包预算，主包 {main_size:,}、最大分包 {max(sizes):,}、总计 {total_size:,} 字节')
-    print(f'生成 {len(cards)} 个精灵形态，主包约 {main_size:,} 字节，{len(sizes)} 个详情分包，合计约 {total_size:,} 字节')
+    total_size = main_size + sum(sizes) + sum(tool_sizes)
+    largest_package = max((*sizes, *tool_sizes), default=0)
+    if max(main_size, largest_package) >= PACKAGE_LIMIT or total_size > TOTAL_LIMIT:
+        raise ValueError(f'小程序超出代码包预算，主包 {main_size:,}、最大分包 {largest_package:,}、总计 {total_size:,} 字节')
+    print(f'生成 {len(cards)} 个精灵形态，主包约 {main_size:,} 字节，{len(sizes)} 个详情分包与 {len(tool_sizes)} 个工具分包，合计约 {total_size:,} 字节')
 
 
 def main():

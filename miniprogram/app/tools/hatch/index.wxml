@@ -1,0 +1,42 @@
+<view class="shell tool">
+  <view class="panel tool-section">
+    <view class="tool-heading"><text class="tool-title">小窝设置</text>
+      <picker range="{{counts}}" value="{{countIndex}}" disabled="{{calculating}}" bindchange="changeCount"><view class="tool-input tool-picker"><text>{{counts[countIndex]}} 个小窝</text><text>⌄</text></view></picker>
+    </view>
+    <text wx:if="{{loading}}" class="tool-note">正在读取可繁殖精灵…</text>
+    <view wx:for="{{slots}}" wx:key="slot" class="nest-slot">
+      <view class="slot-line">
+        <view class="tool-row-copy slot-name" aria-role="button" data-index="{{index}}" bindtap="editSlot">
+          <text class="tool-row-name">{{index + 1}}. {{item.title || '选择精灵'}}</text><text wx:if="{{item.eggLabel}}" class="tool-meta">{{item.eggLabel}}</text>
+        </view>
+        <button class="button sex {{item.gender === 'male' ? 'button-selected' : ''}}" data-index="{{index}}" data-gender="male" bindtap="setGender">雄</button>
+        <button class="button sex {{item.gender === 'female' ? 'button-selected' : ''}}" data-index="{{index}}" data-gender="female" bindtap="setGender">雌</button>
+      </view>
+      <view wx:if="{{openSlot === index}}" class="nest-choose">
+        <input placeholder="输入名称或编号" value="{{search}}" bindinput="searchPet" />
+        <scroll-view scroll-y="{{true}}" class="nest-suggestions" style="height: {{suggestions.length ? (suggestions.length > 4 ? 300 : suggestions.length * 72) : 48}}rpx">
+          <view wx:for="{{suggestions}}" wx:for-item="pet" wx:key="id" class="tool-row nest-option" data-id="{{pet.id}}" bindtap="pickPet">
+            <image class="tool-icon" src="{{pet.image}}" mode="aspectFit" /><view class="tool-row-copy"><text class="tool-row-name">No. {{pet.number}} {{pet.title}}</text><text class="tool-meta">{{pet.eggLabel}}</text></view>
+          </view>
+          <text wx:if="{{!suggestions.length}}" class="tool-note">没有匹配的精灵</text>
+        </scroll-view>
+      </view>
+    </view>
+    <view wx:if="{{error}}" class="tool-actions"><text class="tool-note tool-error">{{error}}</text><button wx:if="{{!ready}}" class="button" bindtap="load">重试</button></view>
+    <view class="tool-actions"><button class="button button-dark" disabled="{{loading || !ready || calculating}}" bindtap="generate">{{calculating ? '正在计算 ' + progress + '%' : '生成最优排布'}}</button></view>
+  </view>
+  <view wx:if="{{result}}" id="nest-result" class="panel tool-section">
+    <view class="tool-heading"><text class="tool-title">最优排布方案</text><text class="tag">{{result.pairs.length}} 组生蛋配对</text></view>
+    <scroll-view scroll-x="{{true}}" class="nest-board-scroll">
+      <view class="nest-board" style="width: {{result.width}}rpx;height: {{result.height}}rpx;background-size: {{result.size}}rpx {{result.size}}rpx">
+        <view wx:for="{{result.nests}}" wx:key="index" class="nest {{item.gender === 'male' ? 'nest-male' : 'nest-female'}}" style="{{item.style}}">
+          <image src="{{item.image}}" mode="aspectFit" /><text>{{item.index + 1}}</text>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="badge-row"><text class="tag nest-male">雄性小窝</text><text class="tag nest-female">雌性小窝</text></view>
+    <text class="tool-subtitle">配对路径 {{result.pairs.length}}</text>
+    <text wx:if="{{!result.pairs.length}}" class="tool-note">没有可配对的精灵</text>
+    <view wx:for="{{result.pairs}}" wx:key="id" class="tool-row"><view class="tool-row-copy"><text class="tool-row-name">{{item.first}} → {{item.second}}</text><text class="tool-meta">距离 {{item.distance}} 格</text></view></view>
+  </view>
+</view>

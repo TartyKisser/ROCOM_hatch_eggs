@@ -1,0 +1,47 @@
+<view class="shell tool">
+  <view class="panel tool-section">
+    <view class="tool-heading"><text class="tool-title">已选择 {{selected.length}} / 10</text><text wx:if="{{selected.length}}" class="tag">{{pairs}} 组共同蛋组</text></view>
+    <text wx:if="{{!selected.length}}" class="tool-note">在下方点选精灵，查看它的配对关系。</text>
+    <block wx:else>
+      <view wx:if="{{regions.length}}" class="tool-actions pair-regions">
+        <button wx:for="{{regions}}" wx:key="group" class="button {{item.focused ? 'button-selected' : ''}}" style="border-color: {{item.border}}" data-group="{{item.group}}" bindtap="focusGroup">{{item.group}}</button>
+      </view>
+      <view class="pair-map" style="height: {{mapHeight}}rpx">
+        <block wx:for="{{regions}}" wx:key="group" wx:for-item="region">
+          <view wx:for="{{region.cells}}" wx:key="key" class="pair-cell" style="{{item.style}}" />
+        </block>
+        <view wx:for="{{markers}}" wx:key="slotId" class="pair-marker {{item.focused ? 'focused' : ''}}" style="{{item.style}}" data-slot="{{item.slotId}}" bindtap="toggleFocus" aria-role="button">
+          <image src="{{item.image}}" mode="aspectFit" /><text>{{item.position}}</text>
+        </view>
+      </view>
+      <view class="selected-list">
+        <view wx:for="{{selected}}" wx:key="slotId" class="tool-row">
+          <view class="tool-row-copy" data-slot="{{item.slotId}}" bindtap="toggleFocus">
+            <text class="tool-row-name">{{item.position}}. {{item.title}} {{item.focused ? '· 筛选中' : ''}}</text>
+            <text class="tool-meta">{{item.eggLabel}} · 可与已选 {{item.matches}} 只配对</text>
+          </view>
+          <button class="button" data-slot="{{item.slotId}}" bindtap="remove">移除</button>
+        </view>
+      </view>
+      <text wx:if="{{focusText}}" class="tool-note">{{focusText}}</text>
+    </block>
+    <view class="tool-actions">
+      <button wx:if="{{focusText}}" class="button" bindtap="clearFocus">取消配对筛选</button>
+      <button wx:if="{{selected.length}}" class="button" bindtap="clearSelection">清空已选</button>
+      <button class="button button-dark" bindtap="openHatch">前往小窝排布</button>
+    </view>
+  </view>
+  <view class="panel tool-section">
+    <view class="tool-heading"><text class="tool-title">候选精灵</text><text class="tag">{{count}} 只</text></view>
+    <view class="field-row"><input placeholder="搜索精灵名称、编号或蛋组" value="{{query}}" bindinput="query" /><button class="button" bindtap="clearSearch">清空</button></view>
+    <view class="tool-actions"><button wx:for="{{rareChoices}}" wx:key="key" class="button {{rarity === item.key ? 'button-selected' : ''}}" data-key="{{item.key}}" bindtap="filterRare">{{item.title}}</button></view>
+    <text wx:if="{{loading}}" class="tool-note">正在读取可繁殖精灵…</text>
+    <view wx:elif="{{error}}" class="tool-actions"><text class="tool-note tool-error">{{error}}</text><button class="button" bindtap="load">重试</button></view>
+    <text wx:elif="{{!rows.length}}" class="tool-note">没有符合条件的精灵</text>
+    <view wx:for="{{rows}}" wx:key="id" class="tool-row" data-id="{{item.id}}" bindtap="add" aria-role="button">
+      <image class="tool-icon" src="{{item.image}}" mode="aspectFit" lazy-load="{{true}}" />
+      <view class="tool-row-copy"><text class="tool-row-name">No. {{item.number}} {{item.title}}</text><text class="tool-meta">{{item.eggLabel}}{{selected.length ? ' · 可与已选 ' + item.matches + ' 只配对' : ''}}</text></view>
+      <text class="tag">添加</text>
+    </view>
+  </view>
+</view>

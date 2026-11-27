@@ -1,0 +1,91 @@
+<view class="shell tool">
+  <view class="panel tool-section">
+    <view class="field-row">
+      <picker wx:if="{{maps.length}}" class="map-picker" range="{{maps}}" range-key="name" value="{{mapIndex}}" bindchange="changeMap">
+        <view class="tool-input tool-picker"><text>{{maps[mapIndex].name}}</text><text>⌄</text></view>
+      </picker>
+      <picker wx:if="{{floors.length}}" class="map-picker" range="{{floors}}" range-key="label" value="{{floorIndex}}" disabled="{{loading || floors.length < 2}}" bindchange="changeFloor">
+        <view class="tool-input tool-picker"><text>{{floors[floorIndex].label}}</text><text wx:if="{{floors.length > 1}}">⌄</text></view>
+      </picker>
+    </view>
+    <view class="field-row">
+      <input placeholder="搜索精灵、地点或物品" value="{{query}}" bindinput="onSearch" bindconfirm="search" confirm-type="search" />
+      <button class="button map-small-button" bindtap="clearSearch" wx:if="{{query}}">清空</button>
+    </view>
+    <view class="tool-heading">
+      <text class="tool-note">{{season}} · 当前 {{count}} 个点位</text>
+      <button class="button map-small-button {{filterOpen ? 'button-selected' : ''}}" bindtap="toggleFilters">{{filterOpen ? '收起筛选' : '展开筛选'}}</button>
+    </view>
+    <view wx:if="{{query}}" class="map-results">
+      <text class="tool-note">匹配 {{foundCount}} 个点位{{foundCount > found.length ? '，显示前 ' + found.length + ' 个' : ''}}</text>
+      <view wx:for="{{found}}" wx:key="id" class="tool-row map-result" data-id="{{item.id}}" bindtap="pickSearch" aria-role="button">
+        <image wx:if="{{item.icon}}" src="{{item.icon}}" mode="aspectFit" webp="{{true}}" />
+        <view class="tool-row-copy"><text class="tool-row-name">{{item.title}}</text><text class="tool-meta">{{item.location || item.genre}}</text></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="panel map-panel">
+    <view class="map-surface">
+      <canvas type="2d" id="world-canvas" class="world-canvas" bindtouchstart="touchStart" catchtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="touchCancel" />
+      <view class="canvas-actions">
+        <button class="button" bindtap="zoomIn" aria-label="放大地图" disabled="{{loading || zoom >= 2000}}">+</button>
+        <button class="button" bindtap="zoomOut" aria-label="缩小地图" disabled="{{loading || zoom <= 100}}">−</button>
+        <button class="button" bindtap="fit" aria-label="回到全图" disabled="{{loading}}">全图</button>
+      </view>
+      <view wx:if="{{loading || error || terrainFailed}}" class="map-alert">
+        <text class="tool-note">{{error || (terrainFailed ? '底图加载失败。' : '正在加载地图资料…')}}</text>
+        <button wx:if="{{error || terrainFailed}}" class="button map-small-button" bindtap="retry">重试</button>
+      </view>
+    </view>
+    <view class="map-status"><text>{{region}}</text><text>视野内 {{visible}} 个点位 · {{zoom}}%</text></view>
+  </view>
+
+  <view wx:if="{{detail || nearby.length}}" id="map-popup" class="panel tool-section">
+    <view class="tool-heading"><text class="tool-title">{{detail ? detail.title : '附近 ' + nearbyCount + ' 个点位'}}</text><button class="button map-small-button" bindtap="closeDetails">关闭</button></view>
+    <block wx:if="{{detail}}">
+      <view class="tool-row map-detail-meta">
+        <image wx:if="{{detail.icon}}" src="{{detail.icon}}" mode="aspectFit" webp="{{true}}" />
+        <view class="tool-row-copy"><text class="tool-meta">{{detail.meta}}</text><text wx:if="{{detail.estimated}}" class="tool-note">区域代表点，非精确刷新位置。</text></view>
+      </view>
+      <view class="tool-actions map-detail-actions">
+        <button wx:if="{{detail.collect}}" class="button {{detail.collected ? 'button-selected' : ''}}" bindtap="collect">{{detail.collected ? '取消已收集' : '标记已收集'}}</button>
+        <button wx:if="{{detail.hasLayers}}" class="button" bindtap="goUnderground">查看地下图层</button>
+        <button wx:if="{{detail.wiki}}" class="button" bindtap="copyPoint">复制 Wiki 点位链接</button>
+      </view>
+      <text wx:if="{{detailLoading}}" class="tool-note">正在加载点位详情…</text>
+      <view wx:elif="{{detailError}}" class="tool-actions"><text class="tool-note tool-error">{{detailError}}</text><button class="button" bindtap="retryDetails">重试</button></view>
+      <view wx:for="{{details}}" wx:key="key" class="tool-row map-detail-row {{item.heading ? 'map-detail-group' : ''}}">
+        <image wx:if="{{item.icon}}" src="{{item.icon}}" mode="aspectFit" lazy-load="{{true}}" webp="{{true}}" />
+        <view class="tool-row-copy"><text wx:if="{{item.title}}" class="tool-row-name">{{item.title}}</text><text wx:if="{{item.text}}" class="tool-prose">{{item.text}}</text></view>
+      </view>
+      <button wx:if="{{moreDetails}}" class="button tool-more" bindtap="loadMoreDetails">更多详情</button>
+    </block>
+    <block wx:else>
+      <button class="button" bindtap="zoomNearby">放大到这组点位</button>
+      <view wx:for="{{nearby}}" wx:key="id" class="tool-row map-result" data-id="{{item.id}}" bindtap="pickNearby">
+        <image wx:if="{{item.icon}}" src="{{item.icon}}" mode="aspectFit" webp="{{true}}" />
+        <view class="tool-row-copy"><text class="tool-row-name">{{item.title}}</text><text class="tool-meta">{{item.location}}</text></view>
+      </view>
+      <button wx:if="{{nearby.length < nearbyCount}}" class="button tool-more" bindtap="expandNearby">更多点位</button>
+    </block>
+  </view>
+
+  <view wx:if="{{filterOpen && groups.length}}" class="panel tool-section map-filters">
+    <text class="tool-title">地图筛选</text>
+    <view class="tool-actions map-presets">
+      <button wx:for="{{presets}}" wx:key="*this" class="button {{presetIndex === index ? 'button-selected' : ''}}" data-index="{{index}}" bindtap="selectPreset">{{item}}</button>
+    </view>
+    <view class="tool-actions"><button class="button" bindtap="showAll">全部显示</button><button class="button" bindtap="hideAll">全部隐藏</button><button class="button" bindtap="resetFilters">恢复默认</button></view>
+    <view class="tool-heading map-collection"><text class="tool-note">隐藏已收集</text><switch checked="{{hideCollected}}" bindchange="changeCollected" color="#bc8c45" /></view>
+    <view wx:for="{{groups}}" wx:key="name" wx:for-item="section" class="map-group">
+      <view class="tool-heading map-group-title" data-group="{{section.name}}" bindtap="toggleGroup" aria-role="button"><text class="tool-row-name">{{section.name}}</text><text class="tag">{{section.categories.length}} 类 {{group === section.name ? '收起' : '展开'}}</text></view>
+      <view wx:if="{{group === section.name}}" class="tool-actions map-categories">
+        <button wx:for="{{section.categories}}" wx:key="id" class="button {{item.enabled ? 'button-selected' : ''}}" data-id="{{item.id}}" bindtap="toggleCategory">
+          <image wx:if="{{item.icon}}" src="{{item.icon}}" mode="aspectFit" webp="{{true}}" /><text>{{item.name}} {{item.count}}</text>
+        </button>
+      </view>
+    </view>
+  </view>
+  <view class="tool-actions map-attribution"><button class="button" bindtap="copySource">复制 WIKI 地图链接</button><button class="button" bindtap="copyLicense">复制 CC BY-SA 4.0 链接</button></view>
+</view>

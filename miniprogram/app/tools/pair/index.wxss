@@ -1,0 +1,11 @@
+@import "../../ui/tools.wxss";
+
+.pair-map { position: relative; width: 650rpx; max-width: 100%; margin: 0 auto; border-radius: 11rpx; overflow: hidden; background: #f6eddf; }
+.pair-cell, .pair-marker { position: absolute; box-sizing: border-box; border: 1px solid; }
+.pair-cell { pointer-events: none; }
+.pair-marker { border-radius: 12rpx; background: #fffaf3; border-color: #e3cbab; }
+.pair-marker.focused { border: 2px solid #b78438; }
+.pair-marker image { width: 100%; height: 100%; }
+.pair-marker text { position: absolute; left: 2rpx; top: 1rpx; font-size: 19rpx; }
+.pair-regions button { flex: 0 0 auto; min-height: 33px; padding: 0 9rpx; border: 1px solid; }
+.selected-list button { flex: none; min-height: 33px; padding: 0 9rpx; }
