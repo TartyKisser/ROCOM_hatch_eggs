@@ -1,1 +1,6 @@
-{"navigationBarTitleText":"家园小窝排布"}
+{
+  "navigationBarTitleText": "家园小窝排布",
+  "usingComponents": {
+    "filter-options": "../../components/filter-options/index"
+  }
+}

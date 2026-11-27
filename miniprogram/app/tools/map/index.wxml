@@ -1,13 +1,6 @@
 <view class="shell tool">
   <view class="panel tool-section">
-    <view class="field-row">
-      <picker wx:if="{{maps.length}}" class="map-picker" range="{{maps}}" range-key="name" value="{{mapIndex}}" bindchange="changeMap">
-        <view class="tool-input tool-picker"><text>{{maps[mapIndex].name}}</text><text>⌄</text></view>
-      </picker>
-      <picker wx:if="{{floors.length}}" class="map-picker" range="{{floors}}" range-key="label" value="{{floorIndex}}" disabled="{{loading || floors.length < 2}}" bindchange="changeFloor">
-        <view class="tool-input tool-picker"><text>{{floors[floorIndex].label}}</text><text wx:if="{{floors.length > 1}}">⌄</text></view>
-      </picker>
-    </view>
+    <filter-options wx:if="{{mapFilter.options.length}}" fields="{{[mapFilter, floorFilter]}}" disabled="{{loading}}" bind:change="selectLocation" />
     <view class="field-row">
       <input placeholder="搜索精灵、地点或物品" value="{{query}}" bindinput="onSearch" bindconfirm="search" confirm-type="search" />
       <button class="button map-small-button" bindtap="clearSearch" wx:if="{{query}}">清空</button>
@@ -48,10 +41,9 @@
         <image wx:if="{{detail.icon}}" src="{{detail.icon}}" mode="aspectFit" webp="{{true}}" />
         <view class="tool-row-copy"><text class="tool-meta">{{detail.meta}}</text><text wx:if="{{detail.estimated}}" class="tool-note">区域代表点，非精确刷新位置。</text></view>
       </view>
-      <view class="tool-actions map-detail-actions">
+      <view wx:if="{{detail.collect || detail.hasLayers}}" class="tool-actions map-detail-actions">
         <button wx:if="{{detail.collect}}" class="button {{detail.collected ? 'button-selected' : ''}}" bindtap="collect">{{detail.collected ? '取消已收集' : '标记已收集'}}</button>
         <button wx:if="{{detail.hasLayers}}" class="button" bindtap="goUnderground">查看地下图层</button>
-        <button wx:if="{{detail.wiki}}" class="button" bindtap="copyPoint">复制 Wiki 点位链接</button>
       </view>
       <text wx:if="{{detailLoading}}" class="tool-note">正在加载点位详情…</text>
       <view wx:elif="{{detailError}}" class="tool-actions"><text class="tool-note tool-error">{{detailError}}</text><button class="button" bindtap="retryDetails">重试</button></view>
@@ -87,5 +79,5 @@
       </view>
     </view>
   </view>
-  <view class="tool-actions map-attribution"><button class="button" bindtap="copySource">复制 WIKI 地图链接</button><button class="button" bindtap="copyLicense">复制 CC BY-SA 4.0 链接</button></view>
+  <view class="tool-actions map-attribution"><button class="button" bindtap="copyLicense">复制 CC BY-SA 4.0 链接</button></view>
 </view>

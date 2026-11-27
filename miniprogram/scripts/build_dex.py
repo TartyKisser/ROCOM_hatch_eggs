@@ -21,7 +21,7 @@ TOTAL_LIMIT = 20_000_000
 TYPES = '普通 草 火 水 光 地 冰 龙 电 毒 虫 武 翼 萌 幽 恶 机械 幻'.split()
 DETAIL_FIELDS = (
     'stats', 'height', 'weight', 'eggSize', 'distribution', 'description', 'abilities',
-    'url', 'baseStarlightValue', 'baseReviewRockCoin', 'evolution', 'research', 'genderRatio',
+    'baseStarlightValue', 'baseReviewRockCoin', 'evolution', 'research', 'genderRatio',
 )
 SKILL_FIELDS = ('name', 'cost', 'category', 'type', 'power', 'description')
 
@@ -104,7 +104,7 @@ def write_font(output, records):
     characters = set(json_bytes(records).decode('utf-8'))
     characters.update(''.join(TYPES))
     sources = list(APP.glob('app.*'))
-    for directory in ('pages', 'lib', 'ui', 'tools'):
+    for directory in ('pages', 'lib', 'ui', 'tools', 'components'):
         sources.extend(file for file in (APP / directory).rglob('*') if file.is_file())
     for file in sources:
         if file.suffix in ('.js', '.json', '.wxml', '.wxss'):
@@ -151,7 +151,7 @@ def build(output, app_config):
         card['package'] = routes[card['id']]
     write_module(output / 'catalog.js', {'types': TYPES, 'records': cards})
     write_font(output, records)
-    source_size = sum(file_size(APP / d) for d in ('pages', 'lib', 'ui'))
+    source_size = sum(file_size(APP / d) for d in ('pages', 'lib', 'ui', 'components'))
     source_size += sum(file.stat().st_size for file in APP.glob('*') if file.is_file())
     main_size = file_size(output) - sum(sizes) + source_size
     total_size = main_size + sum(sizes) + sum(tool_sizes)

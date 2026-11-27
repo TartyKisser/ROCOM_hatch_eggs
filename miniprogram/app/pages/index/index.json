@@ -1,5 +1,8 @@
 {
   "onReachBottomDistance": 250,
   "enablePullDownRefresh": true,
-  "backgroundTextStyle": "dark"
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "filter-options": "../../components/filter-options/index"
+  }
 }

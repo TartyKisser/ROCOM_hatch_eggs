@@ -50,14 +50,14 @@ function normalizeMap(map, mirror) {
     return { ...patch, x, y, width: right - x, height: bottom - y, image: imageUrl(patch.image, mirror) }
   })
   const points = map.points.map(row => {
-    const [id, x, y, kind, title, area, provinceIndex, iconIndex, terms, petIndex, layers, detailIndex, commentId, estimated] = row
+    const [id, x, y, kind, title, area, provinceIndex, iconIndex, terms, petIndex, layers, detailIndex, , estimated] = row
     const category = categories[kind]
     const [name, region, province, icon, keywords, pets] = [title, area, provinceIndex, iconIndex, terms, petIndex].map(i => map.strings[i] || '')
     const [mx, my] = project(map, x, y)
     const pointLayers = layers.map(index => patches[index - 1]).filter(Boolean)
     const floors = new Set(pointLayers.flatMap(layer => layer.floors))
     const search = [id, name, category.genre, region, province, keywords, pets].join(' ').toLowerCase()
-    return { id, x, y, mx, my, name, region, province, search, category, detailIndex, commentId, estimated, floors, layers: pointLayers,
+    return { id, x, y, mx, my, name, region, province, search, category, detailIndex, estimated, floors, layers: pointLayers,
       icon: imageUrl(icon, mirror) || category.icon }
   })
   return { ...map, categories, points, patches, byId: new Map(points.map(point => [point.id, point])),

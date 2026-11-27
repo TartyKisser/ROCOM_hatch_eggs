@@ -1,1 +1,6 @@
-{"navigationBarTitleText":"异色抓取推荐"}
+{
+  "navigationBarTitleText": "异色抓取推荐",
+  "usingComponents": {
+    "filter-options": "../../components/filter-options/index"
+  }
+}

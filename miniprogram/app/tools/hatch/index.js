@@ -28,8 +28,12 @@ function resultFor(sprites, positions) {
 }
 
 Page({
-  data: { counts, countIndex: 0, slots: [], loading: true, ready: false, error: '', openSlot: -1, search: '', suggestions: [],
-    calculating: false, progress: 0, result: null },
+  data: {
+    countFilter: { key: 'count', label: '小窝数量', index: 0, options: counts.map(count => ({ label: String(count), value: count })) },
+    slots: [],
+    loading: true, ready: false, error: '', openSlot: -1, search: '', suggestions: [],
+    calculating: false, progress: 0, result: null,
+  },
 
   onLoad(options = {}) {
     try { this.imported = decodeURIComponent(options.pair || '').split(',').filter(Boolean).slice(0, 10) }
@@ -46,7 +50,7 @@ Page({
       if (this.unloaded) return
       const imported = (this.imported || []).map(id => this.sprites.find(sprite => sprite.id === id)).filter(Boolean)
       const count = Math.max(2, imported.length)
-      this.setData({ ready: true, countIndex: count - 2, slots: Array.from({ length: count }, (_, i) => ({ ...emptySlot(i), ...imported[i] })) })
+      this.setData({ ready: true, 'countFilter.index': count - 2, slots: Array.from({ length: count }, (_, i) => ({ ...emptySlot(i), ...imported[i] })) })
     } catch (error) {
       if (!this.unloaded) this.setData({ error: error.message })
     } finally {
@@ -55,10 +59,9 @@ Page({
     }
   },
 
-  changeCount({ detail: { value } }) {
+  changeCount({ detail: { index, value: count } }) {
     if (this.data.calculating) return
-    const countIndex = Number(value)
-    this.setData({ countIndex, slots: Array.from({ length: counts[countIndex] }, (_, i) => this.data.slots[i] || emptySlot(i)),
+    this.setData({ 'countFilter.index': index, slots: Array.from({ length: count }, (_, i) => this.data.slots[i] || emptySlot(i)),
       openSlot: -1, result: null, error: '' })
   },
 

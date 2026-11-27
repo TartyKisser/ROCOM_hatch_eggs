@@ -36,7 +36,9 @@ function gesture(event) {
 
 Page({
   data: {
-    loading: true, error: '', terrainFailed: false, maps: [], mapIndex: 0, floors: [], floorIndex: 0, season: '',
+    loading: true, error: '', terrainFailed: false, season: '',
+    mapFilter: { key: 'map', label: '地图', index: 0, options: [], columns: 2 },
+    floorFilter: { key: 'floor', label: '图层', index: 0, options: [], columns: 3 },
     filterOpen: false, presets: presets.map(preset => preset.label), presetIndex: 0, groups: [], group: '',
     hideCollected: false, count: 0, query: '', found: [], foundCount: 0,
     region: '', visible: 0, zoom: 100, nearby: [], nearbyCount: 0, detail: null,
@@ -95,9 +97,9 @@ Page({
       if (this.unloaded) return
       if (manifest.schema !== 1 || !manifest.maps?.mainland) throw new Error('地图数据版本不兼容')
       this.mirror = mirror
-      this.maps = Object.entries(manifest.maps).map(([key, entry]) => ({ key, name: entry.name, file: entry.file }))
+      this.maps = Object.entries(manifest.maps).map(([key, entry]) => ({ key, label: entry.name, file: entry.file }))
       const mapIndex = Math.max(0, this.maps.findIndex(map => map.key === this.options.map))
-      this.setData({ maps: this.maps })
+      this.setData({ 'mapFilter.options': this.maps })
       await this.loadScene(mapIndex, this.options.layer)
     } catch (err) {
       if (!this.unloaded) this.setData({ loading: false, error: err.message || '地图资料加载失败。' })
@@ -110,7 +112,7 @@ Page({
     if (!entry) return
     this.closeDetails()
     this.clearSearch(false)
-    this.setData({ mapIndex, loading: true, error: '' })
+    this.setData({ 'mapFilter.index': mapIndex, loading: true, error: '' })
     try {
       const raw = await loadMapFile(entry.file)
       if (this.sceneToken !== sceneToken) return
@@ -123,12 +125,12 @@ Page({
       const saved = readSet(this.categoryKey)
       this.enabled = new Set(this.map.categories.filter(category => saved ? saved.has(category.id) : defaultCategory(category)).map(category => category.id))
       this.lastCenter = null
-      this.setData({ floors: this.floors, floorIndex: this.floors.findIndex(entry => entry.key === this.floor),
-        season: this.map.season, loading: false, region: entry.name, group: '', terrainFailed: false })
+      this.setData({ 'floorFilter.options': this.floors, 'floorFilter.index': this.floors.findIndex(entry => entry.key === this.floor),
+        season: this.map.season, loading: false, region: entry.label, group: '', terrainFailed: false })
       this.applyFilters()
       this.attachScene()
     } catch (_) {
-      if (this.sceneToken === sceneToken) this.setData({ loading: false, error: `${entry.name}加载失败。` })
+      if (this.sceneToken === sceneToken) this.setData({ loading: false, error: `${entry.label}加载失败。` })
     }
   },
 
@@ -141,18 +143,20 @@ Page({
 
   retry() {
     if (!this.frame) this.connectCanvas()
-    if (this.maps) return this.loadScene(this.data.mapIndex, this.floor)
+    if (this.maps) return this.loadScene(this.data.mapFilter.index, this.floor)
     return this.load()
   },
-  changeMap({ detail: { value } }) { return this.loadScene(Number(value)) },
-  changeFloor({ detail: { value } }) {
-    if (!this.floors?.[value]) return
+  selectLocation({ detail: { key, index } }) {
+    if (this.data.loading) return
+    if (key === 'map') return this.loadScene(index)
+    const floor = this.floors?.[index]
+    if (!floor) return
     this.closeDetails()
-    this.setFloor(this.floors[value].key)
+    this.setFloor(floor.key)
   },
   setFloor(key) {
     this.floor = key
-    this.setData({ floorIndex: this.floors.findIndex(floor => floor.key === key), group: '' })
+    this.setData({ 'floorFilter.index': this.floors.findIndex(floor => floor.key === key), group: '' })
     this.applyFilters()
   },
 
@@ -294,7 +298,7 @@ Page({
     const detail = { ...describe(point), meta: `${point.category.genre} · ${location(point)} · X ${point.x} · Y ${point.y}`,
       collect: collectible.has(point.category.genre), collected: this.collected.has(point.id),
       hasLayers: point.layers.length > 0 && this.floor === 'surface',
-      estimated: point.estimated || point.category.classId === 7, wiki: point.commentId ? `https://wiki.biligame.com/nrc/index.php?curid=${point.commentId}` : '' }
+      estimated: point.estimated || point.category.classId === 7 }
     this.setData({ detail, nearby: [], nearbyCount: 0, detailLoading: true, details: [], moreDetails: false, detailError: '' },
       () => wx.pageScrollTo({ selector: '#map-popup', duration: 160 }))
     this.applyFilters()
@@ -323,7 +327,5 @@ Page({
     this.setData({ 'detail.collected': this.collected.has(point.id) })
     this.applyFilters()
   },
-  copyPoint() { copyText(this.data.detail?.wiki) },
-  copySource() { copyText('https://wiki.biligame.com/nrc/地图') },
   copyLicense() { copyText('https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hans') },
 })

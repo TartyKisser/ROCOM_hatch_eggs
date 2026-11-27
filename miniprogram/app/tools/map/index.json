@@ -1,1 +1,7 @@
-{"navigationBarTitleText":"世界地图","disableScroll":false}
+{
+  "navigationBarTitleText": "世界地图",
+  "disableScroll": false,
+  "usingComponents": {
+    "filter-options": "../../components/filter-options/index"
+  }
+}

@@ -1,6 +1,7 @@
 const { handbookRecords, normalize, smallPortrait, openRecord, appendRows } = require('../../lib/tool-data')
+const { typeOptions } = require('../../lib/catalog')
 const { siteImage } = require('../../lib/site')
-const { typeNames, buildSkills, compareSkills, acquisition } = require('./engine')
+const { buildSkills, compareSkills, acquisition } = require('./engine')
 
 const batchSize = 24
 
@@ -18,8 +19,15 @@ function petRow(record, note = '') {
 
 Page({
   data: {
-    query: '', petQuery: '', petId: '', petTitle: '', suggestions: [], types: ['全部系别', ...typeNames],
-    categories: ['全部类别', '物攻', '魔攻', '防御', '状态'], typeIndex: 0, categoryIndex: 0,
+    query: '', petQuery: '', petId: '', petTitle: '', suggestions: [],
+    typeFilter: {
+      key: 'typeFilter', label: '系别', index: 0,
+      options: [{ label: '全部' }, ...typeOptions, { label: '无系别' }],
+    },
+    categoryFilter: {
+      key: 'categoryFilter', label: '类别', index: 0,
+      options: ['全部', '物攻', '魔攻', '防御', '状态'].map(label => ({ label })),
+    },
     loading: true, error: '', total: 0, count: 0, rows: [], more: false,
     detail: null, groups: [], openGroup: '', groupPets: [], research: [], researchTotal: 0, users: [], userTotal: 0,
   },
@@ -47,18 +55,23 @@ Page({
 
   filter() {
     if (!this.sorted) return
-    const { query, typeIndex, categoryIndex, types, categories, petId } = this.data
+    const { query, typeFilter, categoryFilter, petId } = this.data
     const keyword = normalize(query)
+    const type = typeFilter.index ? typeFilter.options[typeFilter.index].label : ''
+    const category = categoryFilter.index ? categoryFilter.options[categoryFilter.index].label : ''
     const record = this.records.get(petId)
     const pool = record ? [...new Set((record.skills || []).map(skill => skill?.name))].map(name => this.skills.get(name)).filter(Boolean) : this.sorted
-    this.results = pool.filter(skill => normalize(skill.name).includes(keyword) && (!typeIndex || types[typeIndex] === skill.type)
-      && (!categoryIndex || categories[categoryIndex] === skill.category))
+    this.results = pool.filter(skill => normalize(skill.name).includes(keyword) && (!type || type === skill.type)
+      && (!category || category === skill.category))
     const rows = this.results.slice(0, batchSize).map(skillCard)
     this.setData({ rows, count: this.results.length, more: rows.length < this.results.length })
   },
 
   onSearch({ detail: { value } }) { this.setData({ query: value }); this.filter() },
-  onFilter({ detail: { value }, currentTarget: { dataset: { key } } }) { this.setData({ [key]: Number(value) }); this.filter() },
+  onFilter({ detail: { key, index } }) {
+    this.setData({ [`${key}.index`]: index })
+    this.filter()
+  },
 
   searchPet({ detail: { value } }) {
     const term = normalize(value)
@@ -76,7 +89,8 @@ Page({
   },
 
   clear() {
-    this.setData({ query: '', petQuery: '', petId: '', petTitle: '', suggestions: [], typeIndex: 0, categoryIndex: 0 })
+    this.selectComponent('#skill-filters')?.close()
+    this.setData({ query: '', petQuery: '', petId: '', petTitle: '', suggestions: [], 'typeFilter.index': 0, 'categoryFilter.index': 0 })
     this.filter()
   },
 

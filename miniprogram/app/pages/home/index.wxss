@@ -1,27 +1,33 @@
 @import "../../ui/tools.wxss";
 
-.landing-hero { position: relative; height: 230rpx; overflow: hidden; background: #25364d; }
+.landing-hero { position: relative; height: 236rpx; overflow: hidden; background: #25364d; }
 .landing-cover, .landing-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
 .landing-shade { background: linear-gradient(90deg, #172337ec, #17233750 65%, transparent); }
-.landing-copy { position: relative; padding-top: 22rpx; color: #fff6e6; }
+.landing-copy { position: relative; padding-top: 24rpx; color: #fff6e6; text-shadow: 0 3rpx 9rpx #162035b5; }
 .wordmark { width: 152rpx; height: calc(152rpx * 217 / 851); overflow: hidden; }
 .wordmark image { display: block; width: 100%; height: calc(152rpx * 295 / 851); }
-.landing-title { display: block; margin-top: 3rpx; font-size: 45rpx; line-height: 1.12; }
+.landing-title { display: block; margin-top: 6rpx; font-size: 48rpx; line-height: 1.12; }
 .landing-note { display: block; margin-top: 7rpx; font-size: max(12px, 24rpx); }
-.landing { position: relative; margin-top: -43rpx; }
-button.short-button { min-height: 33px; padding: 0 17rpx; }
+.landing { position: relative; margin-top: -36rpx; }
+.merchant-panel { overflow: hidden; margin-bottom: 18rpx; border-radius: 18rpx; }
+.merchant-banner { position: relative; overflow: hidden; background: #273c2e; border-bottom: 1px solid #b49a5f; }
+.merchant-cover, .merchant-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
+.merchant-shade { background: linear-gradient(90deg, #1d2b24ed 5%, #243329ba 54%, #25362922 96%); }
+.merchant-heading { position: relative; display: flex; align-items: center; justify-content: space-between; min-height: 116rpx; gap: 12rpx; padding: 14rpx 17rpx; color: #fff7e5; }
+.merchant-title { display: flex; flex-direction: column; gap: 4rpx; text-shadow: 0 2rpx 6rpx #17261a; }
+.merchant-hours { color: #ffe3a3; font-size: max(11px, 22rpx); }
+button.merchant-refresh { min-height: 33px; padding: 0 17rpx; background: #fff3d9; }
+.merchant-body { padding: 10rpx 16rpx; }
 .merchant-list { width: 100%; }
 .shop-row { height: 80rpx; }
 .shop-icon { width: 53rpx; height: 53rpx; flex-basis: 53rpx; }
-.price { display: flex; align-items: center; gap: 4rpx; color: #785318; font-size: max(11px, 22rpx); }
-.price image, .tool-tile > image { width: 26rpx; height: 26rpx; flex: none; }
-.group-tabs button { min-height: 34px; padding: 0 8rpx; }
-.tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8rpx; }
-.tool-tile { display: flex; align-items: flex-start; gap: 8rpx; min-width: 0; padding: 11rpx; background: #f1e8d9; border: 1px solid #ebddc6; border-radius: 10rpx; }
-.tool-tile > image { width: 32rpx; height: 32rpx; }
-.tool-tile .tool-note { font-size: max(11px, 21rpx); }
-.source-links, .support-grid { display: flex; flex-wrap: wrap; gap: 9rpx 16rpx; }
-.source-links text { color: #835c27; padding: 7rpx 0; font-size: max(12px, 23rpx); }
-.support-panel { display: flex; flex-direction: column; gap: 8rpx; }
-.support-grid > view { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5rpx; text-align: center; }
-.support-grid image { width: 100%; height: 245rpx; }
+.shop-row .tool-row-name, .shop-row .tool-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.price { display: flex; flex: none; align-items: center; gap: 4rpx; padding: 4rpx 8rpx; border-radius: 8rpx; background: #f5e7cc; color: #785318; font-size: max(11px, 22rpx); }
+.price image { width: 26rpx; height: 26rpx; }
+.group-tabs button { min-height: 34px; padding: 0 10rpx; }
+.tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10rpx; }
+.tool-tile { display: flex; align-items: flex-start; gap: 9rpx; min-width: 0; padding: 12rpx 10rpx; border: 1px solid #e5d9c6; border-radius: 13rpx; background: linear-gradient(150deg, #fffdf7, #f5ebdb); }
+.tool-tile-dex { background: linear-gradient(150deg, #fffdf7, #eef1e5); border-color: #dce4d2; }
+.tool-tile-explore { background: linear-gradient(150deg, #fffdf7, #e9eff1); border-color: #d9e2e7; }
+.tool-tile > image { width: 41rpx; height: 41rpx; flex: none; }
+.tool-tile .tool-note { font-size: max(11px, 21rpx); line-height: 1.35; }

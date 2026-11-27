@@ -17,8 +17,6 @@ Page({
     logo: uiImages.logo,
     rareIcon: uiImages.rare,
     filterControls: [],
-    filterChoices: {},
-    openFilter: '',
     cards: [],
     count: 0,
     matching: 0,
@@ -75,12 +73,10 @@ Page({
       filters,
       cards,
       count: index.length,
-      filterChoices,
-      filterControls: Object.entries(filterLabels).map(([key, label]) => ({
-        key,
-        label,
-        selected: filterChoices[key].find(option => option.value === filters[key]) || allChoice,
-      })),
+      filterControls: Object.entries(filterLabels).map(([key, label]) => {
+        const options = filterChoices[key]
+        return { key, label, options, index: Math.max(0, options.findIndex(option => option.value === filters[key])) }
+      }),
       matching: this.matchingCards.length,
       isFiltered: Object.values(filters).some(Boolean),
     })
@@ -90,20 +86,12 @@ Page({
     this.updateFilters({ ...this.data.filters, query: event.detail.value })
   },
 
-  toggleFilter(event) {
-    const { filter } = event.currentTarget.dataset
-    this.setData({ openFilter: this.data.openFilter === filter ? '' : filter })
-  },
-
-  selectFilter(event) {
-    const { filter, value } = event.currentTarget.dataset
-    if (filter !== this.data.openFilter) return
-    this.setData({ openFilter: '' })
-    this.updateFilters({ ...this.data.filters, [filter]: value || '' })
+  selectFilter({ detail: { key, value } }) {
+    this.updateFilters({ ...this.data.filters, [key]: value })
   },
 
   clearFilters() {
-    this.setData({ openFilter: '' })
+    this.selectComponent('#dex-filters')?.close()
     this.updateFilters(emptyFilters)
   },
 

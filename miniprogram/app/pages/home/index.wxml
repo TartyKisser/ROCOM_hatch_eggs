@@ -9,56 +9,42 @@
 </view>
 
 <view class="shell tool landing">
-  <view class="panel tool-section">
-    <view class="tool-heading">
-      <text class="tool-title">远行商人</text>
-      <text wx:if="{{hours}}" class="tag">{{hours}}</text>
-      <button class="button short-button" bindtap="refreshMerchant" disabled="{{loading}}">刷新</button>
-    </view>
-    <text wx:if="{{merchantNote}}" class="tool-note">{{merchantNote}}</text>
-    <scroll-view wx:if="{{shop.length}}" scroll-y="{{true}}" class="merchant-list" style="height: {{shop.length > 4 ? 328 : shop.length * 80}}rpx">
-      <view wx:for="{{shop}}" wx:key="id" class="tool-row shop-row" data-index="{{index}}" bindtap="showProduct">
-        <image wx:if="{{item.icon}}" class="tool-icon shop-icon" src="{{item.icon}}" mode="aspectFit" lazy-load="{{true}}"
-          data-index="{{index}}" data-id="{{item.id}}" binderror="onShopImageError" />
-        <view class="tool-row-copy"><text class="tool-row-name">{{item.name}}</text><text class="tool-meta">{{item.summary}}</text></view>
-        <view class="price"><image src="{{coin}}" mode="aspectFit" /><text>{{item.price}}</text></view>
+  <view class="panel merchant-panel">
+    <view class="merchant-banner">
+      <image class="merchant-cover" src="{{merchantCover}}" mode="aspectFill" webp="{{true}}" />
+      <view class="merchant-shade" />
+      <view class="merchant-heading">
+        <view class="merchant-title">
+          <text class="tool-title">远行商人</text>
+          <text wx:if="{{hours}}" class="merchant-hours">{{hours}}</text>
+        </view>
+        <button class="button merchant-refresh" hover-class="pressed" bindtap="refreshMerchant" disabled="{{loading}}">刷新</button>
       </view>
-    </scroll-view>
+    </view>
+    <view class="merchant-body">
+      <text wx:if="{{merchantNote}}" class="tool-note">{{merchantNote}}</text>
+      <scroll-view wx:if="{{shop.length}}" scroll-y="{{true}}" class="merchant-list" style="height: {{shop.length > 4 ? 328 : shop.length * 80}}rpx">
+        <view wx:for="{{shop}}" wx:key="id" class="tool-row shop-row" data-index="{{index}}" bindtap="showProduct">
+          <image wx:if="{{item.icon}}" class="tool-icon shop-icon" src="{{item.icon}}" mode="aspectFit" lazy-load="{{true}}"
+            data-index="{{index}}" data-id="{{item.id}}" binderror="onShopImageError" />
+          <view wx:else class="tool-icon shop-icon" />
+          <view class="tool-row-copy"><text class="tool-row-name">{{item.name}}</text><text class="tool-meta">{{item.summary}}</text></view>
+          <view class="price"><image src="{{coin}}" mode="aspectFit" /><text>{{item.price}}</text></view>
+        </view>
+      </scroll-view>
+    </view>
   </view>
 
   <view class="panel tool-section">
     <text class="tool-title">工具导航</text>
     <view class="tool-actions group-tabs">
-      <button wx:for="{{groups}}" wx:key="key" class="button {{group === item.key ? 'button-selected' : ''}}" data-group="{{item.key}}" bindtap="selectGroup">{{item.label}}</button>
+      <button wx:for="{{groups}}" wx:key="key" class="button {{group === item.key ? 'button-selected' : ''}}" aria-pressed="{{group === item.key}}" hover-class="pressed" data-group="{{item.key}}" bindtap="selectGroup">{{item.label}}</button>
     </view>
     <view class="tool-grid">
-      <view wx:for="{{tools}}" wx:key="id" class="tool-tile" aria-role="button" hover-class="pressed" data-url="{{item.url}}" bindtap="openTool">
-        <image src="{{item.image}}" mode="aspectFit" /><view class="tool-row-copy"><text class="tool-row-name">{{item.title}}</text><text class="tool-note">{{item.note}}</text></view>
+      <view wx:for="{{tools}}" wx:key="id" class="tool-tile tool-tile-{{item.group}}" aria-role="button" hover-class="pressed" data-url="{{item.url}}" bindtap="openTool">
+        <image src="{{item.image}}" mode="aspectFit" />
+        <view class="tool-row-copy"><text class="tool-row-name">{{item.title}}</text><text class="tool-note">{{item.note}}</text></view>
       </view>
     </view>
-  </view>
-
-  <view class="panel tool-section">
-    <view class="tool-actions">
-      <button class="button {{panel === 'feedback' ? 'button-selected' : ''}}" data-panel="feedback" bindtap="togglePanel">反馈建议</button>
-      <button class="button {{panel === 'support' ? 'button-selected' : ''}}" data-panel="support" bindtap="togglePanel">支持工具站</button>
-    </view>
-    <form wx:if="{{panel === 'feedback'}}" class="support-panel" bindsubmit="copyFeedback">
-      <picker range="{{feedbackTypes}}" value="{{feedbackType}}" bindchange="selectFeedback">
-        <view class="tool-input tool-picker"><text>{{feedbackTypes[feedbackType]}}</text><text>⌄</text></view>
-      </picker>
-      <textarea name="message" maxlength="1600" placeholder="描述问题或你想看到的功能" />
-      <input name="contact" maxlength="120" placeholder="QQ、邮箱或 B 站昵称（可选）" />
-      <text wx:if="{{feedbackError}}" class="tool-note tool-error">{{feedbackError}}</text>
-      <text class="tool-note">邮箱 tartykisser1022@gmail.com · QQ 2038241768</text>
-      <view class="tool-actions"><button class="button button-dark" form-type="submit">复制邮件草稿</button></view>
-    </form>
-    <view wx:if="{{panel === 'support'}}" class="support-grid">
-      <view wx:for="{{reward}}" wx:key="*this"><image src="{{item}}" mode="aspectFit" data-url="{{item}}" bindtap="previewReward" show-menu-by-longpress="{{true}}" /><text>{{index === 0 ? '微信' : '支付宝'}}</text></view>
-    </view>
-    <view class="source-links">
-      <text wx:for="{{links}}" wx:key="url" data-url="{{item.url}}" bindtap="copyLink">{{item.label}}</text>
-    </view>
-    <text class="tool-note">点击链接名称可复制地址</text>
   </view>
 </view>

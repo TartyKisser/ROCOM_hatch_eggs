@@ -19,25 +19,8 @@
       <button class="button button-dark" hover-class="pressed" disabled="{{!isFiltered}}" bindtap="clearFilters">清空</button>
     </view>
 
-    <view class="filter-controls">
-      <button wx:for="{{filterControls}}" wx:key="key" class="button filter-control {{filters[item.key] || openFilter === item.key ? 'filter-active' : ''}}"
-        hover-class="pressed" aria-label="{{item.label}} {{item.selected.label}}" aria-expanded="{{openFilter === item.key}}"
-        data-filter="{{item.key}}" bindtap="toggleFilter">
-        <text class="filter-label">{{item.label}}</text>
-        <view class="filter-value">
-          <image wx:if="{{item.selected.icon}}" class="filter-icon" src="{{item.selected.icon}}" mode="aspectFit" />
-          <text>{{item.selected.label}}</text>
-        </view>
-        <view class="filter-arrow {{openFilter === item.key ? 'filter-arrow-up' : ''}}" />
-      </button>
-    </view>
-
-    <view wx:if="{{openFilter}}" class="filter-grid">
-      <button wx:for="{{filterChoices[openFilter]}}" wx:key="value" class="button filter-choice {{filters[openFilter] === item.value ? 'button-selected' : ''}}"
-        hover-class="pressed" data-filter="{{openFilter}}" data-value="{{item.value}}" bindtap="selectFilter">
-        <image wx:if="{{item.icon}}" class="filter-icon" src="{{item.icon}}" mode="aspectFit" />
-        <text>{{item.label}}</text>
-      </button>
+    <view class="catalogue-filters">
+      <filter-options id="dex-filters" fields="{{filterControls}}" bind:change="selectFilter" />
     </view>
   </view>
 

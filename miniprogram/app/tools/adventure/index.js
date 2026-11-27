@@ -4,6 +4,7 @@ const { buildModel, fruitPaths, recommend, formatScore, candidateMatchesTerm } =
 
 const batchSize = 16
 const sortNames = { score: '星光值', rare: '少歪异色' }
+const allTargets = { key: '', label: '全部' }
 
 function familyCard(family) {
   return { id: family.representative.id, title: family.title, image: smallPortrait(family.portrait), number: family.number,
@@ -19,7 +20,8 @@ function strategyCard(strategy) {
 
 Page({
   data: { loading: true, error: '', mode: 'mixed', firstQuery: '', secondQuery: '', suggestions: [], suggestField: '',
-    targetOptions: [{ key: '', label: '全部异色目标' }], targetIndex: 0, sort: [{ key: 'rare', label: sortNames.rare }, { key: 'score', label: sortNames.score }],
+    targetFilter: { key: 'target', label: '异色目标', index: 0, options: [allTargets], columns: 2 },
+    sort: [{ key: 'rare', label: sortNames.rare }, { key: 'score', label: sortNames.score }],
     rows: [], count: 0, page: 1, pages: 1, starlight: uiImages.starlight, showRules: false, rules: '', rulesError: '', rulesLoading: false },
 
   onLoad() { this.load() },
@@ -35,8 +37,8 @@ Page({
       ])
       if (this.unloaded) return
       this.model = buildModel(records, csv, fruitPaths(page))
-      this.setData({ targetIndex: 0, targetOptions: [{ key: '', label: '全部异色目标' },
-        ...this.model.targets.map(target => ({ key: target.key, label: `No. ${target.number} ${target.title}` }))] })
+      const options = [allTargets, ...this.model.targets.map(target => ({ key: target.key, label: `No. ${target.number} ${target.title}` }))]
+      this.setData({ 'targetFilter.index': 0, 'targetFilter.options': options })
       this.search()
     } catch (error) {
       if (!this.unloaded) this.setData({ error: error.message })
@@ -48,9 +50,9 @@ Page({
 
   search() {
     if (!this.model) return
-    const { mode, firstQuery, secondQuery, sort, targetOptions, targetIndex } = this.data
+    const { mode, firstQuery, secondQuery, sort, targetFilter } = this.data
     this.results = recommend(this.model, { mode, firstQuery, secondQuery: mode === 'single' ? '' : secondQuery,
-      target: targetOptions[targetIndex]?.key || '', order: sort.map(item => item.key) })
+      target: targetFilter.options[targetFilter.index].key, order: sort.map(item => item.key) })
     this.setData({ count: this.results.length, suggestions: [], suggestField: '' })
     this.showPage(1)
   },
@@ -71,9 +73,16 @@ Page({
     this.setData({ mode, secondQuery: mode === 'single' ? '' : this.data.secondQuery })
     this.search()
   },
-  changeTarget({ detail: { value } }) { this.setData({ targetIndex: Number(value) }); this.search() },
+  changeTarget({ detail: { index } }) {
+    this.setData({ 'targetFilter.index': index })
+    this.search()
+  },
   changeSort() { this.setData({ sort: [...this.data.sort].reverse() }); this.search() },
-  clear() { this.setData({ firstQuery: '', secondQuery: '', targetIndex: 0, mode: 'mixed' }); this.search() },
+  clear() {
+    this.selectComponent('#target-filter')?.close()
+    this.setData({ firstQuery: '', secondQuery: '', 'targetFilter.index': 0, mode: 'mixed' })
+    this.search()
+  },
 
   inputCandidate({ currentTarget: { dataset: { field } }, detail: { value } }) {
     const term = normalize(value)

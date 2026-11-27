@@ -1,1 +1,7 @@
-{"navigationBarTitleText":"技能图鉴","onReachBottomDistance":160}
+{
+  "navigationBarTitleText": "技能图鉴",
+  "onReachBottomDistance": 160,
+  "usingComponents": {
+    "filter-options": "../../components/filter-options/index"
+  }
+}

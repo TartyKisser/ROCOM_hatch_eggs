@@ -109,4 +109,3 @@ button.shiny-toggle { min-height: max(32px, 56rpx); gap: 5rpx; padding: 0 10rpx;
 .research-task:last-child { padding-bottom: 1rpx; }
 .research-number { flex: 0 0 31rpx; color: #8a632b; font-size: max(12px, 23rpx); }
 .research-text { min-width: 0; overflow-wrap: anywhere; }
-button.source-button { display: flex; width: fit-content; margin: 14rpx auto 0; border-radius: 11rpx; }

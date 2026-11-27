@@ -1,0 +1,34 @@
+.filter-controls { display: grid; gap: 8rpx; }
+.filter-control.button {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: max(36px, 64rpx);
+  align-items: center;
+  justify-content: space-between;
+  gap: 5rpx;
+  padding: 0 8rpx;
+  border: 1px solid #e4d8c4;
+  border-radius: 11rpx;
+  background: #fffaf1;
+  font-size: max(11px, 22rpx);
+  line-height: 1.2;
+}
+.filter-control.filter-active { border-color: #d4a14f; background: #fff0ce; }
+.filter-label { flex: none; color: #756549; }
+.filter-value { display: flex; min-width: 0; align-items: center; gap: 5rpx; }
+.filter-value-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filter-icon { width: 22rpx; height: 22rpx; flex: none; }
+.filter-arrow { flex: none; width: 8rpx; height: 8rpx; margin: -4rpx 3rpx 0 0; border: solid #9a7645; border-width: 0 1px 1px 0; transform: rotate(45deg); }
+.filter-arrow-up { margin-top: 4rpx; transform: rotate(225deg); }
+.filter-grid { display: grid; gap: 7rpx; margin-top: 10rpx; max-height: max(185px, 350rpx); overflow-y: auto; }
+.filter-choice.button {
+  width: 100%;
+  min-height: max(34px, 56rpx);
+  gap: 4rpx;
+  padding: 3rpx 4rpx;
+  border-radius: 10rpx;
+  font-size: max(12px, 23rpx);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

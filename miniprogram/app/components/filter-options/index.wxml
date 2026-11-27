@@ -1,0 +1,23 @@
+<view wx:if="{{fields.length}}" class="filter-controls" style="grid-template-columns: repeat({{fields.length}}, minmax(0, 1fr))">
+  <button wx:for="{{fields}}" wx:for-item="field" wx:key="key"
+    class="button filter-control {{field.index > 0 || openIndex === index ? 'filter-active' : ''}}"
+    disabled="{{disabled || field.options.length < 2}}" hover-class="pressed"
+    aria-label="{{field.label}} {{field.options[field.index].label}}" aria-expanded="{{openIndex === index && !disabled}}"
+    data-index="{{index}}" bindtap="toggleField">
+    <text class="filter-label">{{field.label}}</text>
+    <view class="filter-value">
+      <image wx:if="{{field.options[field.index].icon}}" class="filter-icon" src="{{field.options[field.index].icon}}" mode="aspectFit" />
+      <text class="filter-value-label">{{field.options[field.index].label || '—'}}</text>
+    </view>
+    <view wx:if="{{field.options.length > 1}}" class="filter-arrow {{openIndex === index ? 'filter-arrow-up' : ''}}" />
+  </button>
+</view>
+<view wx:if="{{openIndex >= 0 && fields[openIndex].options.length > 1 && !disabled}}" class="filter-grid"
+  style="grid-template-columns: repeat({{fields[openIndex].columns || 5}}, minmax(0, 1fr))">
+  <button wx:for="{{fields[openIndex].options}}" wx:key="label"
+    class="button filter-choice {{fields[openIndex].index === index ? 'button-selected' : ''}}"
+    hover-class="pressed" aria-pressed="{{fields[openIndex].index === index}}" data-index="{{index}}" bindtap="selectOption">
+    <image wx:if="{{item.icon}}" class="filter-icon" src="{{item.icon}}" mode="aspectFit" />
+    <text>{{item.label}}</text>
+  </button>
+</view>

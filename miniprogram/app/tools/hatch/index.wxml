@@ -1,8 +1,7 @@
 <view class="shell tool">
   <view class="panel tool-section">
-    <view class="tool-heading"><text class="tool-title">小窝设置</text>
-      <picker range="{{counts}}" value="{{countIndex}}" disabled="{{calculating}}" bindchange="changeCount"><view class="tool-input tool-picker"><text>{{counts[countIndex]}} 个小窝</text><text>⌄</text></view></picker>
-    </view>
+    <text class="tool-title">小窝设置</text>
+    <filter-options fields="{{[countFilter]}}" disabled="{{loading || calculating}}" bind:change="changeCount" />
     <text wx:if="{{loading}}" class="tool-note">正在读取可繁殖精灵…</text>
     <view wx:for="{{slots}}" wx:key="slot" class="nest-slot">
       <view class="slot-line">

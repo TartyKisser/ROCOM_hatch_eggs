@@ -15,10 +15,7 @@
           <image class="tool-icon" src="{{item.image}}" mode="aspectFit" /><text class="tool-row-name">No. {{item.number}} {{item.title}}</text>
         </view>
       </view>
-      <view class="field-row">
-        <picker class="skill-picker" range="{{types}}" value="{{typeIndex}}" data-key="typeIndex" bindchange="onFilter"><view class="tool-input tool-picker"><text>{{types[typeIndex]}}</text><text>⌄</text></view></picker>
-        <picker class="skill-picker" range="{{categories}}" value="{{categoryIndex}}" data-key="categoryIndex" bindchange="onFilter"><view class="tool-input tool-picker"><text>{{categories[categoryIndex]}}</text><text>⌄</text></view></picker>
-      </view>
+      <filter-options id="skill-filters" fields="{{[typeFilter, categoryFilter]}}" bind:change="onFilter" />
       <view wx:if="{{error}}" class="tool-actions"><text class="tool-note tool-error">{{error}}</text><button class="button" bindtap="load">重试</button></view>
       <text wx:elif="{{loading}}" class="tool-note">正在整理技能与精灵…</text>
       <text wx:else class="tool-note">{{petTitle ? petTitle + ' · ' : ''}}命中 {{count}} / {{total}} 个技能</text>

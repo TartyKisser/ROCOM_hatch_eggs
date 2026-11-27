@@ -1,6 +1,5 @@
 @import "../../ui/tools.wxss";
 
-.skill-picker { flex: 1; }
 .pet-suggestions { max-height: 340rpx; overflow-y: auto; }
 .skill-source { padding: 11rpx; border-radius: 10rpx; background: #f4ebdf; }
 .skill-source .tool-row { padding-left: 5rpx; }

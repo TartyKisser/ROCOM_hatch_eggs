@@ -8,7 +8,7 @@ page {
   font-size: 28rpx;
 }
 
-view, text, image, button, input, picker, scroll-view { box-sizing: border-box; }
+view, text, image, button, input, scroll-view { box-sizing: border-box; }
 
 .shell { max-width: 920rpx; margin: 0 auto; padding: 0 20rpx 36rpx; }
 .panel {

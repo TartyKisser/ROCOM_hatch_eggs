@@ -139,7 +139,6 @@ function createDetailPage(bundle) {
         })),
         progress: research && research.progress ? research.progress : '',
         tasks: items(research?.tasks).map((task, key) => ({ key, name: valueOr(task.name, '-') })),
-        url: detail.url || '',
       }
       this.setData({
         record,
@@ -226,10 +225,6 @@ function createDetailPage(bundle) {
       if (skill) skill.icon = ''
       const index = this.data.skills.findIndex(item => item.key === Number(key))
       if (index >= 0) this.setData({ [`skills[${index}].icon`]: '' })
-    },
-
-    copySource() {
-      wx.setClipboardData({ data: this.data.record.url })
     },
   }
 }
