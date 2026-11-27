@@ -61,7 +61,11 @@ function createDetailPage(bundle) {
     onLoad(options) {
       const id = decodeId(options.id)
       if (bundle) {
-        this.showRecord(id, bundle.records[id], getCatalogue(false))
+        const catalogue = getCatalogue(false)
+        if (!this.showRecord(id, bundle.records[id], catalogue)) {
+          const route = getCard(id, catalogue)?.route
+          if (route && !route.startsWith(bundle.assetPath.replace(/art\/$/, ''))) wx.redirectTo({ url: route })
+        }
       } else {
         this.openOnlineRecord(id)
       }

@@ -16,8 +16,8 @@ from PIL import Image, ImageOps
 
 APP = Path(__file__).resolve().parents[1]
 SITE = APP.parent
-PACKAGE_LIMIT = 2_000_000
-DETAIL_TARGET = 1_900_000
+PACKAGE_LIMIT = 1_500_000
+DETAIL_TARGET = 1_470_000
 TOTAL_LIMIT = 20_000_000
 TYPES = '普通 草 火 水 光 地 冰 龙 电 毒 虫 武 翼 萌 幽 恶 机械 幻'.split()
 DETAIL_FIELDS = (
@@ -80,7 +80,7 @@ def export_records(records, artwork):
             'id': record['id'], 'number': record['number'], 'title': record['title'],
             'attributes': record['attributes'], 'eggGroups': groups, 'rare': bool(record['rare']),
             'search': record['searchText'], 'distribution': record['distribution'],
-            'thumb': artwork.png(thumb, 68, 80),
+            'thumb': artwork.png(thumb, 48, 48),
         }
         detail = {field: record.get(field) for field in DETAIL_FIELDS}
         detail['images'] = {
@@ -214,7 +214,7 @@ def build(output, app_config):
     source_size += sum(file.stat().st_size for file in APP.glob('*') if file.is_file())
     main_size = file_size(output) - sum(sizes) + source_size
     total_size = main_size + sum(sizes)
-    if max([main_size, *sizes]) > PACKAGE_LIMIT or total_size > TOTAL_LIMIT:
+    if max(main_size, max(sizes, default=0)) >= PACKAGE_LIMIT or total_size > TOTAL_LIMIT:
         raise ValueError(f'图鉴超出代码包预算，主包 {main_size:,}、最大分包 {max(sizes):,}、总计 {total_size:,} 字节')
     print(f'生成 {len(cards)} 个精灵形态，主包约 {main_size:,} 字节，{len(sizes)} 个详情分包，合计约 {total_size:,} 字节')
 

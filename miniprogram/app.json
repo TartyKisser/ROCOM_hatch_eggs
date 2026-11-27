@@ -67,6 +67,24 @@
       "pages": [
         "index"
       ]
+    },
+    {
+      "root": "generated/dex-10",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-11",
+      "pages": [
+        "index"
+      ]
+    },
+    {
+      "root": "generated/dex-12",
+      "pages": [
+        "index"
+      ]
     }
   ]
 }
