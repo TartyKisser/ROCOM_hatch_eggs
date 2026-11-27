@@ -88,8 +88,10 @@ function Profile({ record }) {
 }
 
 function ItemImages({ record }) {
-  const [kind, setKind] = useState('egg')
+  const [selectedKind, setKind] = useState('egg')
   const [appearance, setAppearance] = useState('normal')
+  const hasEgg = record.hasEgg !== false
+  const kind = hasEgg ? selectedKind : 'fruit'
   const isEgg = kind === 'egg'
   const isShiny = isEgg && appearance === 'shiny'
   const imageLabel = isShiny ? '异色蛋' : isEgg ? '精灵蛋' : '精灵果实'
@@ -97,11 +99,15 @@ function ItemImages({ record }) {
 
   return (
     <DetailSection title="精灵蛋与精灵果实" className="dex-items-section">
-      <ChoiceBar label="图片类别" value={kind} choices={imageChoices} onChange={setKind} />
-      <div className="dex-item-preview">
-        <AssetImage src={path} alt={`${record.title} ${imageLabel}`} width="104" height="104" loading="lazy"
-          fallback={<p className="dex-placeholder" role="status">暂无{imageLabel}图片</p>} />
-      </div>
+      {hasEgg
+        ? <ChoiceBar label="图片类别" value={kind} choices={imageChoices} onChange={setKind} />
+        : <p className="dex-placeholder">没有精灵蛋</p>}
+      {(hasEgg || path) && (
+        <div className="dex-item-preview">
+          <AssetImage src={path} alt={`${record.title} ${imageLabel}`} width="104" height="104" loading="lazy"
+            fallback={<p className="dex-placeholder" role="status">暂无{imageLabel}图片</p>} />
+        </div>
+      )}
       {isEgg && record['icon-egg-rare'] && (
         <ChoiceBar label="精灵蛋外观" value={appearance} choices={appearanceChoices} onChange={setAppearance} />
       )}
@@ -154,14 +160,18 @@ function Overview({ record, byId }) {
       <Evolution record={record} byId={byId} />
       <DetailSection title="分布">
         <p className="dex-prose">{valueOr(record.distribution, '暂无分布资料。')}</p>
-        <Divider className="dex-section-divider" />
-        <h3 className="dex-subheading">精灵蛋尺寸</h3>
-        {eggSize ? (
-          <Measures items={[
-            ['蛋身高', rangeText(eggSize.heightMin, eggSize.heightMax, 'm')],
-            ['蛋体重', rangeText(eggSize.weightMin, eggSize.weightMax, 'kg')],
-          ]} />
-        ) : <p className="dex-placeholder">暂无精灵蛋尺寸资料。</p>}
+        {record.hasEgg !== false && (
+          <>
+            <Divider className="dex-section-divider" />
+            <h3 className="dex-subheading">精灵蛋尺寸</h3>
+            {eggSize ? (
+              <Measures items={[
+                ['蛋身高', rangeText(eggSize.heightMin, eggSize.heightMax, 'm')],
+                ['蛋体重', rangeText(eggSize.weightMin, eggSize.weightMax, 'kg')],
+              ]} />
+            ) : <p className="dex-placeholder">暂无精灵蛋尺寸资料。</p>}
+          </>
+        )}
       </DetailSection>
       <DetailSection title="能力值">
         <dl className="dex-stats" style={affinityStyle(record)}>

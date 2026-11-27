@@ -53,6 +53,8 @@ def export_records(records):
             'thumb': existing_image(thumb),
         }
         detail = {field: record.get(field) for field in DETAIL_FIELDS}
+        if record.get('hasEgg') is False:
+            detail['hasEgg'] = False
         detail['images'] = {
             'portrait': existing_image(record['portrait']),
             'shiny': existing_image(record.get('rarePath')) if record['rare'] else '',

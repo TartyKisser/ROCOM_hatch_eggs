@@ -10,8 +10,9 @@
         "光"
       ],
       "portrait": "sprite_imgs/portrait/001-迪莫-portrait.png",
-      "icon-egg": "sprite_imgs/icon-egg/001-迪莫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/001-迪莫-icon-fruit.png",
+      "hasEgg": false,
+      "icon-egg": "",
+      "icon-fruit": "",
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -773,8 +774,9 @@
         "光"
       ],
       "portrait": "sprite_imgs/portrait/001-圣光迪莫-portrait.png",
-      "icon-egg": "sprite_imgs/icon-egg/001-圣光迪莫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/001-圣光迪莫-icon-fruit.png",
+      "hasEgg": false,
+      "icon-egg": "",
+      "icon-fruit": "",
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -1537,8 +1539,9 @@
         "水"
       ],
       "portrait": "sprite_imgs/portrait/001-圣水迪莫-portrait.png",
-      "icon-egg": "sprite_imgs/icon-egg/001-圣水迪莫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/001-圣水迪莫-icon-fruit.png",
+      "hasEgg": false,
+      "icon-egg": "",
+      "icon-fruit": "",
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -2301,8 +2304,9 @@
         "火"
       ],
       "portrait": "sprite_imgs/portrait/001-圣火迪莫-portrait.png",
-      "icon-egg": "sprite_imgs/icon-egg/001-圣火迪莫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/001-圣火迪莫-icon-fruit.png",
+      "hasEgg": false,
+      "icon-egg": "",
+      "icon-fruit": "",
       "rare": false,
       "rarePath": "",
       "stats": {
@@ -3065,8 +3069,9 @@
         "草"
       ],
       "portrait": "sprite_imgs/portrait/001-圣草迪莫-portrait.png",
-      "icon-egg": "sprite_imgs/icon-egg/001-圣草迪莫-icon-egg.png",
-      "icon-fruit": "sprite_imgs/icon-fruit/001-圣草迪莫-icon-fruit.png",
+      "hasEgg": false,
+      "icon-egg": "",
+      "icon-fruit": "",
       "rare": false,
       "rarePath": "",
       "stats": {

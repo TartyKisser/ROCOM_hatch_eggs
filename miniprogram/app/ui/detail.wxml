@@ -53,10 +53,10 @@
       </view>
 
       <view class="panel section">
-        <view class="item-layout">
+        <view wx:if="{{record.hasEgg || record.images.fruit}}" class="item-layout">
           <view class="item-options">
-            <text class="section-title">精灵蛋与果实</text>
-            <view class="choices">
+            <text class="section-title">{{record.hasEgg ? '精灵蛋与果实' : '精灵果实'}}</text>
+            <view wx:if="{{record.hasEgg}}" class="choices">
               <button class="button {{itemKind === 'egg' ? 'button-selected' : ''}}" hover-class="pressed" data-kind="egg" bindtap="selectItem">精灵蛋</button>
               <button class="button {{itemKind === 'fruit' ? 'button-selected' : ''}}" hover-class="pressed" data-kind="fruit" bindtap="selectItem">精灵果实</button>
             </view>
@@ -70,6 +70,8 @@
             <text wx:else>暂无图片</text>
           </view>
         </view>
+        <text wx:else class="section-title">精灵蛋与果实</text>
+        <text wx:if="{{!record.hasEgg}}" class="muted">没有精灵蛋</text>
         <view wx:if="{{record.eggMeasures.length}}" class="measurements">
           <view wx:for="{{record.eggMeasures}}" wx:key="label" class="measure"><text>{{item.label}}</text><text>{{item.value}}</text></view>
         </view>

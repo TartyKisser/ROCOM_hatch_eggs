@@ -99,6 +99,8 @@ function createDetailPage(bundle) {
       this.catalogue = catalogue
       this.detail = detail
       const { stats, eggSize, research } = detail
+      const hasEgg = detail.hasEgg !== false
+      const itemKind = hasEgg ? 'egg' : 'fruit'
       const images = bundle ? detail.images : {
         portrait: detail.portrait,
         shiny: detail.rare ? detail.rarePath : '',
@@ -110,6 +112,7 @@ function createDetailPage(bundle) {
       const record = {
         ...card,
         images: imagePaths,
+        hasEgg,
         groups: card.eggGroups.join(' / ') || '不可繁殖',
         gender: valueOr(detail.genderRatio),
         description: valueOr(detail.description, '暂无简介。'),
@@ -126,7 +129,7 @@ function createDetailPage(bundle) {
         starlight: valueOr(detail.baseStarlightValue),
         rockCoin: valueOr(detail.baseReviewRockCoin),
         distribution: valueOr(detail.distribution, '暂无分布资料。'),
-        eggMeasures: eggSize ? [
+        eggMeasures: hasEgg && eggSize ? [
           { label: '蛋身高', value: range(eggSize.heightMin, eggSize.heightMax, 'm') },
           { label: '蛋体重', value: range(eggSize.weightMin, eggSize.weightMax, 'kg') },
         ] : [],
@@ -138,7 +141,14 @@ function createDetailPage(bundle) {
         tasks: items(research?.tasks).map((task, key) => ({ key, name: valueOr(task.name, '-') })),
         url: detail.url || '',
       }
-      this.setData({ record, loading: false, portrait: imagePaths.portrait || card.thumb, itemImage: imagePaths.egg })
+      this.setData({
+        record,
+        loading: false,
+        portrait: imagePaths.portrait || card.thumb,
+        itemKind,
+        itemLabel: hasEgg ? '精灵蛋' : '精灵果实',
+        itemImage: imagePaths[itemKind],
+      })
       wx.setNavigationBarTitle({ title: card.title })
       return true
     },
@@ -175,8 +185,9 @@ function createDetailPage(bundle) {
     },
 
     updateItem(kind, shinyEgg) {
-      const { images } = this.data.record
+      const { hasEgg, images } = this.data.record
       const isFruit = kind === 'fruit'
+      if (!isFruit && !hasEgg) return
       const appearance = shinyEgg && Boolean(images.shinyEgg)
       this.setData({
         itemKind: kind,
